@@ -1,0 +1,400 @@
+.pageWrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.header {
+  margin-bottom: 28px;
+}
+
+.backLink {
+  display: inline-block;
+  color: var(--primary, #166534);
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.header p {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.searchCard {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #cbd5e1;
+  margin-bottom: 30px;
+}
+
+.searchRow {
+  display: flex;
+  gap: 12px;
+}
+
+.searchInput {
+  flex-grow: 1;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.searchBtn {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.searchBtn:hover {
+  background: #1e293b;
+}
+
+.errorAlert {
+  padding: 14px 18px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.loadingBox {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.reportCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.reportHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.ticketIdTag {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--primary, #166534);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.cowConditionTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.assignedOrgCard {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.assignedOrgHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.assignedBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #166534;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.assignedOrgName {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 4px 0 2px 0;
+}
+
+.assignedOrgLoc {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0;
+}
+
+.btnSupportRescue {
+  background: #166534;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.2);
+}
+
+.btnSupportRescue:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.detailItem {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.detailItem strong {
+  display: block;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+
+.descriptionBox {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.descriptionBox strong {
+  display: block;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.descriptionBox p {
+  margin: 0;
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.photoBox {
+  margin-bottom: 24px;
+}
+
+.photoImg {
+  max-width: 320px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+}
+
+.certCardSection {
+  background: #fffdfa;
+  border: 1px solid #fef08a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 28px;
+}
+
+.certCardTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #854d0e;
+  margin: 0 0 4px 0;
+}
+
+.certCardSub {
+  font-size: 0.85rem;
+  color: #a16207;
+  margin: 0 0 16px 0;
+}
+
+.certList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.certItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #fef08a;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.certRecipient {
+  font-size: 1rem;
+  color: #0f172a;
+  display: block;
+}
+
+.certTypeTag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #166534;
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 8px;
+}
+
+.certCode {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.btnViewCertLink {
+  background: #166534;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.btnViewCertLink:hover {
+  background: #15803d;
+}
+
+.timelineSection {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.timelineTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.emptyTimeline {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.timelineList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.timelineList::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: #cbd5e1;
+}
+
+.timelineItem {
+  position: relative;
+}
+
+.timelineDot {
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--primary, #166534);
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 1px #cbd5e1;
+}
+
+.timelineContent {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.timelineTime {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.timelineNote {
+  margin: 6px 0 0 0;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+@media (max-width: 640px) {
+  .searchRow {
+    flex-direction: column;
+  }
+  .searchBtn {
+    width: 100%;
+  }
+}

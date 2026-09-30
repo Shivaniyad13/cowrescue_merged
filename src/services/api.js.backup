@@ -1,0 +1,804 @@
+const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const cleanBaseUrl = rawApiUrl.replace(/\/+$/, "").replace(/\/api$/, "");
+const API_BASE_URL = `${cleanBaseUrl}/api`;
+
+export const getUploadUrl = (path) => {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${cleanBaseUrl}${path}`;
+};
+
+export const submitContact = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/contact`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to submit contact message.");
+  }
+  return result;
+};
+
+export const submitDonation = async (formData) => {
+  const response = await fetch(`${API_BASE_URL}/donations`, {
+    method: "POST",
+    body: formData, // FormData contains text fields + paymentScreenshot file
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to submit donation.");
+  }
+  return result;
+};
+
+export const createDonationOrder = async (donationData) => {
+  const response = await fetch(`${API_BASE_URL}/donations/create-order`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(donationData),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to create payment order.");
+  }
+  return result;
+};
+
+export const verifyDonationOrder = async (verifyData) => {
+  const response = await fetch(`${API_BASE_URL}/donations/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(verifyData),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to verify payment.");
+  }
+  return result;
+};
+
+export const adminLogin = async (credentials) => {
+  const response = await fetch(`${API_BASE_URL}/admin/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Admin login failed.");
+  }
+  return result;
+};
+
+export const getAdminDonations = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/admin/donations`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch donation records.");
+  }
+  return result;
+};
+
+export const updateAdminDonationStatus = async (token, id, statusData) => {
+  const response = await fetch(`${API_BASE_URL}/admin/donations/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(statusData),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to update donation status.");
+  }
+  return result;
+};
+
+export const getAdminContacts = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/admin/contacts`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch contact messages.");
+  }
+  return result;
+};
+
+export const updateAdminContactStatus = async (token, id, status) => {
+  const response = await fetch(`${API_BASE_URL}/admin/contacts/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to update contact status.");
+  }
+  return result;
+};
+
+// -------------------------------------------------------------
+// COW RESCUE & GAUSHALA NETWORK APIs (Phase 1)
+// -------------------------------------------------------------
+export const submitOrgRegistration = async (formData) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/organizations/register`, {
+    method: "POST",
+    body: formData, // FormData contains text fields + upload files
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to submit organization registration.");
+  }
+  return result;
+};
+
+export const submitRescueReport = async (formData) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/reports`, {
+    method: "POST",
+    body: formData, // FormData contains text fields + incidentPhoto file
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to submit rescue report.");
+  }
+  return result;
+};
+
+export const getRescueReportTrack = async (ticketId) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/reports/${ticketId}`);
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch report tracking info.");
+  }
+  return result;
+};
+
+export const getAdminOrganizations = async (token, status = "ALL") => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations?status=${status}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch organization applications.");
+  }
+  return result;
+};
+
+export const getAdminOrgDetails = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch organization details.");
+  }
+  return result;
+};
+
+export const approveAdminOrg = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/approve`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to approve organization.");
+  }
+  return result;
+};
+
+export const rejectAdminOrg = async (token, id, rejectionReason) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/reject`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ rejectionReason }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to reject organization.");
+  }
+  return result;
+};
+
+export const deactivateAdminOrg = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/deactivate`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to deactivate organization.");
+  }
+  return result;
+};
+
+export const activateAdminOrg = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/activate`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to activate organization.");
+  }
+  return result;
+};
+
+// -------------------------------------------------------------
+// GAUSHALA / NGO PORTAL APIs (Phase 2)
+// -------------------------------------------------------------
+export const orgLogin = async (credentials) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Organization login failed.");
+  }
+  return result;
+};
+
+export const requestOrgPasswordReset = async (email) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to request password reset.");
+  }
+  return result;
+};
+
+export const resetOrgPassword = async (payload) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to reset password.");
+  }
+  return result;
+};
+
+export const changeOrgPassword = async (token, payload) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/change-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to change password.");
+  }
+  return result;
+};
+
+export const getOrgDashboard = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/dashboard`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch organization dashboard data.");
+  }
+  return result;
+};
+
+export const acceptOrgAssignment = async (token, assignmentId) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/assignments/${assignmentId}/accept`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to accept rescue request.");
+  }
+  return result;
+};
+
+export const declineOrgAssignment = async (token, assignmentId, declineReason) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/assignments/${assignmentId}/decline`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ declineReason }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to decline rescue request.");
+  }
+  return result;
+};
+
+export const updateOrgRescueStatus = async (token, ticketId, statusData) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/reports/${ticketId}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(statusData),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to update rescue report status.");
+  }
+  return result;
+};
+
+export const getOrgNotifications = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/notifications`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch organization notifications.");
+  }
+  return result;
+};
+
+export const updateOrgProfile = async (token, profileData) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/profile`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(profileData),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to update organization profile.");
+  }
+  return result;
+};
+
+export const updateOrgBankDetails = async (token, formData) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/bank-details`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData, // FormData contains text fields + bankProof file
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to submit bank details.");
+  }
+  return result;
+};
+
+export const verifyAdminOrgBankDetails = async (token, id, statusOrData, note = "") => {
+  const payload = typeof statusOrData === "object" ? statusOrData : { status: statusOrData, note };
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/bank-details/verify`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to verify bank details.");
+  }
+  return result;
+};
+
+export const getAdminOrgRouteStatus = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/razorpay-route/status`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const result = await response.json();
+  return result;
+};
+
+export const createAdminOrgRouteAccount = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/razorpay-route/create`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Payment Gateway vendor onboarding failed.");
+  }
+  return result;
+};
+
+export const syncAdminOrgRouteAccount = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/organizations/${id}/razorpay-route/sync`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to sync Payment Gateway vendor status.");
+  }
+  return result;
+};
+
+
+// -------------------------------------------------------------
+// ADMIN RESCUE OVERSIGHT APIs (Phase 3)
+// -------------------------------------------------------------
+export const getAdminRescueReports = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/reports`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch admin rescue reports.");
+  }
+  return result;
+};
+
+export const getReportAssignmentsHistory = async (token, reportId) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/reports/${reportId}/assignments`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch report dispatch history.");
+  }
+  return result;
+};
+
+export const manualAdminAssignOrg = async (token, reportId, data) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/reports/${reportId}/assign`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to manually assign organization to report.");
+  }
+  return result;
+};
+
+// -------------------------------------------------------------
+// CASE-SPECIFIC CONTRIBUTION APIs (Phase 4C)
+// -------------------------------------------------------------
+export const createCaseContributionOrder = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/contributions/create-order`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to create case contribution order.");
+  }
+  return result;
+};
+
+export const verifyCaseContribution = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/contributions/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to verify case contribution payment.");
+  }
+  return result;
+};
+
+export const getCaseContributionsSummary = async (ticketId) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/contributions/case/${ticketId}`);
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch case contributions summary.");
+  }
+  return result;
+};
+
+// -------------------------------------------------------------
+// CERTIFICATE & IMPACT APIs (Phase 4D)
+// -------------------------------------------------------------
+export const getPublicCertificateVerification = async (certificateId) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/certificates/verify/${certificateId}`);
+  const result = await response.json();
+  return result; // return full result object to handle VERIFIED, REVOKED, and NOT_FOUND statuses gracefully
+};
+
+export const getCertificateDetails = async (certificateId) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/certificates/details/${certificateId}`);
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch certificate details.");
+  }
+  return result;
+};
+
+export const getCertificatesByTicket = async (ticketId) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/certificates/ticket/${ticketId}`);
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch ticket certificates.");
+  }
+  return result;
+};
+
+export const claimUserCertificates = async (data) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/certificates/claim-lookup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to lookup user certificates.");
+  }
+  return result;
+};
+
+export const getAdminCertificates = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/certificates`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch admin certificates.");
+  }
+  return result;
+};
+
+export const revokeAdminCertificate = async (token, id, reason) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/certificates/${id}/revoke`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ reason }),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to revoke certificate.");
+  }
+  return result;
+};
+
+// -------------------------------------------------------------
+// FINANCIAL LEDGER & SETTLEMENT APIs (Phase 4E)
+// -------------------------------------------------------------
+export const getAdminFinancialSummary = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/summary`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch financial summary.");
+  return result;
+};
+
+export const getAdminFinancialContributions = async (token, status = "ALL", search = "") => {
+  const query = new URLSearchParams({ status, search }).toString();
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/contributions?${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch financial contributions.");
+  return result;
+};
+
+export const createAdminAllocation = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/contributions/${id}/allocate`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to create allocation.");
+  return result;
+};
+
+export const approveAdminAllocation = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/allocations/${id}/approve`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to approve allocation.");
+  return result;
+};
+
+export const recordAdminSettlement = async (token, id, data) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/allocations/${id}/settle`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to record settlement.");
+  return result;
+};
+
+export const updateAdminContributionStatus = async (token, id, data) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/contributions/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to update contribution status.");
+  return result;
+};
+
+export const getAdminSettlementPolicies = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/policies`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch settlement policies.");
+  return result;
+};
+
+export const createAdminSettlementPolicy = async (token, data) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/policies`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to create settlement policy.");
+  return result;
+};
+
+export const activateAdminSettlementPolicy = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/policies/${id}/activate`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to activate settlement policy.");
+  return result;
+};
+
+export const getAdminFinancialAuditLogs = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/admin/financials/audit-logs`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch financial audit logs.");
+  return result;
+};
+
+export const getOrgFinancialSummary = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/org/financials`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch organization financials.");
+  return result;
+};
+
+
+
+
+
+

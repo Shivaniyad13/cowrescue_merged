@@ -1,0 +1,505 @@
+.footer {
+  background: var(--color-primary-dark);
+  color: var(--color-gray-100);
+  margin-top: auto;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* =========================
+   MAIN FOOTER CONTAINER
+========================= */
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--container-padding);
+
+  display: grid;
+
+  grid-template-columns: 2fr 1fr 1fr 1.1fr 1fr 1.3fr;
+
+  gap: var(--spacing-xl);
+}
+
+/* =========================
+   BRAND
+========================= */
+
+.brand {
+  grid-column: span 1;
+}
+
+.logo {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.brandName {
+  font-size: var(--font-size-xl);
+  color: var(--color-white);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 700;
+}
+
+.brandDesc {
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--color-gray-300);
+  max-width: 300px;
+}
+
+/* Brand Impact Tag */
+
+.impactTag {
+  margin-top: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  font-size: 0.8rem;
+  color: var(--color-secondary-light);
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(217, 194, 140, 0.2);
+  border-radius: 30px;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+.linksGroup h4 {
+  font-size: var(--font-size-md);
+  color: var(--color-white);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.linksGroup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.linksGroup li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.linksGroup a {
+  color: var(--color-gray-300);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+}
+
+.linksGroup a:hover {
+  color: var(--color-secondary-light);
+  padding-left: 4px;
+}
+
+/* =========================
+   CONNECT SECTION
+========================= */
+
+.connectSection {
+  grid-column: 1 / 2;
+}
+
+.connectSection h4 {
+  font-size: var(--font-size-md);
+  color: var(--color-white);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.orgAddressFooter {
+  font-size: 0.85rem;
+  color: var(--color-gray-300);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.orgAddressFooter strong {
+  color: var(--color-white);
+  font-size: 0.88rem;
+}
+
+.contactInfo a {
+  color: var(--color-gray-300);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: color var(--transition-fast);
+}
+
+.contactInfo a:hover {
+  color: var(--color-secondary-light);
+}
+
+/* =========================
+   SOCIAL ICONS
+========================= */
+
+.socialIcons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.socialIcons a {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+
+  color: #ffffff;
+  font-size: 18px;
+
+  text-decoration: none;
+
+  transition: all 0.3s ease;
+}
+
+.socialIcons a:hover {
+  transform: translateY(-4px);
+  background: var(--color-secondary-light);
+  color: var(--color-primary-dark);
+}
+
+/* =========================
+   MODERN CTA SECTION
+========================= */
+
+.ctaSection {
+  grid-column: 2 / -1;
+
+  display: flex;
+  align-items: center;
+  gap: 28px;
+
+  padding: 38px 45px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(217, 194, 140, 0.16),
+    rgba(255, 255, 255, 0.04)
+  );
+
+  border: 1px solid rgba(217, 194, 140, 0.25);
+  border-radius: 22px;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative circle */
+
+.ctaSection::before {
+  content: "";
+  position: absolute;
+
+  width: 260px;
+  height: 260px;
+
+  border-radius: 50%;
+
+  background: rgba(217, 194, 140, 0.08);
+
+  right: -100px;
+  top: -120px;
+}
+
+.ctaIcon {
+  width: 70px;
+  height: 70px;
+  min-width: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;
+
+  font-size: 28px;
+
+  color: var(--color-primary-dark);
+  background: var(--color-secondary-light);
+
+  position: relative;
+  z-index: 1;
+}
+
+.ctaContent {
+  position: relative;
+  z-index: 1;
+}
+
+.ctaLabel {
+  display: block;
+
+  color: var(--color-secondary-light);
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 8px;
+}
+
+.ctaContent h3 {
+  font-size: 1.7rem;
+  margin: 0 0 10px;
+  color: var(--color-white);
+}
+
+.ctaContent p {
+  margin: 0;
+
+  max-width: 650px;
+
+  color: var(--color-gray-300);
+
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+/* =========================
+   CTA BUTTONS
+========================= */
+
+.ctaButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+
+  margin-top: 22px;
+}
+
+.donateButton,
+.partnerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 13px 20px;
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  transition: all 0.3s ease;
+}
+
+.donateButton {
+  background: var(--color-secondary-light);
+  color: var(--color-primary-dark);
+}
+
+.donateButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(217, 194, 140, 0.25);
+}
+
+.partnerButton {
+  color: var(--color-white);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.partnerButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-3px);
+}
+
+/* =========================
+   BOTTOM BAR
+========================= */
+
+.bottomBar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-md) 0;
+}
+
+.bottomBar .container,
+.bottomContainer {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 var(--container-padding);
+
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+
+  gap: var(--spacing-md);
+}
+
+.bottomLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 12px;
+}
+
+.bottomLinks span {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.8rem;
+}
+
+.bottomBar a {
+  color: var(--color-gray-400);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.bottomBar a:hover {
+  color: var(--color-secondary-light);
+}
+
+/* =========================
+   TABLET RESPONSIVE
+========================= */
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+  }
+
+  .brand {
+    grid-column: span 3;
+  }
+
+  .brandDesc {
+    max-width: 100%;
+  }
+
+  .connectSection {
+    grid-column: auto;
+  }
+
+  .ctaSection {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .brand {
+    grid-column: span 2;
+  }
+
+  .connectSection {
+    grid-column: span 2;
+  }
+
+  .ctaSection {
+    grid-column: 1 / -1;
+
+    flex-direction: column;
+    align-items: flex-start;
+
+    padding: 30px 25px;
+    gap: 20px;
+  }
+
+  .ctaContent h3 {
+    font-size: 1.45rem;
+  }
+
+  .bottomBar .container,
+  .bottomContainer {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .bottomLinks {
+    justify-content: center;
+    gap: 6px 10px;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 480px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .brand {
+    grid-column: span 1;
+  }
+
+  .connectSection {
+    grid-column: span 1;
+  }
+
+  .ctaSection {
+    padding: 25px 20px;
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .donateButton,
+  .partnerButton {
+    width: 100%;
+  }
+
+  .socialIcons {
+    flex-wrap: wrap;
+  }
+
+  .bottomBar .container,
+  .bottomContainer {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .bottomLinks {
+    justify-content: center;
+    gap: 6px 8px;
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,724 @@
+/* =========================================
+   PAGE
+========================================= */
+
+.pageWrapper {
+  min-height: 100vh;
+  background: #f8f8f5;
+  color: #1f2933;
+  overflow-x: hidden;
+}
+
+.container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+
+/* =========================================
+   HERO SECTION
+========================================= */
+
+.heroSection {
+  padding: 90px 0 75px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(75, 115, 63, 0.12),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #f7faf5 0%,
+      #eef4ea 100%
+    );
+  text-align: center;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 18px;
+
+  border: 1px solid rgba(69, 104, 57, 0.2);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.7);
+
+  color: #4b733f;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  margin-bottom: 20px;
+}
+
+.heroTitle {
+  margin: 0;
+
+  font-size: clamp(2.5rem, 5vw, 4.8rem);
+  line-height: 1.05;
+
+  font-weight: 800;
+
+  color: #20351c;
+}
+
+.heroSubhead {
+  max-width: 650px;
+
+  margin: 22px auto 0;
+
+  font-size: 1.08rem;
+  line-height: 1.8;
+
+  color: #667066;
+}
+
+
+/* =========================================
+   FEATURED VIDEO
+========================================= */
+
+.featuredSection {
+  padding: 80px 0;
+}
+
+.featuredCard {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+
+  align-items: center;
+
+  background: #ffffff;
+
+  border-radius: 28px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 15px 50px rgba(29, 47, 25, 0.08);
+}
+
+.featuredVideoWrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 390px;
+
+  background: #000;
+}
+
+.featuredVideo {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.featuredContent {
+  padding: 50px;
+}
+
+.featuredTag {
+  display: inline-block;
+
+  margin-bottom: 18px;
+
+  padding: 7px 14px;
+
+  border-radius: 999px;
+
+  background: #edf5e8;
+
+  color: #4a733f;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.featuredTitle {
+  margin: 0;
+
+  color: #263a22;
+
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  line-height: 1.2;
+}
+
+.featuredDesc {
+  margin: 22px 0 0;
+
+  color: #687267;
+
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+
+/* =========================================
+   VIDEO SECTION
+========================================= */
+
+.section {
+  padding: 30px 0 100px;
+}
+
+
+/* =========================================
+   FILTER BAR
+========================================= */
+
+.filterBar {
+  display: flex;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-bottom: 45px;
+}
+
+.filterBtn {
+  border: 1px solid #d9e1d5;
+
+  background: #ffffff;
+
+  color: #52604e;
+
+  padding: 11px 20px;
+
+  border-radius: 999px;
+
+  font-size: 0.92rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.filterBtn:hover {
+  transform: translateY(-2px);
+
+  border-color: #5b8b4d;
+
+  color: #426d37;
+}
+
+.filterBtnActive {
+  background: #4b733f;
+
+  border-color: #4b733f;
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 20px rgba(75, 115, 63, 0.22);
+}
+
+
+/* =========================================
+   VIDEO GRID
+========================================= */
+
+.videosGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 26px;
+}
+
+
+/* =========================================
+   VIDEO CARD
+========================================= */
+
+.videoCard {
+  position: relative;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  background: #111;
+
+  cursor: pointer;
+
+  aspect-ratio: 16 / 10;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08);
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.videoCard:hover {
+  transform: translateY(-8px);
+
+  box-shadow:
+    0 22px 45px rgba(0, 0, 0, 0.16);
+}
+
+
+/* =========================================
+   VIDEO PREVIEW
+========================================= */
+
+.videoPreview {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  background: #000;
+}
+
+.cardVideo {
+  width: 100%;
+  height: 100%;
+
+  border: none;
+
+  display: block;
+
+  object-fit: cover;
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   PLAY OVERLAY
+========================================= */
+
+.playOverlay {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.18),
+      rgba(0, 0, 0, 0.02)
+    );
+
+  transition:
+    background 0.3s ease;
+}
+
+.videoCard:hover .playOverlay {
+  background:
+    rgba(0, 0, 0, 0.25);
+}
+
+.playBtnIcon {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding-left: 4px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.94);
+
+  color: #456f3b;
+
+  font-size: 1.35rem;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.25);
+
+  transform:
+    scale(0.92);
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+
+.videoCard:hover .playBtnIcon {
+  transform: scale(1.08);
+
+  background: #ffffff;
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.emptyState {
+  text-align: center;
+
+  padding: 60px 20px;
+
+  color: #7a8378;
+}
+
+
+/* =========================================
+   VIDEO MODAL
+========================================= */
+
+.videoModal {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  background:
+    rgba(8, 12, 8, 0.82);
+
+  backdrop-filter:
+    blur(8px);
+
+  animation:
+    modalFade 0.25s ease;
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.videoModalContent {
+  position: relative;
+
+  width: min(100%, 1000px);
+
+  max-height: 90vh;
+
+  border-radius: 22px;
+
+  overflow: hidden;
+
+  background: #000;
+
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.45);
+
+  animation:
+    modalScale 0.3s ease;
+}
+
+@keyframes modalScale {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.94) translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1) translateY(0);
+  }
+}
+
+.modalVideo {
+  display: block;
+
+  width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  border: none;
+
+  background: #000;
+}
+
+
+/* =========================================
+   INSTAGRAM MODAL
+========================================= */
+
+.instagramModal {
+  display: block;
+
+  width: 100%;
+
+  min-height: 75vh;
+
+  border: none;
+
+  background: #ffffff;
+}
+
+
+/* =========================================
+   CLOSE BUTTON
+========================================= */
+
+.closeModalBtn {
+  position: absolute;
+
+  top: 14px;
+  right: 14px;
+
+  z-index: 10;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(0, 0, 0, 0.65);
+
+  color: #ffffff;
+
+  font-size: 1.2rem;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+
+.closeModalBtn:hover {
+  transform: rotate(90deg);
+
+  background:
+    rgba(75, 115, 63, 0.95);
+}
+
+
+/* =========================================
+   FOOTER CTA
+========================================= */
+
+.footerCtaSection {
+  padding: 85px 0;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #365f2d,
+      #23471d
+    );
+}
+
+.footerCtaTitle {
+  margin: 0 0 28px;
+
+  color: #ffffff;
+
+  font-size:
+    clamp(1.8rem, 4vw, 3rem);
+}
+
+.ctaBtn {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 14px 28px;
+
+  border-radius: 999px;
+
+  background: #ffffff;
+
+  color: #365f2d;
+
+  text-decoration: none;
+
+  font-weight: 700;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.ctaBtn:hover {
+  transform:
+    translateY(-3px);
+
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+  .featuredCard {
+    grid-template-columns: 1fr;
+  }
+
+  .featuredVideoWrapper {
+    min-height: 360px;
+  }
+
+  .videosGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .featuredContent {
+    padding: 38px;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .container {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .heroSection {
+    padding: 70px 0 60px;
+  }
+
+  .featuredSection {
+    padding: 55px 0;
+  }
+
+  .featuredCard {
+    border-radius: 20px;
+  }
+
+  .featuredVideoWrapper {
+    min-height: 240px;
+  }
+
+  .featuredContent {
+    padding: 28px 22px 32px;
+  }
+
+  .section {
+    padding: 20px 0 70px;
+  }
+
+  .filterBar {
+    justify-content: flex-start;
+
+    flex-wrap: nowrap;
+
+    overflow-x: auto;
+
+    padding-bottom: 8px;
+
+    margin-bottom: 30px;
+
+    scrollbar-width: none;
+  }
+
+  .filterBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filterBtn {
+    flex-shrink: 0;
+
+    padding: 10px 17px;
+  }
+
+  .videosGrid {
+    grid-template-columns: 1fr;
+
+    gap: 20px;
+  }
+
+  .videoCard {
+    border-radius: 17px;
+  }
+
+  .playBtnIcon {
+    width: 56px;
+    height: 56px;
+
+    font-size: 1.1rem;
+  }
+
+  .videoModal {
+    padding: 15px;
+  }
+
+  .videoModalContent {
+    border-radius: 16px;
+  }
+
+  .instagramModal {
+    min-height: 70vh;
+  }
+
+  .closeModalBtn {
+    top: 10px;
+    right: 10px;
+
+    width: 38px;
+    height: 38px;
+  }
+
+  .footerCtaSection {
+    padding: 65px 0;
+  }
+
+}

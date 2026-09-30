@@ -1,0 +1,36 @@
+{
+  "navbar": {
+    "home": "Home",
+    "about": "About",
+    "initiative": "Initiative",
+    "consultation": "Consultation",
+    "gallery": "Gallery",
+    "contact": "Contact",
+    "donation": "Donation",
+    "government": "Government",
+    "ngo": "NGO (Non Government Organization)",
+    "cbo": "CBO (Community Based Organization)",
+    "policies": "Policies",
+    "project": "Project",
+    "products": "Products",
+    "news": "News",
+    "images": "Images",
+    "videos": "Videos"
+  },
+
+  "language": {
+    "english": "English",
+    "hindi": "हिंदी",
+    "select": "Language"
+  },
+
+  "finalCTA": {
+    "ariaLabel": "Final Call to Action",
+    "badge": "Join the Transformation",
+    "title": "From Panchgavya Se Panchparivartan",
+    "description": "Explore our comprehensive programs, governmental partnerships, community initiatives, and collaborative consultation frameworks shaping a self-reliant Bharat.",
+    "missionButton": "Learn About Our Mission",
+    "initiativesButton": "Explore Initiatives",
+    "supportButton": "Support the Cause"
+  }
+}

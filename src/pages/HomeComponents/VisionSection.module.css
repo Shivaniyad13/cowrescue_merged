@@ -1,0 +1,161 @@
+.section {
+  padding: clamp(3.5rem, 7vw, 6rem) 0;
+  background-color: var(--color-background, #fcf9f2);
+  color: var(--color-text, #1e1e1e);
+  position: relative;
+}
+
+.container {
+  max-width: var(--container-max-width, 1200px);
+  margin: 0 auto;
+  padding: 0 var(--container-padding, 1.5rem);
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-primary, #2d5a27);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 800;
+  color: var(--color-primary-dark, #1a3a16);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  color: var(--color-text-light, #4a4a4a);
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.bannerCard {
+  background: linear-gradient(135deg, #1a3a16 0%, #2d5a27 100%);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg, 0 10px 30px rgba(0,0,0,0.12));
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  color: var(--color-white, #ffffff);
+}
+
+.bannerGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+}
+
+.bannerText {
+  padding: clamp(2rem, 4vw, 3.5rem);
+}
+
+.bannerTag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-secondary, #c8a45c);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.bannerHeading {
+  font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+  font-weight: 800;
+  color: var(--color-white, #ffffff);
+  line-height: 1.35;
+  margin-bottom: 1rem;
+}
+
+.bannerParagraph {
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.bannerImageWrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+}
+
+.bannerImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.goalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.goalCard {
+  background: var(--color-white, #ffffff);
+  border: 1px solid rgba(45, 90, 39, 0.12);
+  border-radius: var(--radius-md, 8px);
+  padding: 1.5rem;
+  transition: all var(--transition-fast, 150ms ease);
+  box-shadow: var(--shadow-sm, 0 2px 6px rgba(0,0,0,0.04));
+}
+
+.goalCard:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary, #2d5a27);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.08));
+}
+
+.goalHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.goalBullet {
+  color: var(--color-secondary, #c8a45c);
+  font-size: 1rem;
+}
+
+.goalTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary-dark, #1a3a16);
+}
+
+.goalDesc {
+  font-size: 0.875rem;
+  color: var(--color-text-light, #4a4a4a);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .bannerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bannerImageWrapper {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 640px) {
+  .goalsGrid {
+    grid-template-columns: 1fr;
+  }
+}

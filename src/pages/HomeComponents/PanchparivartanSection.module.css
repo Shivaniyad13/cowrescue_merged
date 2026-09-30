@@ -1,0 +1,763 @@
+/* =========================================================
+   SECTION
+========================================================= */
+
+.section {
+  position: relative;
+  width: 100%;
+  padding: 110px 0 120px;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(45, 90, 39, 0.07),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(200, 164, 92, 0.08),
+      transparent 30%
+    ),
+    #faf9f4;
+
+  color: #193b1c;
+}
+
+/* Decorative background */
+
+.section::before {
+  content: '';
+  position: absolute;
+
+  width: 420px;
+  height: 420px;
+
+  border-radius: 50%;
+
+  top: -220px;
+  right: -150px;
+
+  background: rgba(45, 90, 39, 0.035);
+
+  pointer-events: none;
+}
+
+.section::after {
+  content: '';
+  position: absolute;
+
+  width: 300px;
+  height: 300px;
+
+  border-radius: 50%;
+
+  bottom: -160px;
+  left: -120px;
+
+  background: rgba(200, 164, 92, 0.05);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container {
+  position: relative;
+
+  width: min(1280px, 92%);
+  margin: 0 auto;
+
+  z-index: 2;
+}
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+.intro {
+  max-width: 850px;
+  margin: 0 auto 65px;
+
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 15px;
+
+  border-radius: 30px;
+
+  background: rgba(45, 90, 39, 0.08);
+
+  border: 1px solid rgba(45, 90, 39, 0.12);
+
+  color: #356b35;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 2px;
+}
+
+.title {
+  margin: 18px 0 8px;
+
+  color: #173c1b;
+
+  font-size: clamp(42px, 6vw, 72px);
+
+  line-height: 0.98;
+
+  font-weight: 800;
+
+  letter-spacing: -2px;
+}
+
+.heading {
+  margin: 0 auto 18px;
+
+  color: #c28a35;
+
+  font-size: clamp(20px, 2.5vw, 29px);
+
+  line-height: 1.35;
+
+  font-weight: 600;
+}
+
+.introText {
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  color: #536052;
+
+  font-size: 17px;
+
+  line-height: 1.8;
+}
+
+.divider {
+  width: 70px;
+  height: 3px;
+
+  margin: 28px auto 0;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #356b35,
+      #c28a35
+    );
+}
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 24px;
+
+  align-items: start;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+  position: relative;
+
+  /* Sabhi cards same initial size */
+  height: 440px;
+  min-height: 440px;
+
+  padding: 27px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border:
+    1px solid rgba(45, 90, 39, 0.12);
+
+  border-radius: 24px;
+
+  background:
+    rgba(255, 255, 255, 0.88);
+
+  box-shadow:
+    0 10px 30px rgba(27, 55, 31, 0.055);
+
+  cursor: pointer;
+
+  transition:
+    transform 350ms cubic-bezier(0.16, 1, 0.3, 1),
+    height 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 350ms ease,
+    border-color 350ms ease,
+    background 350ms ease;
+}
+
+/* Sirf active card expand hoga */
+
+.cardActive {
+  height: 700px;
+
+  transform: translateY(-10px);
+
+  border-color:
+    rgba(45, 90, 39, 0.25);
+
+  background: #ffffff;
+
+  box-shadow:
+    0 25px 55px rgba(27, 55, 31, 0.13);
+
+  z-index: 5;
+}
+
+/* Top green line */
+
+.card::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+
+  height: 4px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #315f30,
+      #8ba987
+    );
+
+  transform: scaleX(0.35);
+
+  transform-origin: left;
+
+  transition:
+    transform 400ms ease;
+}
+
+.cardActive::before {
+  transform: scaleX(1);
+}
+
+/* =========================================================
+   CARD TOP
+========================================================= */
+
+.cardTop {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 32px;
+}
+
+.number {
+  color: #cdd5cd;
+
+  font-size: 48px;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: -2px;
+
+  transition:
+    color 300ms ease,
+    transform 300ms ease;
+}
+
+.cardActive .number {
+  color: #315f30;
+
+  transform:
+    translateX(3px);
+}
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 17px;
+
+  background:
+    #f0f4ef;
+
+  color: #315f30;
+
+  transition:
+    background 300ms ease,
+    color 300ms ease,
+    transform 350ms ease;
+}
+
+.icon svg {
+  width: 29px;
+  height: 29px;
+}
+
+.cardActive .icon {
+  background:
+    #315f30;
+
+  color: #ffffff;
+
+  transform:
+    rotate(-4deg)
+    scale(1.06);
+}
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.cardContent {
+  flex: 1;
+
+  min-height: 0;
+}
+
+.cardLabel {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #a87932;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.6px;
+}
+
+.cardTitle {
+  margin: 0 0 7px;
+
+  color: #143b18;
+
+  font-size: 27px;
+
+  line-height: 1.15;
+
+  font-weight: 800;
+
+  letter-spacing: -0.6px;
+}
+
+.cardSubtitle {
+  margin: 0 0 18px;
+
+  color: #bd8738;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  font-weight: 600;
+}
+
+.cardText {
+  margin: 0;
+
+  color: #536052;
+
+  font-size: 15px;
+
+  line-height: 1.7;
+}
+
+/* =========================================================
+   EXPAND CONTENT
+========================================================= */
+
+.expandContent {
+  max-height: 0;
+
+  opacity: 0;
+
+  overflow: hidden;
+
+  transform:
+    translateY(8px);
+
+  margin-top: 0;
+
+  transition:
+    max-height 450ms ease,
+    opacity 300ms ease,
+    transform 350ms ease,
+    margin-top 300ms ease;
+}
+
+.expandContentVisible {
+  max-height: 360px;
+
+  opacity: 1;
+
+  transform:
+    translateY(0);
+
+  margin-top: 20px;
+}
+
+.fullText {
+  margin: 0 0 16px;
+
+  padding-top: 16px;
+
+  border-top:
+    1px solid #e8ebe6;
+
+  color: #5c665c;
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.actionHeading {
+  margin-bottom: 9px;
+
+  color: #315f30;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.2px;
+}
+
+.actionsList {
+  margin: 0;
+
+  padding: 0;
+
+  list-style: none;
+}
+
+.actionsList li {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 8px;
+
+  margin-bottom: 7px;
+
+  color: #586258;
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+.check {
+  flex-shrink: 0;
+
+  color: #a87932;
+
+  font-weight: 800;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.cardFooter {
+  margin-top: 25px;
+
+  padding-top: 17px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-top:
+    1px solid #e8ebe6;
+
+  color: #315f30;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.1px;
+
+  text-transform: uppercase;
+
+  flex-shrink: 0;
+}
+
+.arrow {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f0f4ef;
+
+  font-size: 19px;
+
+  transition:
+    transform 300ms ease,
+    background 300ms ease,
+    color 300ms ease;
+}
+
+.cardActive .arrow {
+  background: #315f30;
+
+  color: #ffffff;
+
+  transform:
+    translateX(4px);
+}
+
+/* =========================================================
+   CLOSING STATEMENT
+========================================================= */
+
+.closing {
+  max-width: 850px;
+
+  margin: 70px auto 0;
+
+  padding: 30px 35px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+
+  border:
+    1px solid rgba(45, 90, 39, 0.12);
+
+  border-radius: 20px;
+
+  background:
+    rgba(255, 255, 255, 0.65);
+}
+
+.closingMark {
+  flex-shrink: 0;
+
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    #315f30;
+
+  color: #ffffff;
+
+  font-size: 20px;
+}
+
+.closing p {
+  margin: 0;
+
+  color: #536052;
+
+  font-size: 14px;
+
+  line-height: 1.75;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1050px) {
+  .grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .section {
+    padding: 75px 0 80px;
+  }
+
+  .container {
+    width: 90%;
+  }
+
+  .intro {
+    margin-bottom: 45px;
+  }
+
+  .title {
+    font-size: 48px;
+
+    letter-spacing: -1.5px;
+  }
+
+  .heading {
+    font-size: 21px;
+  }
+
+  .introText {
+    font-size: 15px;
+
+    line-height: 1.7;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+  .card {
+    height: 420px;
+    min-height: 420px;
+
+    padding: 23px;
+
+    border-radius: 20px;
+  }
+
+  .cardActive {
+    height: 700px;
+  }
+
+  .expandContentVisible {
+    max-height: 500px;
+  }
+
+  .cardTitle {
+    font-size: 24px;
+  }
+
+  .closing {
+    margin-top: 45px;
+
+    padding: 24px;
+
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+  .title {
+    font-size: 40px;
+  }
+
+  .heading {
+    font-size: 19px;
+  }
+
+  .cardTop {
+    margin-bottom: 25px;
+  }
+
+  .number {
+    font-size: 40px;
+  }
+
+  .icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .cardTitle {
+    font-size: 22px;
+  }
+
+  .card {
+    height: 400px;
+    min-height: 400px;
+  }
+
+  .cardActive {
+    height: 720px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::before,
+  .icon,
+  .number,
+  .arrow,
+  .expandContent {
+    transition: none;
+  }
+}

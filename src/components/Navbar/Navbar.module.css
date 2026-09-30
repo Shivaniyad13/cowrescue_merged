@@ -1,0 +1,552 @@
+/* ===================================================
+   NAVBAR — Clean, organized, equal spacing
+   Hover-based dropdowns + Cow Rescue blink
+=================================================== */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--navbar-bg, #ffffff);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: background 0.3s ease;
+}
+
+.navbarContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  gap: 24px;
+}
+
+/* ===== LOGO ===== */
+.logo {
+  flex-shrink: 0;
+}
+
+.logo a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logoImage {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.logoTextWrapper {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.logoText {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #166534;
+  letter-spacing: -0.01em;
+}
+
+.logoSub {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.3px;
+}
+
+/* ===== NAV LINKS ===== */
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.navLinks > li {
+  display: flex;
+  align-items: center;
+}
+
+.navLinks > li > a,
+.dropdownToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #334155;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.navLinks > li > a:hover,
+.dropdownToggle:hover {
+  color: #166534;
+  background: #f1f5f9;
+}
+
+.activeLink {
+  color: #166534 !important;
+  background: #f0fdf4 !important;
+}
+
+/* ===== DROPDOWN ===== */
+.dropdown {
+  position: relative;
+}
+
+/* Invisible hover bridge — mouse gap pe bhi dropdown open rahe */
+.dropdown::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.dropdownToggle .arrow {
+  font-size: 0.6rem;
+  transition: transform 0.25s ease;
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+.dropdownToggle[aria-expanded="true"] .arrow {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  list-style: none;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.22s ease;
+  z-index: 100;
+  border: 1px solid #e2e8f0;
+  pointer-events: none;
+}
+
+.dropdownMenu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdownMenu li {
+  margin: 0;
+}
+
+.dropdownMenu li a {
+  display: block;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.18s ease;
+}
+
+.dropdownMenu li a:hover {
+  background: #f0fdf4;
+  color: #166534;
+  padding-left: 18px;
+}
+
+/* ===================================================
+   COW RESCUE — Subtle text blink only
+=================================================== */
+
+.cowRescueItem {
+  position: relative;
+}
+
+.cowRescueToggle {
+  color: #dc2626 !important;
+  font-weight: 700 !important;
+  animation: cowRescueBlink 2.2s ease-in-out infinite;
+}
+
+.cowRescueToggle:hover {
+  color: #b91c1c !important;
+  background: #fef2f2 !important;
+  animation-play-state: paused;
+}
+
+.cowRescueToggle[aria-expanded="true"] {
+  background: #fef2f2 !important;
+  color: #b91c1c !important;
+  animation-play-state: paused;
+}
+
+@keyframes cowRescueBlink {
+  0%, 100% {
+    color: #dc2626;
+    text-shadow: 0 0 0 rgba(220, 38, 38, 0);
+    transform: scale(1);
+  }
+  50% {
+    color: #ef4444;
+    text-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
+    transform: scale(1.04);
+  }
+}
+
+/* ===== DONATION / SUPPORT BUTTON ===== */
+.donationBtn {
+  display: inline-block;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+  color: #ffffff;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.25);
+}
+
+.donationBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(22, 101, 52, 0.35);
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+}
+
+/* ===== LANGUAGE + THEME TOGGLES ===== */
+.languageItem,
+.themeToggleItem {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.languageSelect {
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.languageSelect:hover {
+  border-color: #166534;
+}
+
+.themeToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.themeToggle:hover {
+  border-color: #166534;
+  background: #f0fdf4;
+}
+
+.themeIcon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ===== HAMBURGER ===== */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburgerLine {
+  width: 24px;
+  height: 2.5px;
+  background: #166534;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+}
+
+/* ===== BACKDROP ===== */
+.backdrop {
+  display: none;
+}
+
+/* ===================================================
+   DARK MODE
+=================================================== */
+:global([data-theme="dark"]) .navbar {
+  background: #0f172a;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+:global([data-theme="dark"]) .logoText {
+  color: #4ade80;
+}
+
+:global([data-theme="dark"]) .logoSub {
+  color: #94a3b8;
+}
+
+:global([data-theme="dark"]) .navLinks > li > a,
+:global([data-theme="dark"]) .dropdownToggle {
+  color: #cbd5e1;
+}
+
+:global([data-theme="dark"]) .navLinks > li > a:hover,
+:global([data-theme="dark"]) .dropdownToggle:hover {
+  color: #4ade80;
+  background: #1e293b;
+}
+
+:global([data-theme="dark"]) .activeLink {
+  color: #4ade80 !important;
+  background: rgba(74, 222, 128, 0.1) !important;
+}
+
+:global([data-theme="dark"]) .dropdownMenu {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:global([data-theme="dark"]) .dropdownMenu li a {
+  color: #cbd5e1;
+}
+
+:global([data-theme="dark"]) .dropdownMenu li a:hover {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
+:global([data-theme="dark"]) .cowRescueToggle {
+  color: #f87171 !important;
+  animation: cowRescueBlinkDark 2.2s ease-in-out infinite;
+}
+
+:global([data-theme="dark"]) .cowRescueToggle:hover {
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: #fca5a5 !important;
+  animation-play-state: paused;
+}
+
+:global([data-theme="dark"]) .cowRescueToggle[aria-expanded="true"] {
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: #fca5a5 !important;
+  animation-play-state: paused;
+}
+
+@keyframes cowRescueBlinkDark {
+  0%, 100% {
+    color: #f87171;
+    text-shadow: 0 0 0 rgba(248, 113, 113, 0);
+    transform: scale(1);
+  }
+  50% {
+    color: #fca5a5;
+    text-shadow: 0 0 14px rgba(248, 113, 113, 0.6);
+    transform: scale(1.04);
+  }
+}
+
+:global([data-theme="dark"]) .languageSelect {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+:global([data-theme="dark"]) .themeToggle {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:global([data-theme="dark"]) .themeToggle:hover {
+  border-color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+:global([data-theme="dark"]) .hamburgerLine {
+  background: #4ade80;
+}
+
+/* ===================================================
+   MOBILE / RESPONSIVE
+=================================================== */
+@media (max-width: 1100px) {
+  .navbarContainer {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .navLinks > li > a,
+  .dropdownToggle {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .hamburger {
+    display: flex;
+    order: 3;
+  }
+
+  .navLinks {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    background: #ffffff;
+    padding: 16px;
+    margin: 0;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .navLinks.active {
+    transform: translateX(0);
+  }
+
+  .navLinks > li {
+    width: 100%;
+  }
+
+  .navLinks > li > a,
+  .dropdownToggle {
+    width: 100%;
+    padding: 12px 16px;
+    justify-content: space-between;
+    font-size: 0.95rem;
+  }
+
+  /* Mobile pe dropdown bridge hatao */
+  .dropdown::after {
+    display: none;
+  }
+
+  .dropdownMenu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    background: #f8fafc;
+    margin-top: 4px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 6px;
+    pointer-events: auto;
+  }
+
+  .dropdownMenu.open {
+    max-height: 400px;
+    padding: 6px;
+  }
+
+  .dropdownMenu li a {
+    padding: 10px 14px;
+  }
+
+  .languageItem,
+  .themeToggleItem {
+    margin: 4px 0;
+  }
+
+  .languageSelect,
+  .themeToggle {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: 72px;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 998;
+  }
+
+  :global([data-theme="dark"]) .navLinks {
+    background: #0f172a;
+    border-top-color: #334155;
+  }
+
+  :global([data-theme="dark"]) .dropdownMenu {
+    background: #1e293b;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoText {
+    font-size: 1rem;
+  }
+
+  .logoSub {
+    font-size: 0.6rem;
+  }
+
+  .navbarContainer {
+    height: 64px;
+  }
+
+  .navLinks {
+    top: 64px;
+    max-height: calc(100vh - 64px);
+  }
+
+  .backdrop {
+    top: 64px;
+  }
+}

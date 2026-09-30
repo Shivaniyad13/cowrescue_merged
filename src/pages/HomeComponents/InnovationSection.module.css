@@ -1,0 +1,491 @@
+/* =========================================================
+   SECTION
+========================================================= */
+
+.section {
+  padding: clamp(3.5rem, 7vw, 6rem) 0;
+
+  background-color: #162e20;
+
+  color: var(--color-white, #ffffff);
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container {
+  max-width: var(--container-max-width, 1200px);
+
+  margin: 0 auto;
+
+  padding: 0 var(--container-padding, 1.5rem);
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MAIN SPLIT LAYOUT
+========================================================= */
+
+.splitLayout {
+  display: grid;
+
+  grid-template-columns: 1fr 1.15fr;
+
+  gap: clamp(2rem, 5vw, 4rem);
+
+  align-items: center;
+}
+
+/* =========================================================
+   VISUAL COLUMN
+========================================================= */
+
+.visualCol {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+}
+
+/* =========================================================
+   IMAGE CARD
+   Card height will automatically follow image ratio
+========================================================= */
+
+.imageCard {
+  position: relative;
+
+  width: 100%;
+
+  height: auto;
+
+  border-radius: var(--radius-lg, 12px);
+
+  overflow: hidden;
+
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* =========================================================
+   MAIN IMAGE
+========================================================= */
+
+.mainImg {
+  width: 100%;
+
+  height: auto;
+
+  display: block;
+
+  object-fit: contain;
+
+  transition:
+    transform var(--transition-slow, 350ms ease);
+}
+
+/* Hover zoom */
+
+.imageCard:hover .mainImg {
+  transform: scale(1.03);
+}
+
+/* =========================================================
+   FLOATING BADGE
+========================================================= */
+
+.floatingBadge {
+  position: absolute;
+
+  bottom: 2rem;
+
+  left: 2rem;
+
+  right: 2rem;
+
+  padding: 1rem 1.25rem;
+
+  background:
+    rgba(26, 58, 22, 0.92);
+
+  border:
+    1px solid rgba(200, 164, 92, 0.4);
+
+  border-radius:
+    var(--radius-md, 8px);
+
+  backdrop-filter:
+    blur(10px);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 1rem;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.badgeIcon {
+  width: 44px;
+
+  height: 44px;
+
+  border-radius:
+    var(--radius-sm, 6px);
+
+  background:
+    var(--color-secondary, #c8a45c);
+
+  color: #1a3a16;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.badgeTitle {
+  font-size: 0.95rem;
+
+  font-weight: 700;
+
+  color:
+    var(--color-white, #ffffff);
+}
+
+.badgeSub {
+  font-size: 0.8rem;
+
+  color:
+    var(--color-secondary-light, #e0c78a);
+}
+
+/* =========================================================
+   NARRATIVE COLUMN
+========================================================= */
+
+.narrativeCol {
+  display: flex;
+
+  flex-direction: column;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+  margin-bottom:
+    var(--spacing-xl, 2rem);
+}
+
+.badge {
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  color:
+    var(--color-secondary, #c8a45c);
+
+  display: inline-block;
+
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-family:
+    var(--font-family-heading);
+
+  font-size:
+    clamp(1.8rem, 3.5vw, 2.8rem);
+
+  font-weight: 800;
+
+  color:
+    var(--color-white, #ffffff);
+
+  line-height: 1.2;
+
+  margin-bottom: 1rem;
+}
+
+.leadText {
+  font-size:
+    clamp(0.95rem, 1.2vw, 1.1rem);
+
+  line-height: 1.65;
+
+  color:
+    rgba(255, 255, 255, 0.85);
+}
+
+/* =========================================================
+   BRIDGE LIST
+========================================================= */
+
+.bridgeList {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 1rem;
+}
+
+/* =========================================================
+   BRIDGE CARD
+========================================================= */
+
+.bridgeCard {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 1rem;
+
+  padding: 1.1rem 1.25rem;
+
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius:
+    var(--radius-md, 8px);
+
+  transition:
+    all var(--transition-fast, 150ms ease);
+}
+
+.bridgeCard:hover {
+  background:
+    rgba(255, 255, 255, 0.09);
+
+  border-color:
+    var(--color-secondary, #c8a45c);
+
+  transform:
+    translateX(4px);
+}
+
+/* =========================================================
+   BRIDGE NUMBER
+========================================================= */
+
+.bridgeIcon {
+  font-size: 0.85rem;
+
+  font-weight: 800;
+
+  color:
+    var(--color-secondary, #c8a45c);
+
+  padding: 0.3rem 0.6rem;
+
+  background:
+    rgba(200, 164, 92, 0.15);
+
+  border-radius:
+    var(--radius-sm, 4px);
+
+  border:
+    1px solid rgba(200, 164, 92, 0.3);
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   BRIDGE CONTENT
+========================================================= */
+
+.bridgeContent {
+  flex-grow: 1;
+}
+
+.bridgeTitle {
+  font-size: 0.95rem;
+
+  font-weight: 700;
+
+  color:
+    var(--color-white, #ffffff);
+
+  margin-bottom: 0.2rem;
+}
+
+.bridgeDesc {
+  font-size: 0.85rem;
+
+  color:
+    rgba(255, 255, 255, 0.75);
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   TABLET AND MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+  .splitLayout {
+    grid-template-columns: 1fr;
+
+    gap: 3rem;
+  }
+
+  .visualCol {
+    width: 100%;
+  }
+
+  .imageCard {
+    width: 100%;
+
+    height: auto;
+
+    border-radius: 16px;
+  }
+
+  .mainImg {
+    width: 100%;
+
+    height: auto;
+
+    display: block;
+
+    object-fit: contain;
+
+    object-position: center;
+  }
+
+  .floatingBadge {
+    bottom: 1.5rem;
+
+    left: 1.5rem;
+
+    right: 1.5rem;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .section {
+    padding: 3.5rem 0;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .splitLayout {
+    gap: 2.5rem;
+  }
+
+  .title {
+    font-size:
+      clamp(1.8rem, 8vw, 2.4rem);
+  }
+
+  .imageCard {
+    border-radius: 12px;
+  }
+
+  .mainImg {
+    width: 100%;
+
+    height: auto;
+  }
+
+  .floatingBadge {
+    bottom: 1rem;
+
+    left: 1rem;
+
+    right: 1rem;
+
+    padding: 0.8rem 1rem;
+
+    gap: 0.75rem;
+  }
+
+  .badgeIcon {
+    width: 38px;
+
+    height: 38px;
+  }
+
+  .badgeTitle {
+    font-size: 0.85rem;
+  }
+
+  .badgeSub {
+    font-size: 0.72rem;
+  }
+
+  .bridgeCard {
+    padding: 1rem;
+
+    gap: 0.75rem;
+  }
+
+  .bridgeCard:hover {
+    transform: none;
+  }
+
+  .bridgeTitle {
+    font-size: 0.9rem;
+  }
+
+  .bridgeDesc {
+    font-size: 0.82rem;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 400px) {
+  .floatingBadge {
+    position: relative;
+
+    bottom: auto;
+
+    left: auto;
+
+    right: auto;
+
+    border-radius: 0;
+
+    border-left: none;
+
+    border-right: none;
+
+    border-bottom: none;
+  }
+
+  .imageCard {
+    overflow: hidden;
+  }
+}
