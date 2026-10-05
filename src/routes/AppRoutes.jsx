@@ -24,6 +24,7 @@ import CowRescueHome from '../pages/CowRescue/CowRescueHome';
 import ReportIncident from '../pages/CowRescue/ReportIncident';
 import TrackRescue from '../pages/CowRescue/TrackRescue';
 import AlertResponse from '../pages/CowRescue/AlertResponse';
+import NgoBankDetails from '../pages/Ngo/NgoBankDetails';
 
 // Import Legal Policy Pages
 import PrivacyPolicy from '../pages/Legal/PrivacyPolicy';
@@ -53,6 +54,7 @@ const AppRoutes = () => {
       <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
       <Route path="/donation" element={<MainLayout><Donation /></MainLayout>} />
 
+
       {/* Legal Policy Routes */}
       <Route path="/privacy-policy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
       <Route path="/terms-conditions" element={<MainLayout><TermsConditions /></MainLayout>} />
@@ -65,6 +67,7 @@ const AppRoutes = () => {
       <Route path="/cow-rescue/report" element={<MainLayout><ReportIncident /></MainLayout>} />
       <Route path="/cow-rescue/track" element={<MainLayout><TrackRescue /></MainLayout>} />
       <Route path="/cow-rescue/alert/:token" element={<MainLayout><AlertResponse /></MainLayout>} />
+<Route path="/ngo/bank-details/:token" element={<NgoBankDetails />} />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />

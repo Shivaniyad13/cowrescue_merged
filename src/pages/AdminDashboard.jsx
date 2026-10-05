@@ -9,7 +9,7 @@ import {
   getUploadUrl,
 } from "../services/api";
 import CowRescueAdmin from "./Admin/CowRescueAdmin";
-
+import AdminSettlements from "./Admin/AdminSettlements";
 
 const REJECTION_REASONS = [
   "Invalid payment screenshot",
@@ -21,8 +21,9 @@ const REJECTION_REASONS = [
 ];
 
 const AdminDashboard = () => {
-  const [activeMainTab, setActiveMainTab] = useState("donations"); // 'donations' | 'contacts' | 'cowRescue'
-  const [subTab, setSubTab] = useState("PENDING"); // 'PENDING' | 'VERIFIED' | 'REJECTED' | 'ALL'
+  const [activeMainTab, setActiveMainTab] = useState("donations");
+  const [donationCategory, setDonationCategory] = useState("general");
+  const [subTab, setSubTab] = useState("PENDING");
 
   const [donations, setDonations] = useState([]);
   const [contacts, setContacts] = useState([]);
@@ -30,11 +31,9 @@ const AdminDashboard = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("ALL");
 
-  // Modals State
   const [screenshotModal, setScreenshotModal] = useState(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [detailsModal, setDetailsModal] = useState(null);
@@ -43,33 +42,29 @@ const AdminDashboard = () => {
   const [selectedReason, setSelectedReason] = useState(REJECTION_REASONS[0]);
   const [customReason, setCustomReason] = useState("");
 
-  // Toast Notification State
   const [toast, setToast] = useState(null);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
   const adminUser = localStorage.getItem("adminUser") || "Admin";
-   useEffect(() => {
+
+  useEffect(() => {
     if (!token) {
       navigate("/admin/login");
       return;
     }
-    // Har tab change pe error clear karo
     setError("");
-    // Har tab change pe error clear karo
-    setError("");
-    // Cow Rescue tab apna data khud fetch karta hai — yahan skip karo
-    if (activeMainTab === "cowRescue") {
+    // Cow Rescue aur Settlements tabs apna data khud fetch karte hain
+    if (activeMainTab === "cowRescue" || activeMainTab === "settlements") {
       setLoading(false);
       return;
     }
     fetchData();
   }, [token, activeMainTab]);
+
   const showToast = (message, type = "success") => {
     setToast({ message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 4000);
+    setTimeout(() => setToast(null), 4000);
   };
 
   const fetchData = async () => {
@@ -100,7 +95,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Status Actions
   const handleConfirmApprove = async () => {
     if (!approveModal) return;
     setActionLoading(true);
@@ -109,7 +103,10 @@ const AdminDashboard = () => {
         paymentStatus: "PAID",
         verificationStatus: "VERIFIED",
       });
-      showToast(`Donation #${approveModal.id} from ${approveModal.donor_name || 'Donor'} verified successfully!`, "success");
+      showToast(
+        `Donation #${approveModal.id} from ${approveModal.donor_name || "Donor"} verified successfully!`,
+        "success"
+      );
       setApproveModal(null);
       if (detailsModal?.id === approveModal.id) setDetailsModal(null);
       await fetchData();
@@ -162,23 +159,32 @@ const AdminDashboard = () => {
     navigate("/admin/login");
   };
 
-  // Calculations for summary cards
-  const totalCount = donations.length;
-  const pendingCount = donations.filter(
+  // ─── Split Donations ───
+  const generalDonations = donations.filter((d) => !d.case_id);
+  const caseDonations = donations.filter((d) => !!d.case_id);
+
+  const activeDonations =
+    donationCategory === "general" ? generalDonations : caseDonations;
+
+  const totalCount = activeDonations.length;
+  const pendingCount = activeDonations.filter(
     (d) => (d.verification_status || d.payment_status) === "PENDING"
   ).length;
-  const verifiedCount = donations.filter(
+  const verifiedCount = activeDonations.filter(
     (d) => d.verification_status === "VERIFIED"
   ).length;
-  const rejectedCount = donations.filter(
+  const rejectedCount = activeDonations.filter(
     (d) => d.verification_status === "REJECTED"
   ).length;
-  const verifiedTotalAmount = donations
+  const verifiedTotalAmount = activeDonations
     .filter((d) => d.verification_status === "VERIFIED")
     .reduce((sum, d) => sum + Number(d.amount || 0), 0);
 
-  // Filtering donations for the list
-  const filteredDonations = donations.filter((d) => {
+  const pendingSettlementAmount = caseDonations
+    .filter((d) => d.verification_status === "VERIFIED" && !d.settled)
+    .reduce((sum, d) => sum + Number(d.ngo_amount || 0), 0);
+
+  const filteredDonations = activeDonations.filter((d) => {
     const vStatus = d.verification_status || d.payment_status || "PENDING";
 
     if (subTab === "PENDING" && vStatus !== "PENDING") return false;
@@ -186,7 +192,10 @@ const AdminDashboard = () => {
     if (subTab === "REJECTED" && vStatus !== "REJECTED") return false;
 
     if (paymentMethodFilter !== "ALL") {
-      if ((d.payment_method || "UPI").toUpperCase() !== paymentMethodFilter.toUpperCase()) {
+      if (
+        (d.payment_method || "UPI").toUpperCase() !==
+        paymentMethodFilter.toUpperCase()
+      ) {
         return false;
       }
     }
@@ -196,16 +205,31 @@ const AdminDashboard = () => {
       const name = (d.donor_name || d.name || "").toLowerCase();
       const phone = (d.phone || "").toLowerCase();
       const email = (d.email || "").toLowerCase();
-      const utr = (d.transaction_id || d.gateway_payment_id || d.gateway_order_id || d.razorpay_payment_id || "").toLowerCase();
-      return name.includes(q) || phone.includes(q) || email.includes(q) || utr.includes(q);
+      const caseId = (d.case_id || "").toLowerCase();
+      const utr = (
+        d.transaction_id ||
+        d.gateway_payment_id ||
+        d.gateway_order_id ||
+        d.razorpay_payment_id ||
+        ""
+      ).toLowerCase();
+      return (
+        name.includes(q) ||
+        phone.includes(q) ||
+        email.includes(q) ||
+        caseId.includes(q) ||
+        utr.includes(q)
+      );
     }
 
     return true;
   });
 
+  const isCaseView = donationCategory === "case";
+
   return (
     <div className={styles.adminContainer}>
-      {/* Toast Notification */}
+      {/* Toast */}
       {toast && (
         <div className={styles.toastContainer}>
           <div
@@ -225,63 +249,74 @@ const AdminDashboard = () => {
           <h1 className={styles.adminTitle}>
             <span>🛡️</span> Admin Verification & Management
           </h1>
-          <p className={styles.adminSub}>Logged in as <strong>{adminUser}</strong></p>
+          <p className={styles.adminSub}>
+            Logged in as <strong>{adminUser}</strong>
+          </p>
         </div>
         <button onClick={handleLogout} className={styles.logoutBtn}>
           <span>🚪</span> Sign Out
         </button>
       </header>
 
-      {/* Summary Cards */}
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statTitle}>Total Donations</span>
-            <span className={styles.statIcon}>📦</span>
+      {/* Summary Cards — only for donations tab */}
+      {activeMainTab === "donations" && (
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <span className={styles.statTitle}>
+                {isCaseView ? "Case Donations" : "General Donations"}
+              </span>
+              <span className={styles.statIcon}>📦</span>
+            </div>
+            <div className={styles.statNumber}>{totalCount}</div>
           </div>
-          <div className={styles.statNumber}>{totalCount}</div>
-        </div>
 
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statTitle}>Pending Verification</span>
-            <span className={styles.statIcon}>⏳</span>
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <span className={styles.statTitle}>Pending Verification</span>
+              <span className={styles.statIcon}>⏳</span>
+            </div>
+            <div className={`${styles.statNumber} ${styles.statNumberPending}`}>
+              {pendingCount}
+            </div>
           </div>
-          <div className={`${styles.statNumber} ${styles.statNumberPending}`}>
-            {pendingCount}
-          </div>
-        </div>
 
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statTitle}>Verified Donations</span>
-            <span className={styles.statIcon}>✅</span>
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <span className={styles.statTitle}>Verified</span>
+              <span className={styles.statIcon}>✅</span>
+            </div>
+            <div className={`${styles.statNumber} ${styles.statNumberVerified}`}>
+              {verifiedCount}
+            </div>
           </div>
-          <div className={`${styles.statNumber} ${styles.statNumberVerified}`}>
-            {verifiedCount}
-          </div>
-        </div>
 
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statTitle}>Rejected Donations</span>
-            <span className={styles.statIcon}>❌</span>
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <span className={styles.statTitle}>Rejected</span>
+              <span className={styles.statIcon}>❌</span>
+            </div>
+            <div className={`${styles.statNumber} ${styles.statNumberRejected}`}>
+              {rejectedCount}
+            </div>
           </div>
-          <div className={`${styles.statNumber} ${styles.statNumberRejected}`}>
-            {rejectedCount}
-          </div>
-        </div>
 
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statTitle}>Total Verified Amount</span>
-            <span className={styles.statIcon}>💰</span>
-          </div>
-          <div className={`${styles.statNumber} ${styles.statNumberVerified}`}>
-            ₹{verifiedTotalAmount.toLocaleString("en-IN")}
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <span className={styles.statTitle}>
+                {isCaseView ? "To Transfer to NGOs" : "Total Verified Amount"}
+              </span>
+              <span className={styles.statIcon}>💰</span>
+            </div>
+            <div className={`${styles.statNumber} ${styles.statNumberVerified}`}>
+              ₹
+              {isCaseView
+                ? pendingSettlementAmount.toLocaleString("en-IN")
+                : verifiedTotalAmount.toLocaleString("en-IN")}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Tabs */}
       <div className={styles.tabBar}>
@@ -309,10 +344,17 @@ const AdminDashboard = () => {
         >
           🐄 Cow Rescue Cases
         </button>
+        <button
+          className={`${styles.tabBtn} ${
+            activeMainTab === "settlements" ? styles.tabBtnActive : ""
+          }`}
+          onClick={() => setActiveMainTab("settlements")}
+        >
+          💰 Settlements
+        </button>
       </div>
 
-
-      {/* Error Alert Banner */}
+      {/* Error */}
       {error && (
         <div
           style={{
@@ -344,15 +386,119 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {loading ? (
+      {/* ═══════════ TAB CONTENT ═══════════ */}
+
+      {activeMainTab === "settlements" ? (
+        /* ─── SETTLEMENTS TAB ─── */
+        <AdminSettlements token={token} />
+      ) : activeMainTab === "cowRescue" ? (
+        /* ─── COW RESCUE TAB ─── */
+        <CowRescueAdmin token={token} />
+      ) : loading ? (
         <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>
           <div style={{ fontSize: "2rem", marginBottom: "12px" }}>🔄</div>
           Fetching administrative records...
         </div>
       ) : activeMainTab === "donations" ? (
-        /* DONATIONS TAB CONTENT */
+        /* ─── DONATIONS TAB ─── */
         <div>
-          {/* Sub-tabs & Filter Toolbar */}
+          {/* Category Sub-Tabs (General vs Case) */}
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              marginBottom: "18px",
+              padding: "6px",
+              background: "#f1f5f9",
+              borderRadius: "12px",
+              maxWidth: "520px",
+            }}
+          >
+            <button
+              onClick={() => {
+                setDonationCategory("general");
+                setSubTab("PENDING");
+              }}
+              style={{
+                flex: 1,
+                padding: "12px 16px",
+                background:
+                  donationCategory === "general" ? "#ffffff" : "transparent",
+                border:
+                  donationCategory === "general"
+                    ? "2px solid #16a34a"
+                    : "2px solid transparent",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontSize: "0.95rem",
+                fontWeight: 700,
+                color:
+                  donationCategory === "general" ? "#166534" : "#64748b",
+                boxShadow:
+                  donationCategory === "general"
+                    ? "0 2px 8px rgba(22, 163, 74, 0.15)"
+                    : "none",
+                transition: "all 0.2s",
+              }}
+            >
+              🎁 General ({generalDonations.length})
+            </button>
+            <button
+              onClick={() => {
+                setDonationCategory("case");
+                setSubTab("PENDING");
+              }}
+              style={{
+                flex: 1,
+                padding: "12px 16px",
+                background:
+                  donationCategory === "case" ? "#ffffff" : "transparent",
+                border:
+                  donationCategory === "case"
+                    ? "2px solid #f59e0b"
+                    : "2px solid transparent",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontSize: "0.95rem",
+                fontWeight: 700,
+                color: donationCategory === "case" ? "#92400e" : "#64748b",
+                boxShadow:
+                  donationCategory === "case"
+                    ? "0 2px 8px rgba(245, 158, 11, 0.15)"
+                    : "none",
+                transition: "all 0.2s",
+              }}
+            >
+              🐄 Case Donations ({caseDonations.length})
+            </button>
+          </div>
+
+          {/* Case View Info Banner */}
+          {isCaseView && (
+            <div
+              style={{
+                padding: "14px 18px",
+                background: "#fffbeb",
+                border: "1px solid #fde68a",
+                borderRadius: "10px",
+                marginBottom: "18px",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <span style={{ fontSize: "1.3rem" }}>💡</span>
+              <div style={{ fontSize: "0.9rem", color: "#78350f" }}>
+                <strong>Case Donations:</strong> Ye donations track page ke
+                "Support this Rescue" button se aate hain. Har donation me{" "}
+                <strong>10% platform fee</strong> aur <strong>90% NGO amount</strong>{" "}
+                auto-calculate hota hai. NGO ko transfer karne ke liye{" "}
+                <strong>Settlement tab</strong> use karo.
+              </div>
+            </div>
+          )}
+
+          {/* Toolbar */}
           <div className={styles.toolbar}>
             <div className={styles.subTabs}>
               <button
@@ -392,7 +538,7 @@ const AdminDashboard = () => {
             <div className={styles.filterControls}>
               <input
                 type="text"
-                placeholder="Search name, phone, UTR..."
+                placeholder={isCaseView ? "Search case ID, donor, UTR..." : "Search name, phone, UTR..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.searchInput}
@@ -406,224 +552,284 @@ const AdminDashboard = () => {
                 <option value="UPI">UPI</option>
                 <option value="CASHFREE">Cashfree</option>
                 <option value="ONLINE">Online Gateway</option>
-                <option value="NETBANKING">NetBanking</option>
-                <option value="CARD">Card</option>
               </select>
             </div>
           </div>
 
-          {/* Desktop Table View */}
+          {/* Desktop Table */}
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Donor</th>
-                  <th>Contact & Location</th>
-                  <th>Purpose</th>
-                  <th>Amount</th>
-                  <th>Method & UTR</th>
-                  <th>Status</th>
-                  <th>Screenshot</th>
-                  <th>Submitted</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDonations.length === 0 ? (
-                  <tr>
-                    <td colSpan="9" style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
-                      No donation records matching your filter criteria.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredDonations.map((d) => {
-                    const status = d.verification_status || d.payment_status || "PENDING";
-                    return (
-                      <tr key={d.id}>
-                        <td>
-                          <strong>{d.donor_name || d.name || "Anonymous Donor"}</strong>
-                        </td>
-                        <td>
-                          <div>{d.phone || "—"}</div>
-                          {(d.city || d.state) && (
-                            <div style={{ fontSize: "0.8rem", color: "#64748b" }}>
-                              {[d.city, d.state].filter(Boolean).join(", ")}
-                            </div>
-                          )}
-                        </td>
-                        <td>{d.purpose || "General Welfare"}</td>
-                        <td>
-                          <strong style={{ color: "#166534", fontSize: "1rem" }}>
-                            ₹{Number(d.amount || 0).toLocaleString("en-IN")}
-                          </strong>
-                        </td>
-                        <td>
-                          <div><strong>{d.payment_gateway || d.payment_method || "UPI"}</strong></div>
-                          <div style={{ fontSize: "0.8rem", color: "#64748b" }}>
-                            {d.gateway_payment_id || d.gateway_order_id || d.transaction_id || d.razorpay_payment_id || "—"}
-                          </div>
-                        </td>
-                        <td>
-                          <span
-                            className={`${styles.badge} ${
-                              status === "VERIFIED"
-                                ? styles.badgeVerified
-                                : status === "REJECTED"
-                                ? styles.badgeRejected
-                                : styles.badgePending
-                            }`}
-                          >
-                            {status === "VERIFIED" ? "✓ VERIFIED" : status === "REJECTED" ? "✕ REJECTED" : "⏳ PENDING"}
-                          </span>
-                        </td>
-                        <td>
-                          {d.payment_screenshot_url ? (
-                            <button
-                              className={`${styles.actionBtn} ${styles.btnScreenshot}`}
-                              onClick={() => setScreenshotModal(d)}
-                            >
-                              🖼️ View Screenshot
-                            </button>
-                          ) : (
-                            <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>None</span>
-                          )}
-                        </td>
-                        <td>
-                          {d.created_at ? new Date(d.created_at).toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric"
-                          }) : "—"}
-                        </td>
-                        <td>
-                          <div className={styles.actionGroup}>
-                            <button
-                              onClick={() => setDetailsModal(d)}
-                              className={`${styles.actionBtn} ${styles.btnDetails}`}
-                              title="View full details"
-                            >
-                              🔍 Details
-                            </button>
-                            {status !== "VERIFIED" && (
-                              <button
-                                onClick={() => setApproveModal(d)}
-                                className={`${styles.actionBtn} ${styles.btnVerify}`}
-                                disabled={actionLoading}
-                              >
-                                ✅ Approve
-                              </button>
-                            )}
-                            {status !== "REJECTED" && (
-                              <button
-                                onClick={() => setRejectModal(d)}
-                                className={`${styles.actionBtn} ${styles.btnReject}`}
-                                disabled={actionLoading}
-                              >
-                                ❌ Reject
-                              </button>
-                            )}
-                          </div>
+              {isCaseView ? (
+                <>
+                  <thead>
+                    <tr>
+                      <th>Case ID</th>
+                      <th>Donor</th>
+                      <th>Amount</th>
+                      <th>Platform Fee</th>
+                      <th>NGO Amount</th>
+                      <th>Status</th>
+                      <th>Settled</th>
+                      <th>Submitted</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredDonations.length === 0 ? (
+                      <tr>
+                        <td colSpan="9" style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+                          No case donations found.
                         </td>
                       </tr>
-                    );
-                  })
-                )}
-              </tbody>
+                    ) : (
+                      filteredDonations.map((d) => {
+                        const status = d.verification_status || d.payment_status || "PENDING";
+                        return (
+                          <tr key={d.id}>
+                            <td>
+                              <strong style={{ color: "#92400e", fontSize: "0.85rem" }}>
+                                {d.case_id || "—"}
+                              </strong>
+                            </td>
+                            <td>
+                              <strong>{d.donor_name || "Anonymous"}</strong>
+                              {d.donor_phone && (
+                                <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{d.donor_phone}</div>
+                              )}
+                            </td>
+                            <td>
+                              <strong style={{ color: "#166534", fontSize: "1rem" }}>
+                                ₹{Number(d.amount || 0).toLocaleString("en-IN")}
+                              </strong>
+                            </td>
+                            <td>
+                              <span style={{ color: "#dc2626", fontSize: "0.9rem" }}>
+                                ₹{Number(d.platform_fee || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            <td>
+                              <span style={{ color: "#16a34a", fontWeight: 600, fontSize: "0.9rem" }}>
+                                ₹{Number(d.ngo_amount || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            <td>
+                              <span
+                                className={`${styles.badge} ${
+                                  status === "VERIFIED"
+                                    ? styles.badgeVerified
+                                    : status === "REJECTED"
+                                    ? styles.badgeRejected
+                                    : styles.badgePending
+                                }`}
+                              >
+                                {status === "VERIFIED" ? "✓ VERIFIED" : status === "REJECTED" ? "✕ REJECTED" : "⏳ PENDING"}
+                              </span>
+                            </td>
+                            <td>
+                              {d.settled ? (
+                                <span style={{ color: "#16a34a", fontWeight: 600, fontSize: "0.85rem" }}>
+                                  ✅ Settled
+                                </span>
+                              ) : (
+                                <span style={{ color: "#f59e0b", fontWeight: 600, fontSize: "0.85rem" }}>
+                                  ⏳ Pending
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              {d.created_at
+                                ? new Date(d.created_at).toLocaleDateString("en-IN", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  })
+                                : "—"}
+                            </td>
+                            <td>
+                              <div className={styles.actionGroup}>
+                                <button
+                                  onClick={() => setDetailsModal(d)}
+                                  className={`${styles.actionBtn} ${styles.btnDetails}`}
+                                >
+                                  🔍 Details
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </>
+              ) : (
+                <>
+                  <thead>
+                    <tr>
+                      <th>Donor</th>
+                      <th>Contact & Location</th>
+                      <th>Purpose</th>
+                      <th>Amount</th>
+                      <th>Method & UTR</th>
+                      <th>Status</th>
+                      <th>Screenshot</th>
+                      <th>Submitted</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredDonations.length === 0 ? (
+                      <tr>
+                        <td colSpan="9" style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+                          No general donations matching your filter.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredDonations.map((d) => {
+                        const status = d.verification_status || d.payment_status || "PENDING";
+                        return (
+                          <tr key={d.id}>
+                            <td>
+                              <strong>{d.donor_name || d.name || "Anonymous Donor"}</strong>
+                            </td>
+                            <td>
+                              <div>{d.phone || "—"}</div>
+                              {(d.city || d.state) && (
+                                <div style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                                  {[d.city, d.state].filter(Boolean).join(", ")}
+                                </div>
+                              )}
+                            </td>
+                            <td>{d.purpose || "General Welfare"}</td>
+                            <td>
+                              <strong style={{ color: "#166534", fontSize: "1rem" }}>
+                                ₹{Number(d.amount || 0).toLocaleString("en-IN")}
+                              </strong>
+                            </td>
+                            <td>
+                              <div><strong>{d.payment_gateway || d.payment_method || "UPI"}</strong></div>
+                              <div style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                                {d.gateway_payment_id || d.gateway_order_id || d.transaction_id || d.razorpay_payment_id || "—"}
+                              </div>
+                            </td>
+                            <td>
+                              <span
+                                className={`${styles.badge} ${
+                                  status === "VERIFIED"
+                                    ? styles.badgeVerified
+                                    : status === "REJECTED"
+                                    ? styles.badgeRejected
+                                    : styles.badgePending
+                                }`}
+                              >
+                                {status === "VERIFIED" ? "✓ VERIFIED" : status === "REJECTED" ? "✕ REJECTED" : "⏳ PENDING"}
+                              </span>
+                            </td>
+                            <td>
+                              {d.payment_screenshot_url ? (
+                                <button
+                                  className={`${styles.actionBtn} ${styles.btnScreenshot}`}
+                                  onClick={() => setScreenshotModal(d)}
+                                >
+                                  🖼️ View Screenshot
+                                </button>
+                              ) : (
+                                <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>None</span>
+                              )}
+                            </td>
+                            <td>
+                              {d.created_at
+                                ? new Date(d.created_at).toLocaleDateString("en-IN", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  })
+                                : "—"}
+                            </td>
+                            <td>
+                              <div className={styles.actionGroup}>
+                                <button
+                                  onClick={() => setDetailsModal(d)}
+                                  className={`${styles.actionBtn} ${styles.btnDetails}`}
+                                >
+                                  🔍 Details
+                                </button>
+                                {status !== "VERIFIED" && (
+                                  <button
+                                    onClick={() => setApproveModal(d)}
+                                    className={`${styles.actionBtn} ${styles.btnVerify}`}
+                                    disabled={actionLoading}
+                                  >
+                                    ✅ Approve
+                                  </button>
+                                )}
+                                {status !== "REJECTED" && (
+                                  <button
+                                    onClick={() => setRejectModal(d)}
+                                    className={`${styles.actionBtn} ${styles.btnReject}`}
+                                    disabled={actionLoading}
+                                  >
+                                    ❌ Reject
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </>
+              )}
             </table>
           </div>
 
-          {/* Mobile Cards View */}
-          <div className={styles.mobileCards}>
-            {filteredDonations.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "30px", color: "#64748b" }}>
-                No donation records found.
-              </div>
-            ) : (
-              filteredDonations.map((d) => {
-                const status = d.verification_status || d.payment_status || "PENDING";
-                return (
-                  <div key={d.id} className={styles.mobileCard}>
-                    <div className={styles.mobileCardHeader}>
-                      <div>
-                        <div className={styles.mobileDonorName}>
-                          {d.donor_name || d.name || "Anonymous Donor"}
+          {/* Mobile View (General only) */}
+          {!isCaseView && (
+            <div className={styles.mobileCards}>
+              {filteredDonations.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "30px", color: "#64748b" }}>
+                  No donation records found.
+                </div>
+              ) : (
+                filteredDonations.map((d) => {
+                  const status = d.verification_status || d.payment_status || "PENDING";
+                  return (
+                    <div key={d.id} className={styles.mobileCard}>
+                      <div className={styles.mobileCardHeader}>
+                        <div>
+                          <div className={styles.mobileDonorName}>
+                            {d.donor_name || d.name || "Anonymous Donor"}
+                          </div>
+                          <div style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                            {[d.city, d.state].filter(Boolean).join(", ")}
+                          </div>
                         </div>
-                        <div style={{ fontSize: "0.8rem", color: "#64748b" }}>
-                          {[d.city, d.state].filter(Boolean).join(", ")}
+                        <div className={styles.mobileAmount}>
+                          ₹{Number(d.amount || 0).toLocaleString("en-IN")}
                         </div>
                       </div>
-                      <div className={styles.mobileAmount}>
-                        ₹{Number(d.amount || 0).toLocaleString("en-IN")}
+                      <div className={styles.mobileCardBody}>
+                        <div><strong>Purpose:</strong> {d.purpose || "General Welfare"}</div>
+                        <div><strong>Phone:</strong> {d.phone || "—"}</div>
+                        <div><strong>Status:</strong> {status}</div>
+                      </div>
+                      <div className={styles.mobileCardFooter}>
+                        <button
+                          onClick={() => setDetailsModal(d)}
+                          className={`${styles.actionBtn} ${styles.btnDetails}`}
+                        >
+                          🔍 Details
+                        </button>
                       </div>
                     </div>
-
-                    <div className={styles.mobileCardBody}>
-                      <div><strong>Purpose:</strong> {d.purpose || "General Welfare"}</div>
-                      <div><strong>Phone:</strong> {d.phone || "—"}</div>
-                      <div><strong>Email:</strong> {d.email || "—"}</div>
-                      <div><strong>Method:</strong> {d.payment_gateway || d.payment_method || "UPI"}</div>
-                      <div><strong>Ref / Order ID:</strong> {d.gateway_payment_id || d.gateway_order_id || d.transaction_id || d.razorpay_payment_id || "—"}</div>
-                      <div>
-                        <strong>Status: </strong>
-                        <span
-                          className={`${styles.badge} ${
-                            status === "VERIFIED"
-                              ? styles.badgeVerified
-                              : status === "REJECTED"
-                              ? styles.badgeRejected
-                              : styles.badgePending
-                          }`}
-                        >
-                          {status}
-                        </span>
-                      </div>
-                      <div>
-                        <strong>Date:</strong> {d.created_at ? new Date(d.created_at).toLocaleDateString("en-IN") : "—"}
-                      </div>
-                    </div>
-
-                    <div className={styles.mobileCardFooter}>
-                      {d.payment_screenshot_url && (
-                        <button
-                          onClick={() => setScreenshotModal(d)}
-                          className={`${styles.actionBtn} ${styles.btnScreenshot}`}
-                        >
-                          🖼️ Screenshot
-                        </button>
-                      )}
-                      <button
-                        onClick={() => setDetailsModal(d)}
-                        className={`${styles.actionBtn} ${styles.btnDetails}`}
-                      >
-                        🔍 Details
-                      </button>
-                      {status !== "VERIFIED" && (
-                        <button
-                          onClick={() => setApproveModal(d)}
-                          className={`${styles.actionBtn} ${styles.btnVerify}`}
-                          disabled={actionLoading}
-                        >
-                          ✅ Approve
-                        </button>
-                      )}
-                      {status !== "REJECTED" && (
-                        <button
-                          onClick={() => setRejectModal(d)}
-                          className={`${styles.actionBtn} ${styles.btnReject}`}
-                          disabled={actionLoading}
-                        >
-                          ❌ Reject
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
       ) : activeMainTab === "contacts" ? (
-        /* CONTACT SUBMISSIONS TAB CONTENT */
+        /* ─── CONTACTS TAB ─── */
         <div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
@@ -694,12 +900,11 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
-      ) : (
-        /* COW RESCUE TAB CONTENT */
-        <CowRescueAdmin token={token} />
-      )}
+      ) : null}
 
-      {/* 1. SCREENSHOT LIGHTBOX MODAL */}
+      {/* ═══════════ MODALS ═══════════ */}
+
+      {/* Screenshot Lightbox */}
       {screenshotModal && (
         <div
           className={styles.modalOverlay}
@@ -708,10 +913,7 @@ const AdminDashboard = () => {
             setIsZoomed(false);
           }}
         >
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button
               className={styles.modalClose}
               onClick={() => {
@@ -724,13 +926,11 @@ const AdminDashboard = () => {
             <h3 className={styles.modalTitle}>
               <span>🖼️</span> Payment Proof Screenshot
             </h3>
-
             <div style={{ fontSize: "0.9rem", color: "#475569", marginBottom: "12px" }}>
               <strong>Donor:</strong> {screenshotModal.donor_name || screenshotModal.name || "Donor"} |{" "}
               <strong>Amount:</strong> ₹{Number(screenshotModal.amount || 0).toLocaleString("en-IN")} |{" "}
               <strong>UTR:</strong> {screenshotModal.transaction_id || "N/A"}
             </div>
-
             {screenshotModal.payment_screenshot_url ? (
               <div className={styles.screenshotContainer}>
                 <p style={{ fontSize: "0.8rem", color: "#64748b", marginBottom: "8px" }}>
@@ -748,7 +948,6 @@ const AdminDashboard = () => {
                 No payment screenshot uploaded for this donation.
               </div>
             )}
-
             <div className={styles.modalFooter}>
               <button
                 className={styles.btnSecondary}
@@ -764,42 +963,56 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* 2. DONATION DETAILS MODAL */}
+      {/* Details Modal */}
       {detailsModal && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setDetailsModal(null)}
-        >
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className={styles.modalClose}
-              onClick={() => setDetailsModal(null)}
-            >
+        <div className={styles.modalOverlay} onClick={() => setDetailsModal(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={() => setDetailsModal(null)}>
               ✕
             </button>
-
             <h3 className={styles.modalTitle}>
               <span>📋</span> Donation Record Details #{detailsModal.id}
             </h3>
 
-            {/* Donor Section */}
+            {detailsModal.case_id && (
+              <div
+                style={{
+                  padding: "12px 16px",
+                  background: "#fffbeb",
+                  border: "1px solid #fde68a",
+                  borderRadius: "10px",
+                  marginBottom: "16px",
+                }}
+              >
+                <div style={{ fontSize: "0.85rem", color: "#78350f" }}>
+                  <strong>🐄 Case Donation</strong>
+                </div>
+                <div style={{ fontSize: "0.9rem", color: "#92400e", marginTop: "4px" }}>
+                  <strong>Case ID:</strong> {detailsModal.case_id}
+                </div>
+              </div>
+            )}
+
             <div className={styles.modalSection}>
               <div className={styles.modalSectionTitle}>Donor Information</div>
               <div className={styles.detailGrid}>
                 <div className={styles.detailItem}>
                   <div className={styles.detailLabel}>Full Name</div>
-                  <div className={styles.detailValue}>{detailsModal.donor_name || detailsModal.name || "Anonymous"}</div>
+                  <div className={styles.detailValue}>
+                    {detailsModal.donor_name || detailsModal.name || "Anonymous"}
+                  </div>
                 </div>
                 <div className={styles.detailItem}>
-                  <div className={styles.detailLabel}>Phone Number</div>
-                  <div className={styles.detailValue}>{detailsModal.phone || "—"}</div>
+                  <div className={styles.detailLabel}>Phone</div>
+                  <div className={styles.detailValue}>
+                    {detailsModal.donor_phone || detailsModal.phone || "—"}
+                  </div>
                 </div>
                 <div className={styles.detailItem}>
-                  <div className={styles.detailLabel}>Email Address</div>
-                  <div className={styles.detailValue}>{detailsModal.email || "—"}</div>
+                  <div className={styles.detailLabel}>Email</div>
+                  <div className={styles.detailValue}>
+                    {detailsModal.donor_email || detailsModal.email || "—"}
+                  </div>
                 </div>
                 <div className={styles.detailItem}>
                   <div className={styles.detailLabel}>Location</div>
@@ -810,9 +1023,8 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Donation Section */}
             <div className={styles.modalSection}>
-              <div className={styles.modalSectionTitle}>Donation & Payment Info</div>
+              <div className={styles.modalSectionTitle}>Payment Info</div>
               <div className={styles.detailGrid}>
                 <div className={styles.detailItem}>
                   <div className={styles.detailLabel}>Amount</div>
@@ -820,135 +1032,96 @@ const AdminDashboard = () => {
                     ₹{Number(detailsModal.amount || 0).toLocaleString("en-IN")}
                   </div>
                 </div>
+                {detailsModal.case_id && (
+                  <>
+                    <div className={styles.detailItem}>
+                      <div className={styles.detailLabel}>Platform Fee (10%)</div>
+                      <div className={styles.detailValue} style={{ color: "#dc2626" }}>
+                        ₹{Number(detailsModal.platform_fee || 0).toFixed(2)}
+                      </div>
+                    </div>
+                    <div className={styles.detailItem}>
+                      <div className={styles.detailLabel}>NGO Amount (90%)</div>
+                      <div className={styles.detailValue} style={{ color: "#16a34a", fontWeight: 700 }}>
+                        ₹{Number(detailsModal.ngo_amount || 0).toFixed(2)}
+                      </div>
+                    </div>
+                    <div className={styles.detailItem}>
+                      <div className={styles.detailLabel}>Settled</div>
+                      <div className={styles.detailValue}>
+                        {detailsModal.settled ? "✅ Yes" : "⏳ Pending"}
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div className={styles.detailItem}>
-                  <div className={styles.detailLabel}>Purpose</div>
-                  <div className={styles.detailValue}>{detailsModal.purpose || "General Welfare"}</div>
+                  <div className={styles.detailLabel}>Payment Method</div>
+                  <div className={styles.detailValue}>
+                    {detailsModal.payment_gateway || detailsModal.payment_method || "UPI"}
+                  </div>
                 </div>
                 <div className={styles.detailItem}>
-                  <div className={styles.detailLabel}>Payment Method / Gateway</div>
-                  <div className={styles.detailValue}>{detailsModal.payment_gateway || detailsModal.payment_method || "UPI"}</div>
-                </div>
-                <div className={styles.detailItem}>
-                  <div className={styles.detailLabel}>Transaction ID / Gateway Ref</div>
-                  <div className={styles.detailValue}>{detailsModal.gateway_payment_id || detailsModal.gateway_order_id || detailsModal.transaction_id || detailsModal.razorpay_payment_id || "—"}</div>
-                </div>
-                <div className={styles.detailItem}>
-                  <div className={styles.detailLabel}>Payment Status</div>
-                  <div className={styles.detailValue}>{detailsModal.payment_status || "PENDING"}</div>
+                  <div className={styles.detailLabel}>Transaction Ref</div>
+                  <div className={styles.detailValue}>
+                    {detailsModal.gateway_payment_id ||
+                      detailsModal.gateway_order_id ||
+                      detailsModal.transaction_id ||
+                      "—"}
+                  </div>
                 </div>
                 <div className={styles.detailItem}>
                   <div className={styles.detailLabel}>Verification Status</div>
-                  <div className={styles.detailValue}>{detailsModal.verification_status || "PENDING"}</div>
+                  <div className={styles.detailValue}>
+                    {detailsModal.verification_status || "PENDING"}
+                  </div>
                 </div>
                 <div className={styles.detailItem}>
-                  <div className={styles.detailLabel}>Submitted Date & Time</div>
+                  <div className={styles.detailLabel}>Submitted</div>
                   <div className={styles.detailValue}>
-                    {detailsModal.created_at ? new Date(detailsModal.created_at).toLocaleString("en-IN") : "—"}
+                    {detailsModal.created_at
+                      ? new Date(detailsModal.created_at).toLocaleString("en-IN")
+                      : "—"}
                   </div>
                 </div>
               </div>
-
-              {detailsModal.message && (
-                <div style={{ marginTop: "12px" }}>
-                  <div className={styles.detailLabel}>Donor Message</div>
-                  <div
-                    style={{
-                      background: "#f8fafc",
-                      padding: "10px 14px",
-                      borderRadius: "8px",
-                      fontSize: "0.9rem",
-                      color: "#334155",
-                      marginTop: "4px",
-                    }}
-                  >
-                    "{detailsModal.message}"
-                  </div>
-                </div>
-              )}
-
-              {detailsModal.rejection_reason && (
-                <div style={{ marginTop: "12px" }}>
-                  <div className={styles.detailLabel}>Rejection Reason</div>
-                  <div
-                    style={{
-                      background: "#fef2f2",
-                      padding: "10px 14px",
-                      borderRadius: "8px",
-                      fontSize: "0.9rem",
-                      color: "#991b1b",
-                      marginTop: "4px",
-                      border: "1px solid #fecaca",
-                    }}
-                  >
-                    ⚠️ {detailsModal.rejection_reason}
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Screenshot Proof */}
-            <div className={styles.modalSection}>
-              <div className={styles.modalSectionTitle}>Payment Screenshot Proof</div>
-              {detailsModal.payment_screenshot_url ? (
-                <div>
+            <div className={styles.modalFooter}>
+              <button className={styles.btnSecondary} onClick={() => setDetailsModal(null)}>
+                Close
+              </button>
+              {!detailsModal.case_id &&
+                (detailsModal.verification_status || detailsModal.payment_status) !== "VERIFIED" && (
                   <button
-                    className={`${styles.actionBtn} ${styles.btnScreenshot}`}
+                    className={`${styles.actionBtn} ${styles.btnVerify}`}
                     onClick={() => {
-                      setScreenshotModal(detailsModal);
+                      setApproveModal(detailsModal);
                       setDetailsModal(null);
                     }}
                   >
-                    🖼️ Open Full Screenshot Lightbox
+                    ✅ Verify
                   </button>
-                </div>
-              ) : (
-                <div style={{ fontSize: "0.9rem", color: "#94a3b8" }}>
-                  No payment screenshot uploaded.
-                </div>
-              )}
-            </div>
-
-            {/* Modal Actions */}
-            <div className={styles.modalFooter}>
-              <button
-                className={styles.btnSecondary}
-                onClick={() => setDetailsModal(null)}
-              >
-                Close
-              </button>
-              {(detailsModal.verification_status || detailsModal.payment_status) !== "VERIFIED" && (
-                <button
-                  className={`${styles.actionBtn} ${styles.btnVerify}`}
-                  onClick={() => {
-                    setApproveModal(detailsModal);
-                    setDetailsModal(null);
-                  }}
-                >
-                  ✅ Verify Donation
-                </button>
-              )}
-              {(detailsModal.verification_status || detailsModal.payment_status) !== "REJECTED" && (
-                <button
-                  className={`${styles.actionBtn} ${styles.btnReject}`}
-                  onClick={() => {
-                    setRejectModal(detailsModal);
-                    setDetailsModal(null);
-                  }}
-                >
-                  ❌ Reject Donation
-                </button>
-              )}
+                )}
+              {!detailsModal.case_id &&
+                (detailsModal.verification_status || detailsModal.payment_status) !== "REJECTED" && (
+                  <button
+                    className={`${styles.actionBtn} ${styles.btnReject}`}
+                    onClick={() => {
+                      setRejectModal(detailsModal);
+                      setDetailsModal(null);
+                    }}
+                  >
+                    ❌ Reject
+                  </button>
+                )}
             </div>
           </div>
         </div>
       )}
 
-      {/* 3. APPROVE CONFIRMATION MODAL */}
+      {/* Approve Modal */}
       {approveModal && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => !actionLoading && setApproveModal(null)}
-        >
+        <div className={styles.modalOverlay} onClick={() => !actionLoading && setApproveModal(null)}>
           <div
             className={styles.modalContent}
             style={{ maxWidth: "480px" }}
@@ -961,31 +1134,14 @@ const AdminDashboard = () => {
             >
               ✕
             </button>
-
             <h3 className={styles.modalTitle} style={{ color: "#166534" }}>
-              <span>✅</span> Confirm Donation Verification
+              <span>✅</span> Confirm Verification
             </h3>
-
             <p style={{ fontSize: "0.95rem", color: "#334155", lineHeight: "1.5" }}>
-              Are you sure you want to verify this donation of{" "}
-              <strong>₹{Number(approveModal.amount || 0).toLocaleString("en-IN")}</strong> submitted by{" "}
+              Verify donation of{" "}
+              <strong>₹{Number(approveModal.amount || 0).toLocaleString("en-IN")}</strong> from{" "}
               <strong>{approveModal.donor_name || approveModal.name || "Donor"}</strong>?
             </p>
-
-            <div
-              style={{
-                background: "#f0fdf4",
-                border: "1px solid #bbf7d0",
-                padding: "12px",
-                borderRadius: "8px",
-                fontSize: "0.85rem",
-                color: "#166534",
-                marginTop: "14px",
-              }}
-            >
-              This will change status to <strong>PAID / VERIFIED</strong> and update total verified stats immediately.
-            </div>
-
             <div className={styles.modalFooter}>
               <button
                 className={styles.btnSecondary}
@@ -1007,12 +1163,9 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* 4. REJECT CONFIRMATION MODAL */}
+      {/* Reject Modal */}
       {rejectModal && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => !actionLoading && setRejectModal(null)}
-        >
+        <div className={styles.modalOverlay} onClick={() => !actionLoading && setRejectModal(null)}>
           <div
             className={styles.modalContent}
             style={{ maxWidth: "500px" }}
@@ -1025,40 +1178,26 @@ const AdminDashboard = () => {
             >
               ✕
             </button>
-
             <h3 className={styles.modalTitle} style={{ color: "#dc2626" }}>
               <span>❌</span> Reject Donation
             </h3>
-
             <p style={{ fontSize: "0.95rem", color: "#334155", marginBottom: "12px" }}>
-              Rejecting donation of <strong>₹{Number(rejectModal.amount || 0).toLocaleString("en-IN")}</strong> from{" "}
+              Rejecting donation of{" "}
+              <strong>₹{Number(rejectModal.amount || 0).toLocaleString("en-IN")}</strong> from{" "}
               <strong>{rejectModal.donor_name || rejectModal.name || "Donor"}</strong>.
             </p>
-
-            <label
-              style={{
-                display: "block",
-                fontWeight: "600",
-                fontSize: "0.875rem",
-                color: "#334155",
-                marginBottom: "4px",
-              }}
-            >
-              Reason for rejection:
+            <label style={{ display: "block", fontWeight: "600", fontSize: "0.875rem", color: "#334155", marginBottom: "4px" }}>
+              Reason:
             </label>
-
             <select
               value={selectedReason}
               onChange={(e) => setSelectedReason(e.target.value)}
               className={styles.reasonSelect}
             >
               {REJECTION_REASONS.map((reason, idx) => (
-                <option key={idx} value={reason}>
-                  {reason}
-                </option>
+                <option key={idx} value={reason}>{reason}</option>
               ))}
             </select>
-
             {selectedReason === "Other" && (
               <textarea
                 placeholder="Enter specific rejection reason..."
@@ -1067,7 +1206,6 @@ const AdminDashboard = () => {
                 className={styles.customReasonInput}
               />
             )}
-
             <div className={styles.modalFooter}>
               <button
                 className={styles.btnSecondary}

@@ -1,8 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "./CowRescueHighlight.module.css";
+import { getPublicConfig } from "../../services/api";
 
 const CowRescueHighlight = () => {
+  const [emergencyNumber, setEmergencyNumber] = useState("1962");
+  const [emergencyLabel, setEmergencyLabel] = useState("Govt. Animal Ambulance");
+
+  useEffect(() => {
+    getPublicConfig()
+      .then((res) => {
+        if (res.data) {
+          setEmergencyNumber(res.data.emergency_number || "1962");
+          setEmergencyLabel(res.data.emergency_label || "Govt. Animal Ambulance");
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section className={styles.highlightSection}>
       <div className={styles.bgPattern}></div>
@@ -57,11 +72,14 @@ const CowRescueHighlight = () => {
           </Link>
         </div>
 
+        {/* Emergency Strip — .env se dynamic */}
         <div className={styles.emergencyStrip}>
-          <span className={styles.emergencyLabel}>🚑 Govt. Animal Ambulance:</span>
-          <a href="tel:1962" className={styles.emergencyNumber}>1962</a>
+          <span className={styles.emergencyLabel}>🚑 {emergencyLabel}:</span>
+          <a href={`tel:${emergencyNumber}`} className={styles.emergencyNumber}>
+            {emergencyNumber}
+          </a>
           <span className={styles.emergencyNote}>
-            (Directly call for immediate government assistance)
+            (Directly call for immediate assistance)
           </span>
         </div>
 

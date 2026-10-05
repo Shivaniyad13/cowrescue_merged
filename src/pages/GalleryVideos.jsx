@@ -12,6 +12,7 @@ const GalleryVideos = () => {
   // ==========================================
   // CONVERT YOUTUBE LINK TO EMBED LINK
   // NO AUTOPLAY
+  // Supports: watch?v=, youtu.be, /shorts/, /embed/
   // ==========================================
   const getYoutubeEmbedUrl = (url) => {
     if (!url) return null;
@@ -26,7 +27,18 @@ const GalleryVideos = () => {
         parsedUrl.searchParams.get('v')
       ) {
         const videoId = parsedUrl.searchParams.get('v');
+        return `https://www.youtube.com/embed/${videoId}?rel=0`;
+      }
 
+      // YouTube Shorts URL
+      // https://www.youtube.com/shorts/VIDEO_ID
+      if (
+        parsedUrl.hostname.includes('youtube.com') &&
+        parsedUrl.pathname.startsWith('/shorts/')
+      ) {
+        const videoId = parsedUrl.pathname
+          .split('/shorts/')[1]
+          .split('/')[0];
         return `https://www.youtube.com/embed/${videoId}?rel=0`;
       }
 
@@ -34,7 +46,6 @@ const GalleryVideos = () => {
       // https://youtu.be/VIDEO_ID
       if (parsedUrl.hostname.includes('youtu.be')) {
         const videoId = parsedUrl.pathname.split('/')[1];
-
         return `https://www.youtube.com/embed/${videoId}?rel=0`;
       }
 
@@ -79,38 +90,43 @@ const GalleryVideos = () => {
       id: 1,
       category: 'Cow Care',
       videoUrl:
-        'https://www.instagram.com/reel/DPqrZYsEh_q/?utm_source=ig_web_button_share_sheet&igsi=MzRlODBiNWFlZA==',
-      videoType: 'instagram'
+        'https://www.youtube.com/shorts/03uD076ZF0E',
+      videoType: 'youtube'
     },
 
     {
       id: 2,
       category: 'Awareness',
-      videoUrl:
-        'https://www.youtube.com/watch?v=qlUMWF74nOg',
+      videoUrl: 'https://www.youtube.com/shorts/1nJXjqTa8jk',
       videoType: 'youtube'
     },
 
     {
       id: 3,
       category: 'Community',
-      videoUrl:
-        'https://www.youtube.com/watch?v=hSM1NXnjF_A',
+      videoUrl: 'https://www.youtube.com/shorts/9IyJvtg-MCg',
       videoType: 'youtube'
     },
 
     {
       id: 4,
       category: 'Events',
-      videoUrl: bgVideo,
-      videoType: 'local'
+      videoUrl: 'https://www.youtube.com/shorts/DCaGkGo4N0s',
+      videoType: 'youtube'
     },
 
     {
       id: 5,
       category: 'Campaigns',
-      videoUrl: bgVideo,
-      videoType: 'local'
+      videoUrl: 'https://www.youtube.com/shorts/jnZsqGvcYsA',
+      videoType: 'youtube'
+    },
+    
+    {
+      id: 6,
+      category: 'Campaigns',
+      videoUrl: 'https://www.youtube.com/shorts/wC5FzkCgBL8',
+      videoType: 'youtube'
     }
   ];
 
@@ -132,9 +148,7 @@ const GalleryVideos = () => {
   const filteredVideos =
     activeCategory === 'All'
       ? videoList
-      : videoList.filter(
-          (vid) => vid.category === activeCategory
-        );
+      : videoList.filter((vid) => vid.category === activeCategory);
 
   // ==========================================
   // VIDEO PREVIEW FOR CARDS
@@ -143,9 +157,19 @@ const GalleryVideos = () => {
   const renderVideoPreview = (vid) => {
     // YOUTUBE
     if (vid.videoType === 'youtube') {
+      const embedUrl = getYoutubeEmbedUrl(vid.videoUrl);
+
+      if (!embedUrl) {
+        return (
+          <div className={styles.cardVideoFallback}>
+            Invalid YouTube URL
+          </div>
+        );
+      }
+
       return (
         <iframe
-          src={getYoutubeEmbedUrl(vid.videoUrl)}
+          src={embedUrl}
           title={`Video ${vid.id}`}
           className={styles.cardVideo}
           allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -156,9 +180,19 @@ const GalleryVideos = () => {
 
     // INSTAGRAM
     if (vid.videoType === 'instagram') {
+      const embedUrl = getInstagramEmbedUrl(vid.videoUrl);
+
+      if (!embedUrl) {
+        return (
+          <div className={styles.cardVideoFallback}>
+            Invalid Instagram URL
+          </div>
+        );
+      }
+
       return (
         <iframe
-          src={getInstagramEmbedUrl(vid.videoUrl)}
+          src={embedUrl}
           title={`Instagram Video ${vid.id}`}
           className={styles.cardVideo}
           allowFullScreen
@@ -175,11 +209,7 @@ const GalleryVideos = () => {
         playsInline
         preload="metadata"
       >
-        <source
-          src={vid.videoUrl}
-          type="video/mp4"
-        />
-
+        <source src={vid.videoUrl} type="video/mp4" />
         Your browser does not support video playback.
       </video>
     );
@@ -187,7 +217,6 @@ const GalleryVideos = () => {
 
   return (
     <div className={styles.pageWrapper}>
-
       {/* =====================================
           HERO SECTION
       ===================================== */}
@@ -201,13 +230,11 @@ const GalleryVideos = () => {
             Video Documentaries & Media
           </div>
 
-          <h1 className={styles.heroTitle}>
-            Stories in Motion
-          </h1>
+          <h1 className={styles.heroTitle}>Stories in Motion</h1>
 
           <p className={styles.heroSubhead}>
-            Watch moments, activities and stories from
-            Panchgavya Se Panchparivartan.
+            Watch moments, activities and stories from Panchgavya Se
+            Panchparivartan.
           </p>
         </div>
       </section>
@@ -221,7 +248,6 @@ const GalleryVideos = () => {
       >
         <div className={styles.container}>
           <div className={styles.featuredCard}>
-
             <div className={styles.featuredVideoWrapper}>
               <video
                 className={styles.featuredVideo}
@@ -230,11 +256,7 @@ const GalleryVideos = () => {
                 playsInline
                 preload="metadata"
               >
-                <source
-                  src={bgVideo}
-                  type="video/mp4"
-                />
-
+                <source src={bgVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
@@ -249,12 +271,11 @@ const GalleryVideos = () => {
               </h2>
 
               <p className={styles.featuredDesc}>
-                Discover the foundational spirit of indigenous
-                cattle care, bio-resource utilization, and
-                rural transformation across India.
+                Discover the foundational spirit of indigenous cattle
+                care, bio-resource utilization, and rural transformation
+                across India.
               </p>
             </div>
-
           </div>
         </div>
       </section>
@@ -267,7 +288,6 @@ const GalleryVideos = () => {
         aria-label="Explore Video Library"
       >
         <div className={styles.container}>
-
           {/* CATEGORY FILTER */}
           <div className={styles.filterBar}>
             {categories.map((cat) => (
@@ -291,7 +311,6 @@ const GalleryVideos = () => {
           {/* VIDEO GRID */}
           {filteredVideos.length > 0 ? (
             <div className={styles.videosGrid}>
-
               {filteredVideos.map((vid) => (
                 <div
                   key={vid.id}
@@ -300,10 +319,7 @@ const GalleryVideos = () => {
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (
-                      e.key === 'Enter' ||
-                      e.key === ' '
-                    ) {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       setSelectedVideo(vid);
                     }
                   }}
@@ -314,22 +330,17 @@ const GalleryVideos = () => {
 
                     {/* PLAY BUTTON */}
                     <div className={styles.playOverlay}>
-                      <div className={styles.playBtnIcon}>
-                        ▶
-                      </div>
+                      <div className={styles.playBtnIcon}>▶</div>
                     </div>
                   </div>
-
                 </div>
               ))}
-
             </div>
           ) : (
             <div className={styles.emptyState}>
               More stories and moments will be added soon.
             </div>
           )}
-
         </div>
       </section>
 
@@ -345,7 +356,6 @@ const GalleryVideos = () => {
             className={styles.videoModalContent}
             onClick={(e) => e.stopPropagation()}
           >
-
             {/* CLOSE BUTTON */}
             <button
               className={styles.closeModalBtn}
@@ -359,9 +369,7 @@ const GalleryVideos = () => {
             {selectedVideo.videoType === 'youtube' && (
               <iframe
                 className={styles.modalVideo}
-                src={getYoutubeEmbedUrl(
-                  selectedVideo.videoUrl
-                )}
+                src={getYoutubeEmbedUrl(selectedVideo.videoUrl)}
                 title="YouTube Video"
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -372,9 +380,7 @@ const GalleryVideos = () => {
             {selectedVideo.videoType === 'instagram' && (
               <iframe
                 className={styles.instagramModal}
-                src={getInstagramEmbedUrl(
-                  selectedVideo.videoUrl
-                )}
+                src={getInstagramEmbedUrl(selectedVideo.videoUrl)}
                 title="Instagram Video"
                 allowFullScreen
                 scrolling="no"
@@ -393,11 +399,9 @@ const GalleryVideos = () => {
                   src={selectedVideo.videoUrl}
                   type="video/mp4"
                 />
-
                 Your browser does not support video playback.
               </video>
             )}
-
           </div>
         </div>
       )}
@@ -410,21 +414,15 @@ const GalleryVideos = () => {
         aria-label="Explore Images"
       >
         <div className={styles.container}>
-
           <h2 className={styles.footerCtaTitle}>
             See more moments from our events
           </h2>
 
-          <Link
-            to="/gallery/images"
-            className={styles.ctaBtn}
-          >
+          <Link to="/gallery/images" className={styles.ctaBtn}>
             Explore Images →
           </Link>
-
         </div>
       </section>
-
     </div>
   );
 };

@@ -103,7 +103,7 @@ const Contact = () => {
               <div>
                 <h4>Email</h4>
                 <p>
-                  <a href="mailto:info@khushicentre.in">info@khushicentre.in</a>
+                  <a href="mailto:admin@khushicentre.in.in">admin@khushicentre.in.in</a>
                   <br />
                   <a href="mailto:khushicentre@gmail.com">khushicentre@gmail.com</a>
                 </p>

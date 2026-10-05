@@ -198,8 +198,8 @@ const Footer = () => {
               65/4/2, Sant Kirandass Ashram, Jaunti, Kanjhawala–Qutubgarh Road, New Delhi – 110081, India
             </p>
 
-            <a href="mailto:info@khushicentre.in">
-              📧 info@khushicentre.in
+            <a href="admin@khushicentre.in">
+              📧 admin@khushicentre.in
             </a>
 
             <a href="mailto:khushicentre@gmail.com">
