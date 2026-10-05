@@ -1,8 +1,6 @@
- 
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import styles from "./ReportIncident.module.css";
-import MapPicker from "./components/MapPicker";
 import { reportCow } from "../../services/api";
 
 const ANIMAL_CONDITIONS = [
@@ -39,6 +37,8 @@ const ReportIncident = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [successData, setSuccessData] = useState(null);
   const [locating, setLocating] = useState(false);
+  const [locationFetched, setLocationFetched] = useState(false);
+  const [mediaType, setMediaType] = useState("image");
 
   const fieldRefs = {
     reporter_name: useRef(null),
@@ -145,6 +145,8 @@ const ReportIncident = () => {
             pincode: addr.postcode || "",
           }));
 
+          setLocationFetched(true);
+
           setFieldErrors((prev) => {
             const next = { ...prev };
             delete next.address;
@@ -157,6 +159,7 @@ const ReportIncident = () => {
             latitude: String(latitude),
             longitude: String(longitude),
           }));
+          setLocationFetched(true);
         } finally {
           setLocating(false);
         }
@@ -279,7 +282,7 @@ const ReportIncident = () => {
           <div className={styles.successBadge}>✅ Report Submitted Successfully</div>
           <h2>Thank You for Reporting!</h2>
           <p className={styles.successSub}>
-            Your emergency report has been registered. NGOs and Government helpline have been notified.
+            NGOs and Government helpline have been notified.
           </p>
 
           <div className={styles.ticketDetails}>
@@ -338,14 +341,14 @@ const ReportIncident = () => {
       )}
 
       <form onSubmit={handleSubmit} className={styles.formCard} noValidate>
-        {/* 1. Reporter Info */}
+        {/* ═══ SECTION 1: Reporter Info ═══ */}
         <div className={styles.formSection}>
           <h3 className={styles.sectionTitle}>
-            <span>👤</span> 1. Reporter Information
+            <span>👤</span> Your Details
           </h3>
           <div className={styles.grid2}>
             <div className={styles.fieldGroup}>
-              <label htmlFor="reporter_name">Full Name *</label>
+              <label htmlFor="reporter_name">Your Name *</label>
               <input
                 ref={fieldRefs.reporter_name}
                 type="text"
@@ -362,15 +365,13 @@ const ReportIncident = () => {
               )}
             </div>
             <div className={styles.fieldGroup}>
-              <label htmlFor="reporter_phone">
-                Mobile Number * <small>(10 digits)</small>
-              </label>
+              <label htmlFor="reporter_phone">Mobile Number *</label>
               <input
                 ref={fieldRefs.reporter_phone}
                 type="tel"
                 id="reporter_phone"
                 name="reporter_phone"
-                placeholder="e.g. 9876543210"
+                placeholder="10-digit mobile number"
                 value={formData.reporter_phone}
                 onChange={handleChange}
                 className={fieldClass("reporter_phone")}
@@ -391,7 +392,7 @@ const ReportIncident = () => {
               type="email"
               id="reporter_email"
               name="reporter_email"
-              placeholder="e.g. ramesh@example.com"
+              placeholder="your.email@example.com"
               value={formData.reporter_email}
               onChange={handleChange}
               className={fieldClass("reporter_email")}
@@ -403,14 +404,13 @@ const ReportIncident = () => {
           </div>
         </div>
 
-        {/* 2. Situation */}
+        {/* ═══ SECTION 2: Cow Condition ═══ */}
         <div className={styles.formSection}>
           <h3 className={styles.sectionTitle}>
-            <span>🐄</span> 2. Situation & Condition
+            <span>🐄</span> Cow's Condition
           </h3>
-
           <div className={styles.fieldGroup}>
-            <label htmlFor="animal_condition">Cow Condition *</label>
+            <label htmlFor="animal_condition">What is the cow's condition? *</label>
             <select
               id="animal_condition"
               name="animal_condition"
@@ -425,7 +425,7 @@ const ReportIncident = () => {
           </div>
 
           <div className={styles.fieldGroup}>
-            <label htmlFor="description">Situation Description *</label>
+            <label htmlFor="description">Describe the situation *</label>
             <textarea
               ref={fieldRefs.description}
               id="description"
@@ -443,40 +443,53 @@ const ReportIncident = () => {
           </div>
         </div>
 
-        {/* 3. Location */}
+        {/* ═══ SECTION 3: Location ═══ */}
         <div className={styles.formSection}>
           <h3 className={styles.sectionTitle}>
-            <span>📍</span> 3. Incident Location
+            <span>📍</span> Incident Location
           </h3>
 
-          <MapPicker
-            lat={formData.latitude}
-            lng={formData.longitude}
-            onChangeLocation={(lat, lng) => {
-              setFormData((prev) => ({
-                ...prev,
-                latitude: String(lat),
-                longitude: String(lng),
-              }));
-            }}
-            onAddressGeocoded={(geoDetails) => {
-              if (!geoDetails) return;
-              setFormData((prev) => ({
-                ...prev,
-                address: prev.address.trim() ? prev.address : (geoDetails.address || prev.address),
-                city: geoDetails.city || prev.city,
-                district: geoDetails.district || prev.district,
-                state: geoDetails.state || prev.state,
-                pincode: geoDetails.pincode || prev.pincode,
-              }));
-              setFieldErrors((prev) => {
-                const next = { ...prev };
-                delete next.address;
-                return next;
-              });
-            }}
-          />
+          {/* Step 1: Address field */}
+          <div className={styles.fieldGroup}>
+            <label htmlFor="address">
+              Please provide exact address / area / landmark *
+            </label>
+            <input
+              ref={fieldRefs.address}
+              type="text"
+              id="address"
+              name="address"
+              placeholder="e.g. Near Temple, Main Road, Sector 62"
+              value={formData.address}
+              onChange={handleChange}
+              className={fieldClass("address")}
+              required
+            />
+            {fieldErrors.address && (
+              <p className={styles.fieldErrorMsg}>⚠️ {fieldErrors.address}</p>
+            )}
+            <p style={{ fontSize: "0.82rem", color: "#6b7280", marginTop: "6px" }}>
+              💡 Include nearby landmark for faster rescue
+            </p>
+          </div>
 
+          {/* OR Divider */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              margin: "16px 0",
+            }}
+          >
+            <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
+            <span style={{ fontSize: "0.8rem", color: "#9ca3af", fontWeight: 600 }}>
+              OR
+            </span>
+            <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
+          </div>
+
+          {/* Step 2: Use My Current Location button */}
           <button
             type="button"
             onClick={handleUseCurrentLocation}
@@ -484,8 +497,7 @@ const ReportIncident = () => {
             style={{
               width: "100%",
               padding: "14px",
-              marginTop: "16px",
-              marginBottom: "16px",
+              marginBottom: "12px",
               background: locating
                 ? "#94a3b8"
                 : "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
@@ -499,94 +511,167 @@ const ReportIncident = () => {
               alignItems: "center",
               justifyContent: "center",
               gap: "10px",
+              transition: "all 0.2s ease",
             }}
           >
-            {locating ? "📡 Fetching your location..." : "📡 Use My Current Location"}
+            {locating
+              ? "📡 Fetching your location..."
+              : locationFetched
+              ? "✅ Location Fetched — Click to Refresh"
+              : "📡 Use My Current Location"}
           </button>
 
-          <div className={styles.fieldGroup}>
-            <label htmlFor="address">Road / Area / Landmark *</label>
-            <input
-              ref={fieldRefs.address}
-              type="text"
-              id="address"
-              name="address"
-              placeholder="e.g. Near Temple Chowk, Main Bypass Road"
-              value={formData.address}
-              onChange={handleChange}
-              className={fieldClass("address")}
-              required
-            />
-            {fieldErrors.address && (
-              <p className={styles.fieldErrorMsg}>⚠️ {fieldErrors.address}</p>
-            )}
-          </div>
+          {/* Location Fetched Confirmation */}
+          {locationFetched && (formData.city || formData.state) && (
+            <div
+              style={{
+                padding: "12px 16px",
+                background: "#f0fdf4",
+                border: "1px solid #86efac",
+                borderRadius: "10px",
+                fontSize: "0.88rem",
+                color: "#166534",
+              }}
+            >
+              ✅ Location detected:{" "}
+              <strong>
+                {[formData.city, formData.district, formData.state, formData.pincode]
+                  .filter(Boolean)
+                  .join(", ")}
+              </strong>
+            </div>
+          )}
         </div>
 
-        {/* 4. Media */}
+        {/* ═══ SECTION 4: Media ═══ */}
+               {/* ═══ SECTION 4: Media ═══ */}
         <div className={styles.formSection}>
           <h3 className={styles.sectionTitle}>
-            <span>📷</span> 4. Upload Photo / Video (Optional)
+            <span>📎</span> Upload Evidence (Optional)
           </h3>
-          <p className={styles.uploadHint}>
-            Photo max 5MB (JPG, PNG, WEBP) • Video max 10MB (MP4, MOV, WEBM)
-          </p>
 
-          {!photoPreview ? (
-            <div className={styles.fileDropArea} style={{ marginBottom: "12px" }}>
-              <input
-                type="file"
-                id="incidentPhoto"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handlePhotoChange}
-                className={styles.fileInputHidden}
-              />
-              <label htmlFor="incidentPhoto" className={styles.fileDropLabel}>
-                <span className={styles.uploadIcon}>📷</span>
-                <span>Click to Select Photo</span>
-              </label>
-            </div>
-          ) : (
-            <div className={styles.photoPreviewWrapper} style={{ marginBottom: "12px" }}>
-              <img src={photoPreview} alt="Preview" className={styles.previewImg} />
-              <button
-                type="button"
-                onClick={handleRemovePhoto}
-                className={styles.btnRemovePhoto}
-              >
-                ✕ Remove Photo
-              </button>
-            </div>
+          {/* Media Type Dropdown */}
+          <div className={styles.fieldGroup}>
+            <label htmlFor="mediaType">Select media type</label>
+            <select
+              id="mediaType"
+              value={mediaType}
+              onChange={(e) => {
+                setMediaType(e.target.value);
+                // Reset existing media if type changes
+                setIncidentPhoto(null);
+                setPhotoPreview(null);
+                setIncidentVideo(null);
+                setErrorMsg("");
+              }}
+            >
+              <option value="image">📷 Image</option>
+              <option value="video">🎥 Video</option>
+            </select>
+          </div>
+
+          {/* File Upload based on dropdown */}
+          {mediaType === "image" && (
+            <>
+              {!photoPreview ? (
+                <div className={styles.fileDropArea}>
+                  <input
+                    type="file"
+                    id="incidentPhoto"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handlePhotoChange}
+                    className={styles.fileInputHidden}
+                  />
+                  <label htmlFor="incidentPhoto" className={styles.fileDropLabel}>
+                    <span className={styles.uploadIcon}>📷</span>
+                    <span>Click to Select Image</span>
+                    <small style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: "4px" }}>
+                      JPG, PNG, WEBP • Max 5MB
+                    </small>
+                  </label>
+                </div>
+              ) : (
+                <div className={styles.photoPreviewWrapper}>
+                  <img src={photoPreview} alt="Preview" className={styles.previewImg} />
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className={styles.btnRemovePhoto}
+                  >
+                    ✕ Remove Image
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
-          {!incidentVideo ? (
-            <div className={styles.fileDropArea}>
-              <input
-                type="file"
-                id="incidentVideo"
-                accept="video/mp4,video/quicktime,video/webm"
-                onChange={handleVideoChange}
-                className={styles.fileInputHidden}
-              />
-              <label htmlFor="incidentVideo" className={styles.fileDropLabel}>
-                <span className={styles.uploadIcon}>🎥</span>
-                <span>Click to Select Video</span>
-              </label>
-            </div>
-          ) : (
-            <div style={{ marginTop: "12px", padding: "12px", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "8px" }}>
-              <strong>🎥 Video:</strong> {incidentVideo.name}
-              <button
-                type="button"
-                onClick={handleRemoveVideo}
-                style={{ marginLeft: "12px", padding: "4px 10px", background: "#dc2626", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.8rem" }}
-              >
-                ✕ Remove
-              </button>
-            </div>
+          {mediaType === "video" && (
+            <>
+              {!incidentVideo ? (
+                <div className={styles.fileDropArea}>
+                  <input
+                    type="file"
+                    id="incidentVideo"
+                    accept="video/mp4,video/quicktime,video/webm"
+                    onChange={handleVideoChange}
+                    className={styles.fileInputHidden}
+                  />
+                  <label htmlFor="incidentVideo" className={styles.fileDropLabel}>
+                    <span className={styles.uploadIcon}>🎥</span>
+                    <span>Click to Select Video</span>
+                    <small style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: "4px" }}>
+                      MP4, MOV, WEBM • Max 10MB
+                    </small>
+                  </label>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    padding: "16px",
+                    background: "#f0fdf4",
+                    border: "1px solid #86efac",
+                    borderRadius: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "10px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
+                    <span style={{ fontSize: "1.5rem" }}>🎥</span>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 600, color: "#166534", marginBottom: "2px" }}>
+                        Video selected
+                      </div>
+                      <div style={{ fontSize: "0.85rem", color: "#4b5563", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {incidentVideo.name}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveVideo}
+                    style={{
+                      padding: "6px 14px",
+                      background: "#dc2626",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✕ Remove
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 
+        {/* Submit Button */}
         <button type="submit" disabled={isSubmitting} className={styles.btnSubmit}>
           {isSubmitting ? "Submitting Emergency Report..." : "🚨 Submit Rescue Report"}
         </button>
