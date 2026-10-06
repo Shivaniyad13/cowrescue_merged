@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import styles from './About.module.css';
 
 // Project Images
-import heroImg from '../assets/images/OIP (2).jfif';
-import splitImg from '../assets/images/OIP.jfif';
+import heroImg from "../assets/images/cow1.jpg";
+import splitImg from "../assets/images/cow6.jpg";
 
 const About = () => {
   // Mission Cards Data

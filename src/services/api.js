@@ -1,4 +1,3 @@
- 
 const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const cleanBaseUrl = rawApiUrl.replace(/\/+$/, "").replace(/\/api$/, "");
 const API_BASE_URL = `${cleanBaseUrl}/api`;
@@ -136,7 +135,6 @@ export const updateAdminContactStatus = async (token, id, status) => {
 // COW RESCUE — PUBLIC
 // =====================================================
 
-// Report a cow (FormData or JSON)
 export const reportCow = async (data) => {
   const isFormData = data instanceof FormData;
   const response = await fetch(`${API_BASE_URL}/cases/report`, {
@@ -153,7 +151,6 @@ export const reportCow = async (data) => {
   return result;
 };
 
-// Track case by case_id
 export const trackCase = async (caseId) => {
   const response = await fetch(`${API_BASE_URL}/cases/track/${caseId}`);
   const result = await response.json();
@@ -161,7 +158,6 @@ export const trackCase = async (caseId) => {
   return result;
 };
 
-// Get timeline for a case
 export const getCaseTimeline = async (caseId) => {
   const response = await fetch(`${API_BASE_URL}/cases/track/${caseId}/timeline`);
   const result = await response.json();
@@ -169,7 +165,6 @@ export const getCaseTimeline = async (caseId) => {
   return result;
 };
 
-// Nearby NGOs for a case
 export const getNearbyNGOs = async (caseId) => {
   const response = await fetch(`${API_BASE_URL}/cases/${caseId}/nearby-ngos`);
   const result = await response.json();
@@ -177,7 +172,6 @@ export const getNearbyNGOs = async (caseId) => {
   return result;
 };
 
-// Eligible NGOs for a case
 export const getEligibleNGOs = async (caseId) => {
   const response = await fetch(`${API_BASE_URL}/cases/${caseId}/eligible-ngos`);
   const result = await response.json();
@@ -185,7 +179,6 @@ export const getEligibleNGOs = async (caseId) => {
   return result;
 };
 
-// User actions
 export const userCalled1962 = async (caseId, note = "") => {
   const response = await fetch(`${API_BASE_URL}/cases/${caseId}/user-action/called-1962`, {
     method: "POST",
@@ -361,10 +354,8 @@ export const getAdminFullCase = async (token, caseId) => {
   return result;
 };
 
-
-
 // =====================================================
-// CASE DONATIONS (Phase 1)
+// CASE DONATIONS
 // =====================================================
 
 export const createCaseDonationOrder = async (payload) => {
@@ -405,9 +396,8 @@ export const getNgoPendingSettlements = async (token, ngoId) => {
   return result;
 };
 
-
 // =====================================================
-// NGO BANK DETAILS (Onboarding)
+// NGO BANK DETAILS
 // =====================================================
 
 export const getNgoBankFormInfo = async (token) => {
@@ -429,7 +419,7 @@ export const submitNgoBankDetails = async (token, data) => {
 };
 
 // =====================================================
-// SETTLEMENTS (Admin)
+// SETTLEMENTS
 // =====================================================
 
 export const getPendingSettlements = async (token) => {
@@ -461,5 +451,135 @@ export const markNgoAsSettled = async (token, ngoId, utrReference, note = "") =>
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.message || "Failed to mark as settled.");
+  return result;
+};
+
+// =====================================================
+// NEWS
+// =====================================================
+
+export const getPublicNews = async (category = null) => {
+  const url = category && category !== "All"
+    ? `${API_BASE_URL}/news?category=${encodeURIComponent(category)}`
+    : `${API_BASE_URL}/news`;
+  const response = await fetch(url);
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch news.");
+  return result;
+};
+
+export const getAdminNews = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/admin/news`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch admin news.");
+  return result;
+};
+
+export const createNews = async (token, formData) => {
+  const response = await fetch(`${API_BASE_URL}/admin/news`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to create news.");
+  return result;
+};
+
+export const updateNews = async (token, id, formData) => {
+  const response = await fetch(`${API_BASE_URL}/admin/news/${id}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to update news.");
+  return result;
+};
+
+export const deleteNews = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/admin/news/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to delete news.");
+  return result;
+};
+
+export const toggleNewsPublish = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/admin/news/${id}/toggle-publish`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to toggle publish.");
+  return result;
+};
+
+// =====================================================
+// GALLERY IMAGES
+// =====================================================
+
+export const getPublicGallery = async (category = null) => {
+  const url = category && category !== "All"
+    ? `${API_BASE_URL}/gallery?category=${encodeURIComponent(category)}`
+    : `${API_BASE_URL}/gallery`;
+  const response = await fetch(url);
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch gallery.");
+  return result;
+};
+
+export const getAdminGallery = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/admin/gallery`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch gallery.");
+  return result;
+};
+
+export const createGalleryImage = async (token, formData) => {
+  const response = await fetch(`${API_BASE_URL}/admin/gallery`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to create image.");
+  return result;
+};
+
+export const updateGalleryImage = async (token, id, formData) => {
+  const response = await fetch(`${API_BASE_URL}/admin/gallery/${id}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to update image.");
+  return result;
+};
+
+export const deleteGalleryImage = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/admin/gallery/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to delete image.");
+  return result;
+};
+
+export const toggleGalleryPublish = async (token, id) => {
+  const response = await fetch(`${API_BASE_URL}/admin/gallery/${id}/toggle-publish`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to toggle publish.");
   return result;
 };

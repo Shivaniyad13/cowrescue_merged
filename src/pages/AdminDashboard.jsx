@@ -10,6 +10,8 @@ import {
 } from "../services/api";
 import CowRescueAdmin from "./Admin/CowRescueAdmin";
 import AdminSettlements from "./Admin/AdminSettlements";
+import AdminNews from "./Admin/AdminNews";
+import AdminGalleryImages from "./Admin/AdminGalleryImages";
 
 const REJECTION_REASONS = [
   "Invalid payment screenshot",
@@ -54,8 +56,13 @@ const AdminDashboard = () => {
       return;
     }
     setError("");
-    // Cow Rescue aur Settlements tabs apna data khud fetch karte hain
-    if (activeMainTab === "cowRescue" || activeMainTab === "settlements") {
+    // Tabs that fetch their own data
+    if (
+      activeMainTab === "cowRescue" ||
+      activeMainTab === "settlements" ||
+      activeMainTab === "news" ||
+      activeMainTab === "gallery"
+    ) {
       setLoading(false);
       return;
     }
@@ -352,6 +359,22 @@ const AdminDashboard = () => {
         >
           💰 Settlements
         </button>
+        <button
+          className={`${styles.tabBtn} ${
+            activeMainTab === "news" ? styles.tabBtnActive : ""
+          }`}
+          onClick={() => setActiveMainTab("news")}
+        >
+          📰 News
+        </button>
+        <button
+          className={`${styles.tabBtn} ${
+            activeMainTab === "gallery" ? styles.tabBtnActive : ""
+          }`}
+          onClick={() => setActiveMainTab("gallery")}
+        >
+          🖼️ Gallery
+        </button>
       </div>
 
       {/* Error */}
@@ -389,10 +412,12 @@ const AdminDashboard = () => {
       {/* ═══════════ TAB CONTENT ═══════════ */}
 
       {activeMainTab === "settlements" ? (
-        /* ─── SETTLEMENTS TAB ─── */
         <AdminSettlements token={token} />
+      ) : activeMainTab === "news" ? (
+        <AdminNews token={token} />
+      ) : activeMainTab === "gallery" ? (
+        <AdminGalleryImages token={token} />
       ) : activeMainTab === "cowRescue" ? (
-        /* ─── COW RESCUE TAB ─── */
         <CowRescueAdmin token={token} />
       ) : loading ? (
         <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>
@@ -402,7 +427,7 @@ const AdminDashboard = () => {
       ) : activeMainTab === "donations" ? (
         /* ─── DONATIONS TAB ─── */
         <div>
-          {/* Category Sub-Tabs (General vs Case) */}
+          {/* Category Sub-Tabs */}
           <div
             style={{
               display: "flex",

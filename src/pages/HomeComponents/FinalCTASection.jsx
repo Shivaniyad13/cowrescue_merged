@@ -11,7 +11,7 @@ const FinalCTASection = () => {
         <div className={styles.ctaBox}>
           <div className={styles.content}>
             <span className={styles.badge}>Join the Transformation</span>
-            <h2 className={styles.title}>From Panchgavya Se Panchparivartan</h2>
+            <h2 className={styles.title}> Panchgavya Se Panchparivartan</h2>
             <p className={styles.description}>
               Explore our comprehensive programs, governmental partnerships, community initiatives, and collaborative consultation frameworks shaping a self-reliant Bharat.
             </p>

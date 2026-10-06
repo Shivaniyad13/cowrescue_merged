@@ -4,7 +4,7 @@ import { submitDonation, createDonationOrder, verifyDonationOrder } from "../ser
 
 // Assets
 import qrCode from "../assets/images/qr.jpeg";
-import donationVid from "../assets/videos/vidssave.com एक दान, एक जीवन 🐄 _ गौमाता की रक्षा के लिए आगे आएं _ Cow Donation Campaign _Nabin Chandra Foundation 240P.mp4";
+import donationVid from "../assets/videos/cow-donation-campaign.mp4";
 
 // Hero & Section Images
 import heroCowImg from "../assets/images/Cow-Donation-Feeding-Procedure.jpg";
@@ -13,7 +13,8 @@ import closingCowImg from "../assets/images/nabin-cow.png";
 // 9 Donation Cards Images
 import imgFirstRoti from "../assets/images/Cow-Donation-Feeding-Procedure.jpg";
 import imgAdoptCow from "../assets/images/cow1.jpg";
-import imgNandiSeva from "../assets/images/Kankrej.jfif";
+import imgNandiSeva from "../assets/images/cow7.jpg";
+
 import imgCowTreatment from "../assets/images/1687802961140593-0.png";
 import imgCowShed from "../assets/images/CowShed.jpg";
 import imgFeed20Cows from "../assets/images/20cows.png";
