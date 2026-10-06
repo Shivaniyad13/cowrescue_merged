@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 import styles from './About.module.css';
 
 // Project Images
-import heroImg from "../assets/images/cow1.jpg";
-import splitImg from "../assets/images/cow6.jpg";
+// [moved-to-cloudinary] import heroImg from "../assets/images/cow1.jpg";
+// [moved-to-cloudinary] import splitImg from "../assets/images/cow6.jpg";
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../cloudinary.js';
+const heroImg = cloudinaryAssets["images/cow1.jpg"];
+const splitImg = cloudinaryAssets["images/cow6.jpg"];
 
 const About = () => {
   // Mission Cards Data

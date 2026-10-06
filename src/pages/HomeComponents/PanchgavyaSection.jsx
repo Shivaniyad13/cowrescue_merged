@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import styles from './PanchgavyaSection.module.css';
-import cowDetailImg from '../../assets/images/cow4.png';
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const cowDetailImg = cloudinaryAssets["images/cow4.png"];
+// [moved-to-cloudinary] import cowDetailImg from '../../assets/images/cow4.png';
 
 const PanchgavyaSection = () => {
   const [activeElement, setActiveElement] = useState(0);

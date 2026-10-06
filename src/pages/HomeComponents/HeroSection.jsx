@@ -1,7 +1,12 @@
 import React, { useState, useRef } from 'react';
 import styles from './HeroSection.module.css';
-import bgVideo from '../../assets/videos/213713_medium.mp4';
-import heroImageFallback from '../../assets/images/Gemini_Generated_Image_1kxmsi1kxmsi1kxm.png';
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const bgVideo = cloudinaryAssets["videos/213713_medium.mp4"];
+const heroImageFallback = cloudinaryAssets["images/Gemini_Generated_Image_1kxmsi1kxmsi1kxm.png"];
+// [moved-to-cloudinary] import bgVideo from '../../assets/videos/213713_medium.mp4';
+// [moved-to-cloudinary] import heroImageFallback from '../../assets/images/Gemini_Generated_Image_1kxmsi1kxmsi1kxm.png';
 
 const HeroSection = () => {
   const [isPaused, setIsPaused] = useState(false);

@@ -1,6 +1,10 @@
 import React from 'react';
 import styles from './VisionSection.module.css';
-import visionArt from '../../assets/images/ChatGPT Image Aug 20, 2026, 03_42_22 PM.png';
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const visionArt = cloudinaryAssets["images/ChatGPT Image Aug 20, 2026, 03_42_22 PM.png"];
+// [moved-to-cloudinary] import visionArt from '../../assets/images/ChatGPT Image Aug 20, 2026, 03_42_22 PM.png';
 
 const VisionSection = () => {
   const visionGoals = [

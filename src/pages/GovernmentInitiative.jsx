@@ -1,8 +1,12 @@
 import React from 'react';
 import styles from './GovernmentInitiative.module.css';
 
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../cloudinary.js';
+const cowHeroImg = cloudinaryAssets["images/cow1.jpg"];
+
 // Project image
-import cowHeroImg from '../assets/images/cow1.jpg';
+// [moved-to-cloudinary] import cowHeroImg from '../assets/images/cow1.jpg';
 
 const GovernmentInitiative = () => {
   // 4 Main Government Scheme Cards

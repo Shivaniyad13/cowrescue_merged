@@ -3,24 +3,40 @@ import styles from "./Donate.module.css";
 import { submitDonation, createDonationOrder, verifyDonationOrder } from "../services/api";
 
 // Assets
-import qrCode from "../assets/images/qr.jpeg";
-import donationVid from "../assets/videos/cow-donation-campaign.mp4";
+// [moved-to-cloudinary] import qrCode from "../assets/images/qr.jpeg";
+// [moved-to-cloudinary] import donationVid from "../assets/videos/cow-donation-campaign.mp4";
 
 // Hero & Section Images
-import heroCowImg from "../assets/images/Cow-Donation-Feeding-Procedure.jpg";
-import closingCowImg from "../assets/images/nabin-cow.png";
+// [moved-to-cloudinary] import heroCowImg from "../assets/images/Cow-Donation-Feeding-Procedure.jpg";
+// [moved-to-cloudinary] import closingCowImg from "../assets/images/nabin-cow.png";
 
 // 9 Donation Cards Images
-import imgFirstRoti from "../assets/images/Cow-Donation-Feeding-Procedure.jpg";
-import imgAdoptCow from "../assets/images/cow1.jpg";
-import imgNandiSeva from "../assets/images/cow7.jpg";
+// [moved-to-cloudinary] import imgFirstRoti from "../assets/images/Cow-Donation-Feeding-Procedure.jpg";
+// [moved-to-cloudinary] import imgAdoptCow from "../assets/images/cow1.jpg";
+// [moved-to-cloudinary] import imgNandiSeva from "../assets/images/cow7.jpg";
 
-import imgCowTreatment from "../assets/images/1687802961140593-0.png";
-import imgCowShed from "../assets/images/CowShed.jpg";
-import imgFeed20Cows from "../assets/images/20cows.png";
-import imgAdoptCalf from "../assets/images/donte cow.jpg";
-import imgMedicinesKit from "../assets/images/cow kit.jpg";
-import imgGreenFodder from "../assets/images/WhatsApp Image 2025-08-05 at 18.30.11.jpeg";
+// [moved-to-cloudinary] import imgCowTreatment from "../assets/images/1687802961140593-0.png";
+// [moved-to-cloudinary] import imgCowShed from "../assets/images/CowShed.jpg";
+// [moved-to-cloudinary] import imgFeed20Cows from "../assets/images/20cows.png";
+// [moved-to-cloudinary] import imgAdoptCalf from "../assets/images/donte cow.jpg";
+// [moved-to-cloudinary] import imgMedicinesKit from "../assets/images/cow kit.jpg";
+// [moved-to-cloudinary] import imgGreenFodder from "../assets/images/WhatsApp Image 2025-08-05 at 18.30.11.jpeg";
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../cloudinary.js';
+const qrCode = cloudinaryAssets["images/qr.jpeg"];
+const donationVid = cloudinaryAssets["videos/cow-donation-campaign.mp4"];
+const heroCowImg = cloudinaryAssets["images/Cow-Donation-Feeding-Procedure.jpg"];
+const closingCowImg = cloudinaryAssets["images/nabin-cow.png"];
+const imgFirstRoti = cloudinaryAssets["images/Cow-Donation-Feeding-Procedure.jpg"];
+const imgAdoptCow = cloudinaryAssets["images/cow1.jpg"];
+const imgNandiSeva = cloudinaryAssets["images/cow7.jpg"];
+const imgCowTreatment = cloudinaryAssets["images/1687802961140593-0.png"];
+const imgCowShed = cloudinaryAssets["images/CowShed.jpg"];
+const imgFeed20Cows = cloudinaryAssets["images/20cows.png"];
+const imgAdoptCalf = cloudinaryAssets["images/donte cow.jpg"];
+const imgMedicinesKit = cloudinaryAssets["images/cow kit.jpg"];
+const imgGreenFodder = cloudinaryAssets["images/WhatsApp Image 2025-08-05 at 18.30.11.jpeg"];
 
 const Donation = () => {
   const [selectedAmount, setSelectedAmount] = useState("501");

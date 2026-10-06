@@ -1,6 +1,10 @@
 import React from 'react';
 import styles from './InnovationSection.module.css';
-import heritageImg from '../../assets/images/ChatGPT Image Aug 13, 2026, 03_06_02 PM.png';
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const heritageImg = cloudinaryAssets["images/ChatGPT Image Aug 13, 2026, 03_06_02 PM.png"];
+// [moved-to-cloudinary] import heritageImg from '../../assets/images/ChatGPT Image Aug 13, 2026, 03_06_02 PM.png';
 
 const InnovationSection = () => {
   const bridgeItems = [

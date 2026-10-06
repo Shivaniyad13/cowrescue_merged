@@ -2,8 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './CboInitiative.module.css';
 
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../cloudinary.js';
+const heroArt = cloudinaryAssets["images/cow7.jpg"];
+
 // Project image asset
-import heroArt from '../assets/images/cow7.jpg';
+// [moved-to-cloudinary] import heroArt from '../assets/images/cow7.jpg';
 
 const CboInitiative = () => {
   // 4 Examples of Community Groups

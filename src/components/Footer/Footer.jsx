@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
-import logo from "../../assets/logos/logo.png";
+// [moved-to-cloudinary] import logo from "../../assets/logos/logo.png";
 
 import {
   FaFacebookF,
@@ -11,6 +11,10 @@ import {
   FaHeart,
   FaHandsHelping,
 } from 'react-icons/fa';
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const logo = cloudinaryAssets["logos/logo.png"];
 
 const Footer = () => {
 

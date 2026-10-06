@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './GalleryVideos.module.css';
 
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../cloudinary.js';
+const bgVideo = cloudinaryAssets["videos/WhatsApp Video 2026-08-10 at 11.44.52 AM.mp4"];
+
 // Local featured video
-import bgVideo from '../assets/videos/WhatsApp Video 2026-08-10 at 11.44.52 AM.mp4';
+// [moved-to-cloudinary] import bgVideo from '../assets/videos/WhatsApp Video 2026-08-10 at 11.44.52 AM.mp4';
 
 const GalleryVideos = () => {
   const [activeCategory, setActiveCategory] = useState('All');

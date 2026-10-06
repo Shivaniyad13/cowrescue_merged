@@ -2,14 +2,25 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "./GalleryImages.module.css";
 
-import imgPanchgavyaDay from "../assets/images/3rd National Panchgavya Day Celebration (1).png";
-import imgCow1 from "../assets/images/cow1.jpg";
-import imgCow6 from "../assets/images/cow6.jpg";
-import imgCow7 from "../assets/images/cow7.jpg";
-import imgCow8 from "../assets/images/cow8.jpg";
-import imgCow9 from "../assets/images/cow9.jpg";
-import imgGovigyan from "../assets/images/govigyan.jpg";
-import imgWhatsapp from "../assets/images/WhatsApp Image 2025-08-05 at 18.30.11 (1).jpeg";
+// [moved-to-cloudinary] import imgPanchgavyaDay from "../assets/images/3rd National Panchgavya Day Celebration (1).png";
+// [moved-to-cloudinary] import imgCow1 from "../assets/images/cow1.jpg";
+// [moved-to-cloudinary] import imgCow6 from "../assets/images/cow6.jpg";
+// [moved-to-cloudinary] import imgCow7 from "../assets/images/cow7.jpg";
+// [moved-to-cloudinary] import imgCow8 from "../assets/images/cow8.jpg";
+// [moved-to-cloudinary] import imgCow9 from "../assets/images/cow9.jpg";
+// [moved-to-cloudinary] import imgGovigyan from "../assets/images/govigyan.jpg";
+// [moved-to-cloudinary] import imgWhatsapp from "../assets/images/WhatsApp Image 2025-08-05 at 18.30.11 (1).jpeg";
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../cloudinary.js';
+const imgPanchgavyaDay = cloudinaryAssets["images/3rd National Panchgavya Day Celebration (1).png"];
+const imgCow1 = cloudinaryAssets["images/cow1.jpg"];
+const imgCow6 = cloudinaryAssets["images/cow6.jpg"];
+const imgCow7 = cloudinaryAssets["images/cow7.jpg"];
+const imgCow8 = cloudinaryAssets["images/cow8.jpg"];
+const imgCow9 = cloudinaryAssets["images/cow9.jpg"];
+const imgGovigyan = cloudinaryAssets["images/govigyan.jpg"];
+const imgWhatsapp = cloudinaryAssets["images/WhatsApp Image 2025-08-05 at 18.30.11 (1).jpeg"];
 
 const GalleryImages = () => {
   const [activeCategory, setActiveCategory] = useState("All");

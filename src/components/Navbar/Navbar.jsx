@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import logo from "../../assets/logos/logo.png";
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const logo = cloudinaryAssets["logos/logo.png"];
+// [moved-to-cloudinary] import logo from "../../assets/logos/logo.png";
 
 // Touch device detect karne ke liye
 const isTouchDevice = () => {

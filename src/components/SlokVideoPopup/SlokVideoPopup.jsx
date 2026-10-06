@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import slokVideo from '../../assets/videos/slok.mp4';
+// [moved-to-cloudinary] import slokVideo from '../../assets/videos/slok.mp4';
 import styles from './SlokVideoPopup.module.css';
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const slokVideo = cloudinaryAssets["videos/slok.mp4"];
 
 const POPUP_DELAY_MS = 4000;
 const SESSION_KEY = 'slok_video_dismissed';

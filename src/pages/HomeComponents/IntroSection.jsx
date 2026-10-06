@@ -1,6 +1,10 @@
 import React from 'react';
 import styles from './IntroSection.module.css';
-import introArt from '../../assets/images/ChatGPT Image Aug 6, 2026, 03_20_17 PM.png';
+
+// ─── Cloudinary assets ───
+import cloudinaryAssets from '../../cloudinary.js';
+const introArt = cloudinaryAssets["images/ChatGPT Image Aug 6, 2026, 03_20_17 PM.png"];
+// [moved-to-cloudinary] import introArt from '../../assets/images/ChatGPT Image Aug 6, 2026, 03_20_17 PM.png';
 
 const IntroSection = () => {
   return (
