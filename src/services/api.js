@@ -583,3 +583,12 @@ export const toggleGalleryPublish = async (token, id) => {
   if (!response.ok) throw new Error(result.message || "Failed to toggle publish.");
   return result;
 };
+
+
+
+export const getMyCasesByPhone = async (phone) => {
+  const response = await fetch(`${API_BASE_URL}/cases/my-reports/${phone}`);
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch cases.");
+  return result;
+};

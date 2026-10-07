@@ -1,0 +1,577 @@
+/* ═══════════════════════════════════════════════
+   FLOATING BUTTON (bottom-right, above Track Rescue)
+   Normal — no pulse, dark red border + light red fill
+═══════════════════════════════════════════════ */
+.floatingBtn {
+  position: fixed;
+  bottom: 152px;
+  right: 24px;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: rgba(254, 226, 226, 0.9);
+  color: #991b1b;
+  border: 2px solid #991b1b;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(153, 27, 27, 0.15);
+  transition: all 0.25s ease;
+}
+
+.floatingBtn:hover {
+  transform: translateY(-2px);
+  background: rgba(254, 202, 202, 0.95);
+  border-color: #7f1d1d;
+  color: #7f1d1d;
+  box-shadow: 0 8px 22px rgba(153, 27, 27, 0.28);
+}
+
+.btnIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.btnIcon svg {
+  stroke: currentColor;
+  width: 18px;
+  height: 18px;
+}
+
+.btnLabel {
+  white-space: nowrap;
+}
+
+.btnPulse {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════
+   MODAL OVERLAY
+═══════════════════════════════════════════════ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   MODAL HEADER
+═══════════════════════════════════════════════ */
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 22px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.modalTitle {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #991b1b;
+  line-height: 1.3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modalSub {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #4b5563;
+}
+
+.closeBtn {
+  width: 34px;
+  height: 34px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.closeBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════
+   MODAL BODY
+═══════════════════════════════════════════════ */
+.modalBody {
+  padding: 20px 22px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modalBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+/* ═══════════════════════════════════════════════
+   ERROR / SUCCESS
+═══════════════════════════════════════════════ */
+.errorBox {
+  padding: 12px 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.successBox {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+.successIcon {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+}
+
+.successTitle {
+  margin: 0 0 8px;
+  color: #166534;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.successText {
+  color: #4b5563;
+  margin: 0 0 18px;
+  font-size: 0.92rem;
+}
+
+.caseIdBox {
+  padding: 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.caseIdLabel {
+  font-size: 0.78rem;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.caseIdValue {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #166534;
+  letter-spacing: 0.5px;
+  font-family: monospace;
+}
+
+.successActions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btnPrimary,
+.btnSecondary {
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btnPrimary {
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+}
+
+.btnPrimary:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.btnSecondary {
+  background: #ffffff;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.btnSecondary:hover {
+  background: #f3f4f6;
+}
+
+/* ═══════════════════════════════════════════════
+   FORM
+═══════════════════════════════════════════════ */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 0.92rem;
+  color: #111827;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+}
+
+.input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+}
+
+.inputError {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+.fieldError {
+  color: #dc2626;
+  font-size: 0.78rem;
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* OR divider */
+.orDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+
+.orLine {
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.orText {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════════════
+   LOCATION BUTTON — light green, same style as submitBtn
+═══════════════════════════════════════════════ */
+.locationBtn {
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 6px;
+  background: rgba(220, 252, 231, 0.9);
+  color: #166534;
+  border: 2px solid #16a34a;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(22, 101, 52, 0.15);
+  transition: all 0.25s ease;
+}
+
+.locationBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(187, 247, 208, 0.95);
+  border-color: #14532d;
+  color: #14532d;
+  box-shadow: 0 8px 22px rgba(22, 101, 52, 0.28);
+}
+
+.locationBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(22, 101, 52, 0.15);
+}
+
+.locationBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f0fdf4;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+  box-shadow: none;
+}
+
+.locationDetected {
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  color: #166534;
+}
+
+/* Media row */
+.mediaRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mediaTypeSelect {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  background: #ffffff;
+  cursor: pointer;
+  color: #374151;
+  font-weight: 600;
+}
+
+.uploadBtn {
+  flex: 1;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 9px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #4b5563;
+  transition: all 0.2s;
+}
+
+.uploadBtn:hover {
+  border-color: #16a34a;
+  color: #166534;
+  background: #f0fdf4;
+}
+
+.removeBtn {
+  flex: 1;
+  padding: 10px 14px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  color: #991b1b;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.previewImg {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 9px;
+  margin-top: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.videoInfo {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  color: #166534;
+  word-break: break-all;
+}
+
+/* ═══════════════════════════════════════════════
+   SUBMIT BUTTON — light red, matches floating btn
+═══════════════════════════════════════════════ */
+.submitBtn {
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 6px;
+  background: rgba(254, 226, 226, 0.9);
+  color: #991b1b;
+  border: 2px solid #991b1b;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(153, 27, 27, 0.15);
+  transition: all 0.25s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(254, 202, 202, 0.95);
+  border-color: #7f1d1d;
+  color: #7f1d1d;
+  box-shadow: 0 8px 22px rgba(153, 27, 27, 0.28);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(153, 27, 27, 0.15);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #fef2f2;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+  box-shadow: none;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .floatingBtn {
+    bottom: 132px;
+    right: 16px;
+    padding: 12px;
+    width: 52px;
+    height: 52px;
+    justify-content: center;
+  }
+
+  .btnLabel {
+    display: none;
+  }
+
+  .btnIcon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .modal {
+    max-height: 92vh;
+    border-radius: 18px 18px 0 0;
+  }
+
+  .modalHeader {
+    padding: 16px 18px;
+  }
+
+  .modalBody {
+    padding: 16px 18px 20px;
+  }
+
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}

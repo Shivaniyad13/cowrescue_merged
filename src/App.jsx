@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 
 import AppRoutes from "./routes/AppRoutes";
 import SlokVideoPopup from "./components/SlokVideoPopup/SlokVideoPopup";
-import WhatsAppButton from "./components/WhatsAppButton/WhatsAppButton";
-import Chatbot from "./components/Chatbot/Chatbot";
+import ReportCowWidget from "./components/ReportCowWidget/ReportCowWidget";
+import TrackCowWidget from "./components/TrackCowWidget/TrackCowWidget";
 
 import {
   translatePageToHindi,
@@ -22,7 +22,6 @@ function AppContent() {
       localStorage.setItem("websiteLanguage", language);
 
       if (language === "hi") {
-        // Page render hone ke baad translate
         setTimeout(async () => {
           await translatePageToHindi();
         }, 300);
@@ -33,26 +32,18 @@ function AppContent() {
       }
     };
 
-    window.addEventListener(
-      "languageChanged",
-      handleLanguageChange
-    );
+    window.addEventListener("languageChanged", handleLanguageChange);
 
     return () => {
-      window.removeEventListener(
-        "languageChanged",
-        handleLanguageChange
-      );
+      window.removeEventListener("languageChanged", handleLanguageChange);
     };
   }, []);
 
   // Route/page change detect
   useEffect(() => {
-    const language =
-      localStorage.getItem("websiteLanguage") || "en";
+    const language = localStorage.getItem("websiteLanguage") || "en";
 
     if (language === "hi") {
-      // React ko new page render karne ka time do
       const timer = setTimeout(async () => {
         await translatePageToHindi();
       }, 500);
@@ -65,8 +56,8 @@ function AppContent() {
     <>
       <AppRoutes />
       <SlokVideoPopup />
-      <WhatsAppButton />
-      <Chatbot />
+      <ReportCowWidget />
+      <TrackCowWidget />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../pages/layouts/MainLayout';
 
 // Import pages
@@ -55,6 +55,7 @@ const AppRoutes = () => {
       <Route path="/donation" element={<MainLayout><Donation /></MainLayout>} />
 
 
+
       {/* Legal Policy Routes */}
       <Route path="/privacy-policy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
       <Route path="/terms-conditions" element={<MainLayout><TermsConditions /></MainLayout>} />
@@ -65,7 +66,7 @@ const AppRoutes = () => {
       {/* Cow Rescue Module Routes (Only backend-supported pages) */}
       <Route path="/cow-rescue" element={<MainLayout><CowRescueHome /></MainLayout>} />
       <Route path="/cow-rescue/report" element={<MainLayout><ReportIncident /></MainLayout>} />
-      <Route path="/cow-rescue/track" element={<MainLayout><TrackRescue /></MainLayout>} />
+<Route path="/cow-rescue/track" element={<Navigate to="/cow-rescue" replace />} />
       <Route path="/cow-rescue/alert/:token" element={<MainLayout><AlertResponse /></MainLayout>} />
 <Route path="/ngo/bank-details/:token" element={<NgoBankDetails />} />
 

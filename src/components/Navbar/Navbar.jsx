@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
-
-// ─── Cloudinary assets ───
-import cloudinaryAssets from '../../cloudinary.js';
-const logo = cloudinaryAssets["logos/logo.png"];
-// [moved-to-cloudinary] import logo from "../../assets/logos/logo.png";
+import logo from "../../assets/logos/logo.png";
 
 // Touch device detect karne ke liye
 const isTouchDevice = () => {
@@ -72,18 +68,18 @@ const Navbar = () => {
 
   // ====== HOVER HANDLERS (desktop) ======
   const handleMouseEnter = (name) => {
-    if (isTouchDevice()) return; // mobile pe ignore
+    if (isTouchDevice()) return;
     setOpenDropdown(name);
   };
 
   const handleMouseLeave = () => {
-    if (isTouchDevice()) return; // mobile pe ignore
+    if (isTouchDevice()) return;
     setOpenDropdown(null);
   };
 
   // ====== CLICK HANDLER (mobile) ======
   const toggleDropdown = (name) => {
-    if (!isTouchDevice()) return; // desktop pe click se kuch na ho
+    if (!isTouchDevice()) return;
     setOpenDropdown((prev) => (prev === name ? null : name));
   };
 
@@ -103,11 +99,6 @@ const Navbar = () => {
       { name: "News", path: "/gallery/news" },
       { name: "Images", path: "/gallery/images" },
       { name: "Videos", path: "/gallery/videos" },
-    ],
-    cowRescue: [
-      { name: "Cow Rescue Portal", path: "/cow-rescue" },
-      { name: "Report Injured Cow 🚨", path: "/cow-rescue/report" },
-      { name: "Track Rescue Status 🔍", path: "/cow-rescue/track" },
     ],
   };
 
@@ -282,39 +273,17 @@ const Navbar = () => {
             </ul>
           </li>
 
-          {/* COW RESCUE */}
-          <li
-            className={`${styles.dropdown} ${styles.cowRescueItem}`}
-            onMouseEnter={() => handleMouseEnter("cowRescue")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              className={`${styles.dropdownToggle} ${styles.cowRescueToggle}`}
-              onClick={() => toggleDropdown("cowRescue")}
-              aria-expanded={openDropdown === "cowRescue"}
+          {/* COW RESCUE — Direct Link */}
+          <li className={styles.cowRescueItem}>
+            <NavLink
+              to="/cow-rescue"
+              className={({ isActive }) =>
+                `${styles.cowRescueToggle} ${isActive ? styles.activeLink : ""}`
+              }
+              onClick={closeMenu}
             >
               🚨 Cow Rescue
-              <span className={styles.arrow}>▼</span>
-            </button>
-            <ul
-              className={`${styles.dropdownMenu} ${
-                openDropdown === "cowRescue" ? styles.open : ""
-              }`}
-            >
-              {dropdowns.cowRescue.map((item) => (
-                <li key={item.path}>
-                  <NavLink
-                    to={item.path}
-                    onClick={() => {
-                      closeMenu();
-                      setOpenDropdown(null);
-                    }}
-                  >
-                    {item.name}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
+            </NavLink>
           </li>
 
           {/* CONTACT */}

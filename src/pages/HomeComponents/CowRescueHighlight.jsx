@@ -1,7 +1,42 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import styles from "./CowRescueHighlight.module.css";
 import { getPublicConfig } from "../../services/api";
+
+// Plus icon (inline SVG)
+const PlusIcon = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ display: "inline-block", verticalAlign: "middle" }}
+  >
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+// Profile / user icon (inline SVG)
+const ProfileIcon = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ display: "inline-block", verticalAlign: "middle" }}
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
 
 const CowRescueHighlight = () => {
   const [emergencyNumber, setEmergencyNumber] = useState("1962");
@@ -18,6 +53,14 @@ const CowRescueHighlight = () => {
       .catch(() => {});
   }, []);
 
+  const handleOpenReport = () => {
+    window.dispatchEvent(new CustomEvent("openReportCowWidget"));
+  };
+
+  const handleOpenTrack = () => {
+    window.dispatchEvent(new CustomEvent("openTrackCowWidget"));
+  };
+
   return (
     <section className={styles.highlightSection}>
       <div className={styles.bgPattern}></div>
@@ -25,9 +68,8 @@ const CowRescueHighlight = () => {
       <div className={styles.container}>
         {/* Spiritual Quote */}
         <div className={styles.quoteBlock}>
-          <span className={styles.quoteSymbol}>🕉️</span>
           <p className={styles.quoteText}>
-            "गौ माता की रक्षा हमारा परम धर्म है"
+            "गौ माता की रक्षा हमारा परम कर्तव्य है"
           </p>
           <p className={styles.quoteTranslation}>
             Protecting Mother Cow is our sacred duty
@@ -48,28 +90,40 @@ const CowRescueHighlight = () => {
         </h2>
 
         <p className={styles.subtitle}>
-          Our verified Gaushala & NGO network is ready 24×7 to rescue injured,
+          Our verified Gaushala &amp; NGO network is ready 24×7 to rescue injured,
           sick, or distressed cows across India. Your one report can save a life.
         </p>
 
         <div className={styles.actionGrid}>
-          <Link to="/cow-rescue/report" className={styles.primaryBtn}>
-            <span className={styles.btnIcon}>🐄</span>
+          <button
+            type="button"
+            className={styles.primaryBtn}
+            onClick={handleOpenReport}
+          >
+            <span className={styles.btnIcon}>
+              <PlusIcon />
+            </span>
             <span className={styles.btnText}>
-              <strong>Report Injured Cow</strong>
+              <strong>Report Incident</strong>
               <small>Takes less than 60 seconds</small>
             </span>
             <span className={styles.btnArrow}>→</span>
-          </Link>
+          </button>
 
-          <Link to="/cow-rescue/track" className={styles.secondaryBtn}>
-            <span className={styles.btnIcon}>🔍</span>
+          <button
+            type="button"
+            className={styles.secondaryBtn}
+            onClick={handleOpenTrack}
+          >
+            <span className={styles.btnIcon}>
+              <ProfileIcon />
+            </span>
             <span className={styles.btnText}>
-              <strong>Track Your Case</strong>
+              <strong>Track Your Status</strong>
               <small>Enter Case ID to see status</small>
             </span>
             <span className={styles.btnArrow}>→</span>
-          </Link>
+          </button>
         </div>
 
         {/* Emergency Strip — .env se dynamic */}
