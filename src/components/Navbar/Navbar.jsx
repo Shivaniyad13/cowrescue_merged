@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import logo from "../../assets/logos/logo.png";
+
+// Logo from public folder (Vercel-compatible)
+const logo = "/logo.png";
 
 // Touch device detect karne ke liye
 const isTouchDevice = () => {
