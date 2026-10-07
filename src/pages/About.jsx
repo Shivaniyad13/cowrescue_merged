@@ -252,7 +252,7 @@ const About = () => {
             </div>
 
             <h1 className={styles.heroTitle}>
-              From <span className={styles.heroHighlight}>Panchgavya</span>
+              <span className={styles.heroHighlight}>Panchgavya</span>
               <br />
               Se<span className={styles.heroHighlight}>Panchparivartan</span>
             </h1>

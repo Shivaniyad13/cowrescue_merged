@@ -107,9 +107,35 @@ const TrackCowWidget = () => {
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  // External open event
+  // ✅ UPDATED — External open event with optional caseId
   useEffect(() => {
-    const handler = () => setIsOpen(true);
+    const handler = async (e) => {
+      setIsOpen(true);
+
+      const caseId = e?.detail?.caseId;
+      if (!caseId) return;
+
+      // Pre-fill and auto-search
+      setSearchMode("case");
+      setCaseInput(String(caseId).toUpperCase());
+      setLoading(true);
+      setError("");
+      setCaseData(null);
+      setTimeline([]);
+      setShowFullDetails(false);
+      setActionMessage("");
+
+      try {
+        const res = await trackCase(String(caseId).trim().toUpperCase());
+        setCaseData(res.data);
+        setTimeline(res.data.case_timeline || []);
+      } catch (err) {
+        setError(err.message || "Case not found with this ID.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     window.addEventListener("openTrackCowWidget", handler);
     return () => window.removeEventListener("openTrackCowWidget", handler);
   }, []);
@@ -361,11 +387,10 @@ const TrackCowWidget = () => {
       </>
     );
   };
-  
 
   return (
     <>
-      {/* Floating Button — profile icon + "Track Status" */}
+      {/* Floating Button — profile icon + "Track Your Status" */}
       <button
         className={styles.floatingBtn}
         onClick={() => setIsOpen(true)}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styles from "./ReportCowWidget.module.css";
 import { reportCow } from "../../services/api";
 
@@ -270,6 +270,23 @@ const ReportCowWidget = () => {
     setIsOpen(false);
   };
 
+  // ✅ NEW — Open Track Widget with prefilled Case ID
+  const handleCheckStatus = () => {
+    const caseId = success?.case_id;
+    setIsOpen(false);
+
+    if (!caseId) return;
+
+    // Give the report modal time to close, then open track modal
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("openTrackCowWidget", {
+          detail: { caseId },
+        })
+      );
+    }, 150);
+  };
+
   return (
     <>
       {/* Floating Button */}
@@ -323,13 +340,13 @@ const ReportCowWidget = () => {
                     <span className={styles.caseIdValue}>{success.case_id}</span>
                   </div>
                   <div className={styles.successActions}>
-                    <Link
-                      to={`/cow-rescue/track?case=${success.case_id}`}
+                    <button
+                      type="button"
                       className={styles.btnPrimary}
-                      onClick={handleClose}
+                      onClick={handleCheckStatus}
                     >
                       <ProfileIcon /> Check Status
-                    </Link>
+                    </button>
                     <button className={styles.btnSecondary} onClick={handleClose}>
                       Close
                     </button>

@@ -322,18 +322,7 @@ const Navbar = () => {
           </li>
 
           {/* DARK / LIGHT MODE */}
-          <li className={styles.themeToggleItem}>
-            <button
-              className={styles.themeToggle}
-              onClick={toggleTheme}
-              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              <span className={styles.themeIcon}>
-                {darkMode ? "☀️" : "🌙"}
-              </span>
-            </button>
-          </li>
+          
         </ul>
       </div>
 
