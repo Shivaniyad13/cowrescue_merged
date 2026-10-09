@@ -23,8 +23,9 @@ const projects = [
   {
     id: 2,
     number: "02",
-    title: "Protection of GauVansh",
-    shortTitle: "Gaushala & NandiShala",
+     title: "Supporting Nirashrit (Homeless) Gau",
+    shortTitle: "Care for Homeless Cows",
+   
     image:
       "https://www.gauvanshakhada.com/img/Gauvansh-Mahotsave.jpg",
     description:
@@ -41,8 +42,10 @@ const projects = [
   {
     id: 3,
     number: "03",
-    title: "Supporting Nirashrit (Homeless) Gau",
-    shortTitle: "Care for Homeless Cows",
+
+     title: "Protection of GauVansh",
+    shortTitle: "Gaushala & NandiShala",
+   
     image:
       "https://iskcongoshala.in/wp-content/uploads/2022/01/Best-Goshala-1024x680.jpg",
     description:

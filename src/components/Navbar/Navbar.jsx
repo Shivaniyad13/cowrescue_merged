@@ -93,9 +93,10 @@ const Navbar = () => {
       { name: "CBO", path: "/initiative/cbo" },
     ],
     consultation: [
-      { name: "Policies", path: "/consultation/policies" },
-      { name: "Project Protection", path: "/consultation/project-protection" },
+     
+      { name: "Project ", path: "/consultation/project-protection" },
       { name: "Products", path: "/consultation/products" },
+       { name: "Policies", path: "/consultation/policies" },
     ],
     gallery: [
       { name: "News", path: "/gallery/news" },

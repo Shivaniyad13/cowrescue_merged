@@ -95,31 +95,13 @@
   font-weight: 800;
   line-height: 1.15;
   color: var(--color-white);
-  margin-bottom: 1.2rem;
+  margin-bottom: 2rem;
   letter-spacing: -0.01em;
 }
 
 .heroHighlight {
   color: var(--color-secondary-light);
   display: inline-block;
-}
-
-.heroSubhead {
-  font-size: clamp(1.1rem, 2vw, 1.35rem);
-  font-weight: 500;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.92);
-  margin-bottom: 1.2rem;
-  border-left: 3px solid var(--color-secondary);
-  padding-left: 1rem;
-}
-
-.heroIntro {
-  font-size: 1rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.82);
-  margin-bottom: 2rem;
-  max-width: 620px;
 }
 
 .heroActions {
@@ -290,203 +272,88 @@
 }
 
 /* ==========================================================================
-   About / Initiative Section
+   Vision & Mission Section
    ========================================================================== */
-.ecosystemGrid {
+.visionMissionGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  align-items: stretch;
+  margin-top: 1rem;
 }
 
-.ecosystemCard {
-  background: var(--color-white);
-  padding: 1.8rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-gray-200);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
+.visionMissionCard {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-}
-
-.ecosystemCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-secondary-light);
-}
-
-.iconWrapper {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-md);
-  background: rgba(45, 90, 39, 0.08);
-  color: var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.2rem;
-  transition: all var(--transition-base);
-}
-
-.ecosystemCard:hover .iconWrapper {
-  background: var(--color-primary);
-  color: var(--color-white);
-}
-
-.cardTitle {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--color-primary-dark);
-  margin-bottom: 0.6rem;
-}
-
-.cardDesc {
-  font-size: 0.95rem;
-  color: var(--color-text-light);
-  line-height: 1.6;
-}
-
-/* ==========================================================================
-   Vision Section
-   ========================================================================== */
-.visionWrapper {
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  gap: 1rem;
+  padding: 2.5rem;
   border-radius: var(--radius-lg);
-  padding: 3.5rem 3rem;
-  color: var(--color-white);
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-}
-
-.visionDecoBg {
-  position: absolute;
-  right: -50px;
-  bottom: -50px;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(200, 164, 92, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
-  pointer-events: none;
-}
-
-.visionContent {
-  position: relative;
-  z-index: 1;
-  max-width: 900px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.visionQuoteIcon {
-  margin-bottom: 1.5rem;
-  color: var(--color-secondary);
-  display: inline-block;
-}
-
-.visionStatement {
-  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
-  font-weight: 600;
-  line-height: 1.5;
-  color: var(--color-white);
-  margin-bottom: 2rem;
-  font-style: italic;
-}
-
-.visionHighlightText {
-  color: var(--color-secondary-light);
-  font-style: normal;
-  font-weight: 700;
-}
-
-.visionDivider {
-  width: 80px;
-  height: 3px;
-  background-color: var(--color-secondary);
-  margin: 0 auto 2rem;
-  border-radius: var(--radius-full);
-}
-
-.visionParagraph {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.88);
-  max-width: 780px;
-  margin: 0 auto;
-}
-
-/* ==========================================================================
-   Mission Section
-   ========================================================================== */
-.missionGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
-}
-
-.missionCard {
-  background-color: var(--color-background);
+  background: var(--color-white);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
-  transition: all var(--transition-base);
-  position: relative;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
-.missionCard::before {
+.visionMissionCard:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+.visionMissionCard::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 4px;
-  height: 100%;
-  background-color: var(--color-secondary);
-  opacity: 0;
-  transition: opacity var(--transition-base);
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
 }
 
-.missionCard:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-secondary-light);
-  background-color: var(--color-white);
-}
-
-.missionCard:hover::before {
-  opacity: 1;
-}
-
-.missionHeader {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.missionIcon {
-  width: 48px;
-  height: 48px;
+.visionMissionIcon {
+  width: 54px;
+  height: 54px;
   border-radius: var(--radius-md);
-  background-color: rgba(200, 164, 92, 0.12);
-  color: #a87d2b;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  background: rgba(45, 90, 39, 0.08);
+  color: var(--color-primary);
+  transition: all var(--transition-base);
 }
 
-.missionCardTitle {
-  font-size: 1.25rem;
+.visionMissionCard:hover .visionMissionIcon {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.visionMissionLabel {
+  font-size: 0.78rem;
   font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.visionMissionHeading {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--color-primary-dark);
 }
 
-.missionCardDesc {
-  font-size: 0.98rem;
+.visionMissionText {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.75;
   color: var(--color-text-light);
-  line-height: 1.65;
+}
+
+.visionMissionText strong {
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -585,90 +452,6 @@
   flex-wrap: wrap;
   gap: 1rem;
   align-items: center;
-}
-
-/* ==========================================================================
-   Second Image / Split Section
-   ========================================================================== */
-.splitGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3.5rem;
-  align-items: center;
-}
-
-.splitImageWrapper {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-}
-
-.splitImg {
-  width: 100%;
-  height: 420px;
-  object-fit: cover;
-  display: block;
-  transition: transform var(--transition-slow);
-}
-
-.splitImageWrapper:hover .splitImg {
-  transform: scale(1.03);
-}
-
-.splitBadge {
-  position: absolute;
-  top: 1.2rem;
-  left: 1.2rem;
-  background: rgba(26, 58, 22, 0.85);
-  backdrop-filter: blur(6px);
-  color: var(--color-secondary-light);
-  padding: 0.4rem 1rem;
-  border-radius: var(--radius-full);
-  font-size: 0.85rem;
-  font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.splitContent {
-  display: flex;
-  flex-direction: column;
-}
-
-.splitTitle {
-  font-size: clamp(1.7rem, 2.5vw, 2.3rem);
-  font-weight: 800;
-  color: var(--color-primary-dark);
-  margin-bottom: 1.2rem;
-  line-height: 1.25;
-}
-
-.splitText {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--color-text-light);
-  margin-bottom: 1.5rem;
-}
-
-.splitPoints {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.splitPoint {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.8rem;
-  font-size: 0.98rem;
-  color: var(--color-text);
-}
-
-.splitPointIcon {
-  color: var(--color-primary);
-  margin-top: 2px;
-  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -814,6 +597,8 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 1rem;
+  font-size: 1.5rem;
+  line-height: 1;
 }
 
 .valueTitle {
@@ -877,17 +662,6 @@
     text-align: center;
   }
 
-  .heroSubhead {
-    border-left: none;
-    padding-left: 0;
-    border-bottom: 2px solid var(--color-secondary);
-    padding-bottom: 0.8rem;
-  }
-
-  .heroIntro {
-    max-width: 100%;
-  }
-
   .heroActions {
     justify-content: center;
   }
@@ -896,13 +670,9 @@
     height: 320px;
   }
 
-  .splitGrid {
+  .visionMissionGrid {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-
-  .splitImg {
-    height: 350px;
+    gap: 1.5rem;
   }
 
   .timelineWrapper {
@@ -932,7 +702,9 @@
     padding: 4rem 0 3rem;
   }
 
-  .section, .sectionAlt, .inspirationSection {
+  .section,
+  .sectionAlt,
+  .inspirationSection {
     padding: 3.5rem 0;
   }
 
@@ -944,16 +716,12 @@
     padding: 2rem 1.5rem;
   }
 
-  .visionWrapper {
-    padding: 2.5rem 1.5rem;
+  .visionMissionCard {
+    padding: 2rem 1.5rem;
   }
 
   .exploreBox {
     padding: 2.5rem 1.5rem;
-  }
-
-  .missionGrid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -966,16 +734,17 @@
     height: 250px;
   }
 
-  .splitImg {
-    height: 240px;
-  }
-
-  .heroActions, .exploreBtnGroup, .ctaBtnGroup, .inspirationActions {
+  .heroActions,
+  .exploreBtnGroup,
+  .ctaBtnGroup,
+  .inspirationActions {
     flex-direction: column;
     width: 100%;
   }
 
-  .btnPrimary, .btnSecondary, .btnOutlineDark {
+  .btnPrimary,
+  .btnSecondary,
+  .btnOutlineDark {
     width: 100%;
     justify-content: center;
   }

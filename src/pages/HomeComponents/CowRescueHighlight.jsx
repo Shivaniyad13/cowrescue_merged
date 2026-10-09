@@ -69,10 +69,10 @@ const CowRescueHighlight = () => {
         {/* Spiritual Quote */}
         <div className={styles.quoteBlock}>
           <p className={styles.quoteText}>
-            "गौ माता की रक्षा हमारा परम कर्तव्य है"
+           "गौ का संरक्षण एवं संवर्धन हमारा परम कर्तव्य है।"
           </p>
           <p className={styles.quoteTranslation}>
-            Protecting Mother Cow is our sacred duty
+            "Protecting and promoting the welfare of cows is our sacred duty."
           </p>
         </div>
 
