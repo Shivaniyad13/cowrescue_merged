@@ -1,0 +1,139 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  background: rgba(18, 12, 6, 0.74);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: festivalOverlayFadeIn 0.25s ease-out both;
+}
+
+.dialog {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: min(240px, 80vw);
+  min-height: min(240px, 70dvh);
+  max-width: min(92vw, 560px);
+  max-height: 88dvh;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff9ec;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.55),
+    0 0 0 2px rgba(255, 204, 102, 0.5);
+  animation: festivalPopupScaleIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.image {
+  display: block;
+  max-width: min(92vw, 560px);
+  max-height: 88dvh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  background: rgba(20, 14, 10, 0.76);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.closeBtn:hover {
+  transform: scale(1.08);
+  background: rgba(185, 28, 28, 0.92);
+  border-color: #ffffff;
+}
+
+.closeBtn:active {
+  transform: scale(0.94);
+}
+
+.closeBtn:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+@keyframes festivalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes festivalPopupScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.86) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog {
+    max-width: 94vw;
+    max-height: 84dvh;
+    border-radius: 14px;
+  }
+
+  .image {
+    max-width: 94vw;
+    max-height: 84dvh;
+  }
+
+  .closeBtn {
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog {
+    animation: none;
+  }
+
+  .closeBtn {
+    transition: none;
+  }
+}
+

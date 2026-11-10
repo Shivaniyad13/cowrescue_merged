@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // [moved-to-cloudinary] import slokVideo from '../../assets/videos/slok.mp4';
 import styles from './SlokVideoPopup.module.css';
 
@@ -9,7 +9,7 @@ const slokVideo = cloudinaryAssets["videos/slok.mp4"];
 const POPUP_DELAY_MS = 4000;
 const SESSION_KEY = 'slok_video_dismissed';
 
-const SlokVideoPopup = () => {
+const SlokVideoPopup = ({ canShow = true }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -22,6 +22,8 @@ const SlokVideoPopup = () => {
   // =========================================================
 
   useEffect(() => {
+    if (!canShow) return;
+
     const dismissed = sessionStorage.getItem(SESSION_KEY);
 
     if (dismissed) return;
@@ -31,7 +33,7 @@ const SlokVideoPopup = () => {
     }, POPUP_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [canShow]);
 
   // =========================================================
   // AUTO PLAY VIDEO

@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import AppRoutes from "./routes/AppRoutes";
+import FestivalPopup from "./components/FestivalPopup/FestivalPopup";
 import SlokVideoPopup from "./components/SlokVideoPopup/SlokVideoPopup";
 import ReportCowWidget from "./components/ReportCowWidget/ReportCowWidget";
 import TrackCowWidget from "./components/TrackCowWidget/TrackCowWidget";
@@ -13,6 +14,13 @@ import {
 
 function AppContent() {
   const location = useLocation();
+  const [showFestivalPopup, setShowFestivalPopup] = useState(
+    () => !location.pathname.startsWith("/admin")
+  );
+
+  const handleCloseFestivalPopup = useCallback(() => {
+    setShowFestivalPopup(false);
+  }, []);
 
   // Language change listener
   useEffect(() => {
@@ -55,7 +63,11 @@ function AppContent() {
   return (
     <>
       <AppRoutes />
-      <SlokVideoPopup />
+      <FestivalPopup
+        isOpen={showFestivalPopup}
+        onClose={handleCloseFestivalPopup}
+      />
+      <SlokVideoPopup canShow={!showFestivalPopup} />
       <ReportCowWidget />
       <TrackCowWidget />
     </>
