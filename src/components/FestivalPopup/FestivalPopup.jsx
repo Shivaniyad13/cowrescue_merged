@@ -4,7 +4,7 @@ import styles from "./FestivalPopup.module.css";
 const FestivalPopup = ({
   isOpen,
   onClose,
-  imageSrc = "/Chhath Puja at Sunrise.png",
+  imageSrc = "\Chhath Puja at Sunrise.png",
   alt = "Chhath Puja at Sunrise",
 }) => {
   useEffect(() => {
