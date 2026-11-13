@@ -4,8 +4,8 @@ import styles from "./FestivalPopup.module.css";
 const FestivalPopup = ({
   isOpen,
   onClose,
-  imageSrc = "/govardhan-puja-popup.jpg",
-  alt = "Govardhan Puja Wishes - Panchgavya se Panch Parivartan",
+  imageSrc = "/Chhath Puja at Sunrise.png",
+  alt = "Chhath Puja at Sunrise",
 }) => {
   useEffect(() => {
     if (!isOpen) return undefined;
