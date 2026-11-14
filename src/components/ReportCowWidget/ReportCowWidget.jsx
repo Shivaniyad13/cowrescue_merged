@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "./ReportCowWidget.module.css";
 import { reportCow } from "../../services/api";
+import MapPicker from "../../pages/CowRescue/components/MapPicker";
 
 const ANIMAL_CONDITIONS = [
   "Injured",
@@ -54,7 +55,6 @@ const ReportCowWidget = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(null);
-  const [locating, setLocating] = useState(false);
   const [mediaType, setMediaType] = useState("image");
   const [photoFile, setPhotoFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
@@ -70,13 +70,24 @@ const ReportCowWidget = () => {
     animal_condition: ANIMAL_CONDITIONS[0],
     description: "",
     address: "",
-    latitude: "28.6139",
-    longitude: "77.2090",
+    latitude: "",
+    longitude: "",
     state: "",
     district: "",
     city: "",
     pincode: "",
   });
+  const handleMapLocationChange = useCallback((latitude, longitude) => {
+    setForm((previous) => ({ ...previous, latitude, longitude }));
+    setFieldErrors((previous) => {
+      const next = { ...previous };
+      delete next.location;
+      return next;
+    });
+  }, []);
+  const handleMapAddressGeocoded = useCallback((locationData) => {
+    setForm((previous) => ({ ...previous, ...locationData }));
+  }, []);
 
   // Hide button on dedicated report page
   const isReportPage = location.pathname === "/cow-rescue/report";
@@ -135,51 +146,6 @@ const ReportCowWidget = () => {
     setForm((p) => ({ ...p, [name]: value }));
   };
 
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setError("Geolocation not supported by browser");
-      return;
-    }
-    setLocating(true);
-    setError("");
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-          );
-          const data = await res.json();
-          const a = data.address || {};
-          setForm((prev) => ({
-            ...prev,
-            latitude: String(latitude),
-            longitude: String(longitude),
-            address: a.road || a.suburb || a.neighbourhood || a.village || prev.address,
-            city: a.city || a.town || a.village || a.county || "",
-            district: a.state_district || a.county || "",
-            state: a.state || "",
-            pincode: a.postcode || "",
-          }));
-          setFieldErrors((prev) => {
-            const n = { ...prev };
-            delete n.address;
-            return n;
-          });
-        } catch (err) {
-          console.warn(err);
-        } finally {
-          setLocating(false);
-        }
-      },
-      () => {
-        setLocating(false);
-        setError("Could not fetch location. Please enable permission.");
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
-
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -220,6 +186,14 @@ const ReportCowWidget = () => {
     else if (form.description.trim().length < 10) errs.description = "Minimum 10 characters";
 
     if (!form.address.trim()) errs.address = "Please provide exact address";
+
+    const latitude = Number(form.latitude);
+    const longitude = Number(form.longitude);
+    if (!form.latitude.trim() || !form.longitude.trim() ||
+        !Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+        !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+      errs.location = "Pinpoint the incident location on the map or use GPS.";
+    }
 
     return errs;
   };
@@ -333,7 +307,7 @@ const ReportCowWidget = () => {
                   <div className={styles.successIcon}>✅</div>
                   <h3 className={styles.successTitle}>Report Submitted!</h3>
                   <p className={styles.successText}>
-                    NGOs and Government helpline have been notified.
+                    Rescue alerts are limited to verified Gaushalas within 25 km of the reported location.
                   </p>
                   <div className={styles.caseIdBox}>
                     <span className={styles.caseIdLabel}>Case ID:</span>
@@ -449,27 +423,14 @@ const ReportCowWidget = () => {
                       <p className={styles.fieldError}>⚠️ {fieldErrors.address}</p>
                     )}
                   </div>
-
-                  {/* OR divider */}
-                  <div className={styles.orDivider}>
-                    <span className={styles.orLine}></span>
-                    <span className={styles.orText}>OR</span>
-                    <span className={styles.orLine}></span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleUseCurrentLocation}
-                    disabled={locating}
-                    className={styles.locationBtn}
-                  >
-                    {locating ? "📡 Fetching location..." : "📡 Use My Current Location"}
-                  </button>
-
-                  {(form.city || form.state) && (
-                    <div className={styles.locationDetected}>
-                      ✅ <strong>{[form.city, form.district, form.state, form.pincode].filter(Boolean).join(", ")}</strong>
-                    </div>
+                  <MapPicker
+                    lat={form.latitude}
+                    lng={form.longitude}
+                    onChangeLocation={handleMapLocationChange}
+                    onAddressGeocoded={handleMapAddressGeocoded}
+                  />
+                  {fieldErrors.location && (
+                    <p className={styles.fieldError}>⚠️ {fieldErrors.location}</p>
                   )}
 
                   {/* Media */}

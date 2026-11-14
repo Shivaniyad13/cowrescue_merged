@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../pages/layouts/MainLayout';
 
@@ -14,12 +15,15 @@ import Products from '../pages/Products';
 import GalleryImages from '../pages/GalleryImages';
 import GalleryVideos from '../pages/GalleryVideos';
 import GalleryNews from '../pages/GalleryNews';
-import Donation from '../pages/Donation';
 import Contact from '../pages/Contact';
 import AdminLogin from '../pages/AdminLogin';
 import AdminDashboard from '../pages/AdminDashboard';
 
 // Cow Rescue Pages
+import RegisterOrganization from '../pages/CowRescue/RegisterOrganization';
+import OrgLogin from '../pages/CowRescue/OrgLogin'; 
+import OrgDashboard from '../pages/CowRescue/OrgDashboard';
+import OrgResetPassword from '../pages/CowRescue/OrgResetPassword'; // NAYA IMPORT
 import CowRescueHome from '../pages/CowRescue/CowRescueHome';
 import ReportIncident from '../pages/CowRescue/ReportIncident';
 import TrackRescue from '../pages/CowRescue/TrackRescue';
@@ -32,6 +36,21 @@ import TermsConditions from '../pages/Legal/TermsConditions';
 import RefundCancellationPolicy from '../pages/Legal/RefundCancellationPolicy';
 import DonationFundFlowPolicy from '../pages/Legal/DonationFundFlowPolicy';
 import ShippingDeliveryPolicy from '../pages/Legal/ShippingDeliveryPolicy';
+
+const SUPPORT_URL = 'https://support.khushicentre.in/';
+
+const DonationRedirect = () => {
+  useEffect(() => {
+    window.location.replace(SUPPORT_URL);
+  }, []);
+
+  return (
+    <main style={{ padding: '32px', textAlign: 'center' }}>
+      <p>Opening the support page...</p>
+      <a href={SUPPORT_URL}>Continue to support.khushicentre.in</a>
+    </main>
+  );
+};
 
 const AppRoutes = () => {
   return (
@@ -52,9 +71,7 @@ const AppRoutes = () => {
       <Route path="/gallery/videos" element={<MainLayout><GalleryVideos /></MainLayout>} />
       <Route path="/gallery/news" element={<MainLayout><GalleryNews /></MainLayout>} />
       <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
-      <Route path="/donation" element={<MainLayout><Donation /></MainLayout>} />
-
-
+      <Route path="/donation" element={<DonationRedirect />} />
 
       {/* Legal Policy Routes */}
       <Route path="/privacy-policy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
@@ -63,12 +80,19 @@ const AppRoutes = () => {
       <Route path="/donation-fund-flow-policy" element={<MainLayout><DonationFundFlowPolicy /></MainLayout>} />
       <Route path="/shipping-delivery-policy" element={<MainLayout><ShippingDeliveryPolicy /></MainLayout>} />
 
-      {/* Cow Rescue Module Routes (Only backend-supported pages) */}
+      {/* Cow Rescue Module Routes */}
       <Route path="/cow-rescue" element={<MainLayout><CowRescueHome /></MainLayout>} />
       <Route path="/cow-rescue/report" element={<MainLayout><ReportIncident /></MainLayout>} />
-<Route path="/cow-rescue/track" element={<Navigate to="/cow-rescue" replace />} />
+      <Route path="/cow-rescue/track" element={<Navigate to="/cow-rescue" replace />} />
       <Route path="/cow-rescue/alert/:token" element={<MainLayout><AlertResponse /></MainLayout>} />
-<Route path="/ngo/bank-details/:token" element={<NgoBankDetails />} />
+      
+      {/* NAYE ROUTES */}
+      <Route path="/cow-rescue/register" element={<RegisterOrganization />} />
+      <Route path="/cow-rescue/org/login" element={<OrgLogin />} />
+      <Route path="/cow-rescue/org/dashboard" element={<OrgDashboard />} />
+      <Route path="/cow-rescue/org/reset-password" element={<OrgResetPassword />} /> {/* NAYA ROUTE */}
+      
+      <Route path="/ngo/bank-details/:token" element={<NgoBankDetails />} />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />

@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
+import { useCallback, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import styles from "./ReportIncident.module.css";
 import { reportCow } from "../../services/api";
+import MapPicker from "./components/MapPicker";
 
 const ANIMAL_CONDITIONS = [
   "Injured",
@@ -21,8 +22,8 @@ const ReportIncident = () => {
     description: "",
     animal_condition: ANIMAL_CONDITIONS[0],
     address: "",
-    latitude: "28.6139",
-    longitude: "77.2090",
+    latitude: "",
+    longitude: "",
     state: "",
     district: "",
     city: "",
@@ -36,8 +37,6 @@ const ReportIncident = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const [successData, setSuccessData] = useState(null);
-  const [locating, setLocating] = useState(false);
-  const [locationFetched, setLocationFetched] = useState(false);
   const [mediaType, setMediaType] = useState("image");
 
   const fieldRefs = {
@@ -47,6 +46,17 @@ const ReportIncident = () => {
     description: useRef(null),
     address: useRef(null),
   };
+  const handleMapLocationChange = useCallback((latitude, longitude) => {
+    setFormData((previous) => ({ ...previous, latitude, longitude }));
+    setFieldErrors((previous) => {
+      const next = { ...previous };
+      delete next.location;
+      return next;
+    });
+  }, []);
+  const handleMapAddressGeocoded = useCallback((location) => {
+    setFormData((previous) => ({ ...previous, ...location }));
+  }, []);
 
   // ==================== VALIDATION ====================
   const isValidName = (name) => {
@@ -91,6 +101,14 @@ const ReportIncident = () => {
       errors.address = "Please enter the location / area.";
     }
 
+    const latitude = Number(formData.latitude);
+    const longitude = Number(formData.longitude);
+    if (!formData.latitude.trim() || !formData.longitude.trim() ||
+        !Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+        !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+      errors.location = "Pinpoint the incident location on the map or use GPS.";
+    }
+
     return errors;
   };
 
@@ -112,65 +130,6 @@ const ReportIncident = () => {
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // ==================== CURRENT LOCATION ====================
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setErrorMsg("Geolocation is not supported by your browser.");
-      return;
-    }
-    setLocating(true);
-    setErrorMsg("");
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-          );
-          const data = await res.json();
-          const addr = data.address || {};
-
-          setFormData((prev) => ({
-            ...prev,
-            latitude: String(latitude),
-            longitude: String(longitude),
-            address: addr.road || addr.suburb || addr.neighbourhood || addr.village || prev.address,
-            city: addr.city || addr.town || addr.village || addr.county || "",
-            district: addr.state_district || addr.county || "",
-            state: addr.state || "",
-            pincode: addr.postcode || "",
-          }));
-
-          setLocationFetched(true);
-
-          setFieldErrors((prev) => {
-            const next = { ...prev };
-            delete next.address;
-            return next;
-          });
-        } catch (err) {
-          console.warn("Reverse geocode failed:", err.message);
-          setFormData((prev) => ({
-            ...prev,
-            latitude: String(latitude),
-            longitude: String(longitude),
-          }));
-          setLocationFetched(true);
-        } finally {
-          setLocating(false);
-        }
-      },
-      (err) => {
-        setLocating(false);
-        setErrorMsg("Could not fetch your location. Please enable location permission in browser.");
-        console.warn(err);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
   };
 
   // ==================== FILE HANDLERS ====================
@@ -282,7 +241,7 @@ const ReportIncident = () => {
           <div className={styles.successBadge}>✅ Report Submitted Successfully</div>
           <h2>Thank You for Reporting!</h2>
           <p className={styles.successSub}>
-            NGOs and Government helpline have been notified.
+            Rescue alerts are limited to verified Gaushalas within 25 km of the reported location.
           </p>
 
           <div className={styles.ticketDetails}>
@@ -473,73 +432,14 @@ const ReportIncident = () => {
             </p>
           </div>
 
-          {/* OR Divider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              margin: "16px 0",
-            }}
-          >
-            <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
-            <span style={{ fontSize: "0.8rem", color: "#9ca3af", fontWeight: 600 }}>
-              OR
-            </span>
-            <div style={{ flex: 1, height: "1px", background: "#e5e7eb" }}></div>
-          </div>
-
-          {/* Step 2: Use My Current Location button */}
-          <button
-            type="button"
-            onClick={handleUseCurrentLocation}
-            disabled={locating}
-            style={{
-              width: "100%",
-              padding: "14px",
-              marginBottom: "12px",
-              background: locating
-                ? "#94a3b8"
-                : "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
-              color: "#fff",
-              border: "none",
-              borderRadius: "10px",
-              fontSize: "1rem",
-              fontWeight: 700,
-              cursor: locating ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "10px",
-              transition: "all 0.2s ease",
-            }}
-          >
-            {locating
-              ? "📡 Fetching your location..."
-              : locationFetched
-              ? "✅ Location Fetched — Click to Refresh"
-              : "📡 Use My Current Location"}
-          </button>
-
-          {/* Location Fetched Confirmation */}
-          {locationFetched && (formData.city || formData.state) && (
-            <div
-              style={{
-                padding: "12px 16px",
-                background: "#f0fdf4",
-                border: "1px solid #86efac",
-                borderRadius: "10px",
-                fontSize: "0.88rem",
-                color: "#166534",
-              }}
-            >
-              ✅ Location detected:{" "}
-              <strong>
-                {[formData.city, formData.district, formData.state, formData.pincode]
-                  .filter(Boolean)
-                  .join(", ")}
-              </strong>
-            </div>
+          <MapPicker
+            lat={formData.latitude}
+            lng={formData.longitude}
+            onChangeLocation={handleMapLocationChange}
+            onAddressGeocoded={handleMapAddressGeocoded}
+          />
+          {fieldErrors.location && (
+            <p className={styles.fieldErrorMsg}>⚠️ {fieldErrors.location}</p>
           )}
         </div>
 

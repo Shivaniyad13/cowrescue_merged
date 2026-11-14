@@ -46,6 +46,8 @@ const TrackRescue = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
+  const [helpLineNumber, setHelpLineNumber] = useState("1962");
+  const [showHelpLine, setShowHelpLine] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [supportCaseData, setSupportCaseData] = useState(null);
 
@@ -142,9 +144,20 @@ const TrackRescue = () => {
 
     setActionLoading(true);
     setActionMessage("");
+    setShowHelpLine(false);
     try {
-      await actionFn(caseId, "");
-      setActionMessage(`✅ ${actionName} logged successfully`);
+      const result = await actionFn(caseId, "");
+      if (actionFn === userRequestHelp) {
+        setActionMessage(result.message || "Help request submitted.");
+        setHelpLineNumber(result.emergency_number || "1962");
+        setShowHelpLine(
+          result.no_nearby_gaushala ||
+          result.nearby_check_failed ||
+          result.ngo_alerts_sent === 0
+        );
+      } else {
+        setActionMessage(`✅ ${actionName} logged successfully`);
+      }
       // Refetch phone reports
       const res = await getMyCasesByPhone(phoneInput.trim());
       setMyCases(res.data || []);
@@ -277,6 +290,11 @@ const TrackRescue = () => {
             {actionMessage && (
               <p style={{ marginTop: "12px", padding: "10px", background: "#f0f0f0", borderRadius: "6px" }}>
                 {actionMessage}
+                {showHelpLine && (
+                  <span style={{ display: "block", marginTop: "8px" }}>
+                    <a href={`tel:${helpLineNumber}`}>Call {helpLineNumber} animal helpline</a>
+                  </span>
+                )}
               </p>
             )}
           </div>

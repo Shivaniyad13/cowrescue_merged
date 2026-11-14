@@ -62,6 +62,8 @@ const TrackCowWidget = () => {
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
+  const [helpLineNumber, setHelpLineNumber] = useState("1962");
+  const [showHelpLine, setShowHelpLine] = useState(false);
   const [showFullDetails, setShowFullDetails] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [supportCaseData, setSupportCaseData] = useState(null);
@@ -97,6 +99,7 @@ const TrackCowWidget = () => {
       setError("");
       setShowFullDetails(false);
       setActionMessage("");
+      setShowHelpLine(false);
     }
   }, [isOpen]);
 
@@ -221,9 +224,20 @@ const TrackCowWidget = () => {
 
     setActionLoading(true);
     setActionMessage("");
+    setShowHelpLine(false);
     try {
-      await actionFn(caseId, "");
-      setActionMessage(`✅ ${actionName} logged successfully`);
+      const result = await actionFn(caseId, "");
+      if (actionFn === userRequestHelp) {
+        setActionMessage(result.message || "Help request submitted.");
+        setHelpLineNumber(result.emergency_number || "1962");
+        setShowHelpLine(
+          result.no_nearby_gaushala ||
+          result.nearby_check_failed ||
+          result.ngo_alerts_sent === 0
+        );
+      } else {
+        setActionMessage(`✅ ${actionName} logged successfully`);
+      }
 
       if (searchMode === "phone") {
         const res = await getMyCasesByPhone(phoneInput.trim());
@@ -349,7 +363,16 @@ const TrackCowWidget = () => {
                 ⚠️ Report No Response
               </button>
             </div>
-            {actionMessage && <div className={styles.actionMsg}>{actionMessage}</div>}
+            {actionMessage && (
+              <div className={styles.actionMsg}>
+                {actionMessage}
+                {showHelpLine && (
+                  <p>
+                    <a href={`tel:${helpLineNumber}`}>Call {helpLineNumber} animal helpline</a>
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
 

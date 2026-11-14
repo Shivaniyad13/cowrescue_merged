@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styles from "./CowRescueHome.module.css";
 
 // Cow icon (inline SVG)
@@ -14,18 +15,13 @@ const CowIcon = () => (
     strokeLinejoin="round"
     style={{ display: "inline-block", verticalAlign: "middle" }}
   >
-    {/* Horns */}
     <path d="M4 6c0-1.5 1-2.5 2-2.5" />
     <path d="M20 6c0-1.5-1-2.5-2-2.5" />
-    {/* Ears */}
     <path d="M6 7c-1.5 0-2.5.8-2.5 2 0 .8.6 1.4 1.5 1.6" />
     <path d="M18 7c1.5 0 2.5.8 2.5 2 0 .8-.6 1.4-1.5 1.6" />
-    {/* Head */}
     <path d="M6 8h12c.6 0 1 .4 1 1v3.5c0 3.6-3.1 6.5-7 6.5s-7-2.9-7-6.5V9c0-.6.4-1 1-1z" />
-    {/* Eyes */}
     <circle cx="9.5" cy="11.5" r="0.9" fill="currentColor" stroke="none" />
     <circle cx="14.5" cy="11.5" r="0.9" fill="currentColor" stroke="none" />
-    {/* Snout / nose */}
     <ellipse cx="12" cy="15.5" rx="2.2" ry="1.5" />
     <circle cx="11.2" cy="15.5" r="0.35" fill="currentColor" stroke="none" />
     <circle cx="12.8" cy="15.5" r="0.35" fill="currentColor" stroke="none" />
@@ -68,6 +64,27 @@ const ProfileIcon = () => (
   </svg>
 );
 
+// Building / Org icon (inline SVG)
+const BuildingIcon = () => (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ display: "inline-block", verticalAlign: "middle" }}
+  >
+    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+    <path d="M9 22v-4h6v4" />
+    <path d="M8 6h.01" /><path d="M16 6h.01" /><path d="M12 6h.01" />
+    <path d="M12 10h.01" /><path d="M12 14h.01" /><path d="M16 10h.01" />
+    <path d="M16 14h.01" /><path d="M8 10h.01" /><path d="M8 14h.01" />
+  </svg>
+);
+
 const CowRescueHome = () => {
   const handleOpenReport = () => {
     window.dispatchEvent(new CustomEvent("openReportCowWidget"));
@@ -92,7 +109,10 @@ const CowRescueHome = () => {
           Report an injured cow or track your existing rescue case
         </p>
 
+        {/* Yahan 4 boxes hain */}
         <div className={styles.actionGrid}>
+          
+          {/* 1. PURANA BOX: Report Incident */}
           <button
             className={`${styles.card} ${styles.cardJoin}`}
             onClick={handleOpenReport}
@@ -105,6 +125,7 @@ const CowRescueHome = () => {
             <span className={styles.btnAction}>Open Report Form →</span>
           </button>
 
+          {/* 2. PURANA BOX: Track Your Status */}
           <button
             className={`${styles.card} ${styles.cardJoin}`}
             onClick={handleOpenTrack}
@@ -116,6 +137,35 @@ const CowRescueHome = () => {
             <p>Already reported a cow? Enter your Case ID to see live status.</p>
             <span className={styles.btnAction}>Open Track Form →</span>
           </button>
+
+          {/* 3. NAYA BOX: Join Verified Rescue Network */}
+          <Link
+            to="/cow-rescue/register"
+            className={`${styles.card} ${styles.cardJoin}`}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <div className={styles.cardIcon}>
+              <CowIcon />
+            </div>
+            <h3>Join Verified Rescue Network</h3>
+            <p>Register your Gaushala, NGO, or Animal Shelter to become a verified partner.</p>
+            <span className={styles.btnAction}>Register Now →</span>
+          </Link>
+
+          {/* 4. NAYA BOX: Gaushala / NGO Portal Login */}
+          <Link
+            to="/cow-rescue/org/login"
+            className={`${styles.card} ${styles.cardJoin}`}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <div className={styles.cardIcon}>
+              <BuildingIcon />
+            </div>
+            <h3>Gaushala / NGO Portal</h3>
+            <p>Access your organization's emergency rescue dashboard and active dispatches.</p>
+            <span className={styles.btnAction}>Login to Portal →</span>
+          </Link>
+
         </div>
       </div>
     </div>

@@ -1,0 +1,27 @@
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f8fdf9;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  font-family: inherit;
+}
+.header { text-align: center; margin-bottom: 30px; }
+.backLink { display: inline-block; margin-bottom: 15px; color: #006400; text-decoration: none; font-weight: bold; }
+.header h1 { color: #004d00; margin-bottom: 10px; }
+.header p { color: #555; font-size: 1.1rem; }
+.form { display: flex; flex-direction: column; gap: 25px; }
+.section { background: white; padding: 20px; border-radius: 8px; border: 1px solid #d4edda; }
+.section h2 { font-size: 1.2rem; color: #006400; margin-bottom: 15px; border-bottom: 2px solid #e9f5ec; padding-bottom: 8px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.grid input[type="text"], .grid input[type="email"], .grid input[type="tel"], .grid input[type="number"], .grid select {
+  width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem;
+}
+.grid input:focus, .grid select:focus { outline: none; border-color: #28a745; box-shadow: 0 0 5px rgba(40, 167, 69, 0.3); }
+.checkboxGroup { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+.mapPlaceholder { grid-column: 1 / -1; background: #e9f5ec; padding: 20px; text-align: center; border-radius: 8px; border: 1px dashed #28a745; }
+.note { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
+.submitBtn { background-color: #006400; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+.submitBtn:hover { background-color: #004d00; }
+@media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }

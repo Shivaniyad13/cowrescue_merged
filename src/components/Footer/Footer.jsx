@@ -22,7 +22,7 @@ const Footer = () => {
   };
 
   const addressQuery = encodeURIComponent(
-    "65/4/2, Sant Kirandass Ashram, Jaunti, Kanjhawala-Qutubgarh Road, New Delhi 110081, India"
+    "T2 & S2/886, Sector 5, Kalinga Road, Vaishali, Ghaziabad, Uttar Pradesh - 201010, India"
   );
 
   return (
@@ -139,9 +139,9 @@ const Footer = () => {
             <div className={styles.contactItem}>
               <FaMapMarkerAlt className={styles.contactIcon} />
               <span>
-                KHUSHI CENTRE FOR REHABILITATION AND RESEARCH,<br />
-                65/4/2, Sant Kirandass Ashram, Jaunti,<br />
-                New Delhi – 110081, India
+                T2 &amp; S2/886, Sector 5, Kalinga Road,<br />
+                Vaishali, Ghaziabad,<br />
+                Uttar Pradesh – 201010, India
               </span>
             </div>
           </div>

@@ -1,8 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./MapPicker.module.css";
 
 const DEFAULT_LAT = 28.6139; // Default Noida/Delhi coords
 const DEFAULT_LNG = 77.209;
+
+function addDraggableMarker(map, markerRef, latitude, longitude, onChangeLocation, reverseGeocode) {
+  const marker = window.L.marker([latitude, longitude], { draggable: true }).addTo(map);
+  marker.on("dragend", () => {
+    const position = marker.getLatLng();
+    const newLat = position.lat.toFixed(6);
+    const newLng = position.lng.toFixed(6);
+    onChangeLocation(newLat, newLng);
+    reverseGeocode(newLat, newLng);
+  });
+  markerRef.current = marker;
+  return marker;
+}
 
 const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
   const mapContainerRef = useRef(null);
@@ -12,10 +25,21 @@ const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
   const [geoError, setGeoError] = useState("");
   const [isLocating, setIsLocating] = useState(false);
 
-  const initialLat = Number(lat) || DEFAULT_LAT;
-  const initialLng = Number(lng) || DEFAULT_LNG;
+  const parsedLat = Number(lat);
+  const parsedLng = Number(lng);
+  const hasCoordinates =
+    String(lat ?? "").trim() !== "" &&
+    String(lng ?? "").trim() !== "" &&
+    Number.isFinite(parsedLat) &&
+    Number.isFinite(parsedLng) &&
+    parsedLat >= -90 &&
+    parsedLat <= 90 &&
+    parsedLng >= -180 &&
+    parsedLng <= 180;
+  const initialLat = hasCoordinates ? parsedLat : DEFAULT_LAT;
+  const initialLng = hasCoordinates ? parsedLng : DEFAULT_LNG;
 
-  const triggerReverseGeocode = async (latitude, longitude) => {
+  const triggerReverseGeocode = useCallback(async (latitude, longitude) => {
     if (!onAddressGeocoded) return;
     try {
       const res = await fetch(
@@ -43,7 +67,7 @@ const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
     } catch (err) {
       console.warn("Reverse Geocode Warning:", err.message);
     }
-  };
+  }, [onAddressGeocoded]);
 
   useEffect(() => {
     let isMounted = true;
@@ -106,38 +130,42 @@ const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      // Create draggable marker
-      const marker = L.marker([initialLat, initialLng], {
-        draggable: true,
-      }).addTo(map);
-
-      marker.on("dragend", () => {
-        const position = marker.getLatLng();
-        const newLat = position.lat.toFixed(6);
-        const newLng = position.lng.toFixed(6);
-        onChangeLocation(newLat, newLng);
-        triggerReverseGeocode(newLat, newLng);
-      });
-
       map.on("click", (e) => {
         const { lat: clickLat, lng: clickLng } = e.latlng;
         const newLat = clickLat.toFixed(6);
         const newLng = clickLng.toFixed(6);
+        const marker = markerRef.current || addDraggableMarker(
+          map,
+          markerRef,
+          clickLat,
+          clickLng,
+          onChangeLocation,
+          triggerReverseGeocode
+        );
         marker.setLatLng([clickLat, clickLng]);
         onChangeLocation(newLat, newLng);
         triggerReverseGeocode(newLat, newLng);
       });
 
       mapInstanceRef.current = map;
-      markerRef.current = marker;
-    } else {
-      // Update marker position if props change externally
+    }
+
+    if (hasCoordinates) {
       if (markerRef.current) {
         markerRef.current.setLatLng([initialLat, initialLng]);
-        mapInstanceRef.current.setView([initialLat, initialLng], 13);
+      } else {
+        addDraggableMarker(
+          mapInstanceRef.current,
+          markerRef,
+          initialLat,
+          initialLng,
+          onChangeLocation,
+          triggerReverseGeocode
+        );
       }
+      mapInstanceRef.current.setView([initialLat, initialLng], 13);
     }
-  }, [mapLoaded, initialLat, initialLng]);
+  }, [mapLoaded, initialLat, initialLng, hasCoordinates, onChangeLocation, triggerReverseGeocode]);
 
   const handleGetCurrentLocation = () => {
     setGeoError("");
@@ -156,8 +184,19 @@ const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
         onChangeLocation(currentLat, currentLng);
         triggerReverseGeocode(currentLat, currentLng);
 
-        if (mapInstanceRef.current && markerRef.current && window.L) {
-          markerRef.current.setLatLng([currentLat, currentLng]);
+        if (mapInstanceRef.current && window.L) {
+          if (markerRef.current) {
+            markerRef.current.setLatLng([currentLat, currentLng]);
+          } else {
+            addDraggableMarker(
+              mapInstanceRef.current,
+              markerRef,
+              currentLat,
+              currentLng,
+              onChangeLocation,
+              triggerReverseGeocode
+            );
+          }
           mapInstanceRef.current.setView([currentLat, currentLng], 15);
         }
 
@@ -168,11 +207,11 @@ const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
         setIsLocating(false);
         if (err.code === err.PERMISSION_DENIED) {
           setGeoError(
-            "Location permission denied. Please click on the map or enter coordinates manually."
+            "Location permission denied. Please click the map to set the exact location."
           );
         } else {
           setGeoError(
-            "Unable to retrieve current location. Please use manual entry or map click."
+            "Unable to retrieve current location. Please click the map to set the exact location."
           );
         }
       },
@@ -186,8 +225,8 @@ const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
         <div className={styles.locationInfo}>
           <span className={styles.pinIcon}>📍</span>
           <span>
-            Selected Coordinates: <strong>{lat || "—"}</strong>,{" "}
-            <strong>{lng || "—"}</strong>
+            Selected Coordinates: <strong>{hasCoordinates ? lat : "—"}</strong>,{" "}
+            <strong>{hasCoordinates ? lng : "—"}</strong>
           </span>
         </div>
 
@@ -211,7 +250,7 @@ const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
         )}
       </div>
       <p className={styles.mapHint}>
-        💡 Drag marker or click anywhere on the map to pinpoint exact location.
+        💡 Use GPS or click the map to set the exact location. Drag the marker to refine it.
       </p>
     </div>
   );

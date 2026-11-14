@@ -231,6 +231,50 @@ export const acceptAlert = async (token) => {
   return result;
 };
 
+export const getNgoDashboard = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/ngo/dashboard`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    const error = new Error(result.error || result.message || "Could not load your dashboard.");
+    error.status = response.status;
+    throw error;
+  }
+  return result.data;
+};
+
+export const acceptNgoAlert = async (token, alertToken) => {
+  const response = await fetch(`${API_BASE_URL}/ngo/alerts/${encodeURIComponent(alertToken)}/accept`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to accept this rescue alert.");
+  return result;
+};
+
+export const startNgoTreatment = async (token, caseId, formData) => {
+  const response = await fetch(`${API_BASE_URL}/ngo/cases/${encodeURIComponent(caseId)}/treatment-started`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to start treatment.");
+  return result;
+};
+
+export const completeNgoTreatment = async (token, caseId) => {
+  const response = await fetch(`${API_BASE_URL}/ngo/cases/${encodeURIComponent(caseId)}/treatment-completed`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to complete treatment.");
+  return result;
+};
+
 export const rejectAlert = async (token, reason = "") => {
   const response = await fetch(`${API_BASE_URL}/alerts/${token}/reject`, {
     method: "POST",
@@ -307,8 +351,8 @@ export const getAdminStats = async (token) => {
   return result;
 };
 
-export const getAdminNGOs = async (token) => {
-  const response = await fetch(`${API_BASE_URL}/admin/ngos`, {
+export const getAdminNGOs = async (token, limit = 20) => {
+  const response = await fetch(`${API_BASE_URL}/admin/ngos?limit=${encodeURIComponent(limit)}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const result = await response.json();
