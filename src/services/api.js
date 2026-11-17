@@ -258,6 +258,32 @@ export const getNgoDashboard = async (token) => {
   return result.data;
 };
 
+export const saveNgoBankDetails = async (token, bankDetails) => {
+  const response = await fetch(`${API_BASE_URL}/ngo/bank-details`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(bankDetails),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to save bank details.");
+  return result;
+};
+
+export const revealNgoBankDetails = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/ngo/bank-details/reveal`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+    body: JSON.stringify({}),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to reveal bank details.");
+  return result;
+};
+
 export const acceptNgoAlert = async (token, alertToken) => {
   const response = await fetch(`${API_BASE_URL}/ngo/alerts/${encodeURIComponent(alertToken)}/accept`, {
     method: "POST",

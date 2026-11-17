@@ -116,7 +116,7 @@ const AdminSettlements = ({ token }) => {
       <div style={{ marginBottom: "20px" }}>
         <h2 style={{ margin: 0 }}>💰 Settlement Management</h2>
         <p style={{ color: "#64748b", margin: "6px 0 0" }}>
-          Pending payments to NGOs from case donations (90% of each donation)
+          Pending payments to NGOs from case donations (95% of each donation)
         </p>
       </div>
 
@@ -267,6 +267,10 @@ const AdminSettlements = ({ token }) => {
                   borderRadius: "10px",
                 }}
               >
+                <div style={{ fontSize: "0.78rem", color: "#475569", marginBottom: "10px" }}>
+                  Confidential payout information. Use only to process settlements; see the{" "}
+                  <a href="/privacy-policy" target="_blank" rel="noreferrer" style={{ color: "#166534" }}>Privacy Policy</a>.
+                </div>
                 {ngo.bank_onboarding_completed ? (
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "0.85rem" }}>
                     <div>

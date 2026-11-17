@@ -83,7 +83,10 @@ const AppRoutes = () => {
       {/* Cow Rescue Module Routes */}
       <Route path="/cow-rescue" element={<MainLayout><CowRescueHome /></MainLayout>} />
       <Route path="/cow-rescue/report" element={<MainLayout><ReportIncident /></MainLayout>} />
-      <Route path="/cow-rescue/track" element={<Navigate to="/cow-rescue" replace />} />
+      <Route path="/cow-rescue/track" element={<MainLayout><TrackRescue /></MainLayout>} />
+      <Route path="/cow-rescue/track/:caseId" element={<MainLayout><TrackRescue /></MainLayout>} />
+      <Route path="/track" element={<MainLayout><TrackRescue /></MainLayout>} />
+      <Route path="/track/:caseId" element={<MainLayout><TrackRescue /></MainLayout>} />
       <Route path="/cow-rescue/alert/:token" element={<MainLayout><AlertResponse /></MainLayout>} />
       
       {/* NAYE ROUTES */}

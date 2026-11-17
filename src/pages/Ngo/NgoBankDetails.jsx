@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getNgoBankFormInfo, submitNgoBankDetails } from "../../services/api";
 
@@ -153,6 +153,11 @@ const NgoBankDetails = () => {
         <div style={styles.infoBox}>
           <p style={{ margin: 0, fontSize: "0.9rem", color: "#1e40af" }}>
             ℹ️ Your bank details will be used to transfer the donation funds. Please enter accurate details to avoid delays.
+          </p>
+          <p style={{ margin: "8px 0 0", fontSize: "0.9rem", color: "#1e40af" }}>
+            🔒 Bank details are handled under our{" "}
+            <Link to="/privacy-policy" style={{ color: "#166534", fontWeight: 600 }}>Privacy Policy</Link>
+            {" "}and are not displayed in public listings.
           </p>
         </div>
 

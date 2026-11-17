@@ -55,6 +55,8 @@ const Donation = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ type: null, message: "" });
+  const [donorCountry, setDonorCountry] = useState("");
+  const [domesticSourceConfirmed, setDomesticSourceConfirmed] = useState(false);
 
   const amounts = [10, 251, 501, 1001, 2100];
   const upiId = "49122452@sbi";
@@ -226,6 +228,13 @@ const Donation = () => {
   };
 
   const validateForm = () => {
+    if (donorCountry !== "IN" || !domesticSourceConfirmed) {
+      setSubmitStatus({
+        type: "error",
+        message: "Foreign contributions are not accepted at this time.",
+      });
+      return false;
+    }
     if (!formData.name.trim()) {
       setSubmitStatus({ type: "error", message: "Please enter your full name." });
       return false;
@@ -284,6 +293,8 @@ const Donation = () => {
       payload.append("message", formData.message);
       payload.append("transactionId", formData.transactionId);
       payload.append("paymentMethod", "UPI");
+      payload.append("donor_country", donorCountry);
+      payload.append("domestic_source_confirmed", "true");
 
       if (paymentScreenshot) {
         payload.append("paymentScreenshot", paymentScreenshot);
@@ -352,6 +363,8 @@ const Donation = () => {
           purpose: formData.purpose,
           amount: Number(selectedAmount),
           message: formData.message ? formData.message.trim() : "",
+          donor_country: donorCountry,
+          domestic_source_confirmed: domesticSourceConfirmed,
         };
 
         orderRes = await createDonationOrder(orderData);
@@ -779,6 +792,40 @@ const Donation = () => {
                   />
                 </div>
 
+                <div className={styles.formGroup}>
+                  <label htmlFor="donor-country" className={styles.formLabel}>
+                    Country of contribution <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <select
+                    id="donor-country"
+                    className={styles.formSelect}
+                    value={donorCountry}
+                    onChange={(event) => {
+                      setDonorCountry(event.target.value);
+                      setDomesticSourceConfirmed(false);
+                    }}
+                    required
+                  >
+                    <option value="">Select your country</option>
+                    <option value="IN">India</option>
+                    <option value="OTHER">Outside India</option>
+                  </select>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "flex-start", marginTop: "10px", color: "#374151", lineHeight: 1.45 }}>
+                    <input
+                      type="checkbox"
+                      checked={domesticSourceConfirmed}
+                      disabled={donorCountry !== "IN"}
+                      onChange={(event) => setDomesticSourceConfirmed(event.target.checked)}
+                    />
+                    <span>I confirm that I am in India and this contribution is from Indian sources, not a foreign source.</span>
+                  </label>
+                  {(donorCountry === "OTHER" || (donorCountry === "IN" && !domesticSourceConfirmed)) && (
+                    <p role="alert" style={{ color: "#991b1b", margin: "8px 0 0", fontSize: "0.9rem" }}>
+                      Foreign contributions are not accepted at this time.
+                    </p>
+                  )}
+                </div>
+
                 {/* PAYMENT SCREENSHOT UPLOAD */}
                 <div className={styles.formGroup}>
                   <label htmlFor="payment-screenshot" className={styles.formLabel}>
@@ -895,6 +942,7 @@ const Donation = () => {
             {/* RIGHT COLUMN: UPI QR CARD & LIVE SUMMARY */}
             <div className={styles.sideColumn}>
               {/* QR / UPI DONATION CARD */}
+              {donorCountry === "IN" && domesticSourceConfirmed ? (
               <div className={styles.qrCard}>
                 <div className={styles.qrCardHeader}>
                   <span className={styles.qrIcon}>📱</span>
@@ -945,6 +993,14 @@ const Donation = () => {
                   📱 Pay via UPI App (₹{selectedAmount || "0"})
                 </button>
               </div>
+              ) : (
+                <div className={styles.qrCard}>
+                  <h3 className={styles.qrCardTitle}>Payment methods unavailable</h3>
+                  <p className={styles.qrCardSubtitle}>
+                    Payments are available only after confirming an India-based, Indian-source contribution.
+                  </p>
+                </div>
+              )}
 
               {/* DYNAMIC DONATION SUMMARY CARD */}
               <div className={styles.summaryCard}>

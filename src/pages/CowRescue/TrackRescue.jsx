@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import styles from "./TrackRescue.module.css";
 import SupportRescueModal from "./components/SupportRescueModal";
 import {
@@ -25,8 +25,10 @@ const STATUS_LABELS = {
 };
 
 const TrackRescue = () => {
+  const { caseId: paramCaseId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialCaseId = searchParams.get("case") || searchParams.get("ticket") || "";
+  const queryCaseId = searchParams.get("case") || searchParams.get("caseId") || searchParams.get("ticket") || "";
+  const initialCaseId = (paramCaseId || queryCaseId).trim().toUpperCase();
 
   const [searchMode, setSearchMode] = useState("case"); // "case" | "phone"
 
@@ -67,6 +69,7 @@ const TrackRescue = () => {
 
   useEffect(() => {
     if (initialCaseId) {
+      setCaseInput(initialCaseId);
       fetchCase(initialCaseId);
     }
   }, [initialCaseId]);

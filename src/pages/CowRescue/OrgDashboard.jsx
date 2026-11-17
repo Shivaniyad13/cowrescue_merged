@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   acceptNgoAlert,
   completeNgoTreatment,
   getNgoDashboard,
+  revealNgoBankDetails,
+  saveNgoBankDetails,
   startNgoTreatment
 } from '../../services/api';
 
@@ -54,6 +56,12 @@ const OrgDashboard = () => {
   const [busyAction, setBusyAction] = useState('');
   const [treatmentPhotos, setTreatmentPhotos] = useState({});
   const [refreshKey, setRefreshKey] = useState(0);
+  const [bankForm, setBankForm] = useState({ bank_account_number: '', bank_ifsc: '' });
+  const [revealedAccount, setRevealedAccount] = useState('');
+  const [bankVisible, setBankVisible] = useState(false);
+  const [bankBusy, setBankBusy] = useState(false);
+  const [bankError, setBankError] = useState('');
+  const [bankMessage, setBankMessage] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('ngoToken');
@@ -133,6 +141,46 @@ const OrgDashboard = () => {
     );
   };
 
+  const handleSaveBankDetails = async (event) => {
+    event.preventDefault();
+    const token = localStorage.getItem('ngoToken');
+    setBankBusy(true);
+    setBankError('');
+    setBankMessage('');
+    try {
+      const result = await saveNgoBankDetails(token, bankForm);
+      setDashboard((current) => ({ ...current, bankDetails: result.data }));
+      setBankForm({ bank_account_number: '', bank_ifsc: '' });
+      setRevealedAccount('');
+      setBankVisible(false);
+      setBankMessage(result.message || 'Bank details saved securely.');
+    } catch (requestError) {
+      setBankError(requestError.message || 'Could not save bank details.');
+    } finally {
+      setBankBusy(false);
+    }
+  };
+
+  const handleToggleBankDetails = async () => {
+    if (bankVisible) {
+      setRevealedAccount('');
+      setBankVisible(false);
+      return;
+    }
+    const token = localStorage.getItem('ngoToken');
+    setBankBusy(true);
+    setBankError('');
+    try {
+      const result = await revealNgoBankDetails(token);
+      setRevealedAccount(result.data.bank_account_number || '');
+      setBankVisible(true);
+    } catch (requestError) {
+      setBankError(requestError.message || 'Could not reveal bank details.');
+    } finally {
+      setBankBusy(false);
+    }
+  };
+
   if (loading) {
     return <main style={{ padding: '48px 20px', textAlign: 'center' }}>Loading organization dashboard...</main>;
   }
@@ -148,7 +196,7 @@ const OrgDashboard = () => {
 
   if (!dashboard) return null;
 
-  const { ngo, verification, stats, cases = [], pendingAlerts = [] } = dashboard;
+  const { ngo, verification, stats, cases = [], pendingAlerts = [], terms, bankDetails } = dashboard;
   const statusLabel = verification.isNetworkMember
     ? 'Verified rescue network member'
     : verification.status === 'PENDING'
@@ -195,6 +243,88 @@ const OrgDashboard = () => {
               <strong style={{ display: 'block', marginTop: '8px', color: '#14532d', fontSize: '1.8rem' }}>{value}</strong>
             </div>
           ))}
+        </section>
+
+        <section aria-label="Bank details and terms" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+          <article style={cardStyle}>
+            <h2 style={{ margin: '0 0 12px', color: '#14532d' }}>Bank Details</h2>
+            <p style={{ margin: '0 0 12px', color: '#64748b' }}>
+              Details are encrypted and visible only to you and authorized administrators.
+            </p>
+            <p style={{ margin: '0 0 12px', color: '#64748b' }}>
+              Bank details are used only for eligible settlements, are never shown on public listings, and are handled under our{' '}
+              <Link to="/privacy-policy" style={{ color: '#166534', fontWeight: 600 }}>Privacy Policy</Link>.
+            </p>
+            {bankDetails ? (
+              <div style={{ marginBottom: '14px' }}>
+                <p style={{ margin: '4px 0' }}>
+                  <strong>Account:</strong> {bankVisible ? revealedAccount : bankDetails.account_number_masked}
+                </p>
+                <p style={{ margin: '4px 0' }}><strong>IFSC:</strong> {bankDetails.ifsc || '—'}</p>
+                <button
+                  type="button"
+                  onClick={handleToggleBankDetails}
+                  disabled={bankBusy}
+                  style={{ ...primaryButtonStyle, marginTop: '6px', background: '#475569' }}
+                >
+                  {bankVisible ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            ) : (
+              <p style={{ color: '#64748b' }}>No bank details have been added.</p>
+            )}
+            <form onSubmit={handleSaveBankDetails} style={{ display: 'grid', gap: '10px' }}>
+              <label>
+                Bank account number
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  required
+                  value={bankForm.bank_account_number}
+                  onChange={(event) => setBankForm((current) => ({
+                    ...current,
+                    bank_account_number: event.target.value.replace(/\D/g, '').slice(0, 18)
+                  }))}
+                  style={{ display: 'block', width: '100%', boxSizing: 'border-box', marginTop: '5px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                />
+              </label>
+              <label>
+                IFSC Code
+                <input
+                  type="text"
+                  autoComplete="off"
+                  required
+                  value={bankForm.bank_ifsc}
+                  onChange={(event) => setBankForm((current) => ({
+                    ...current,
+                    bank_ifsc: event.target.value.toUpperCase().slice(0, 11)
+                  }))}
+                  style={{ display: 'block', width: '100%', boxSizing: 'border-box', marginTop: '5px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                />
+              </label>
+              <button type="submit" disabled={bankBusy} style={{ ...primaryButtonStyle, opacity: bankBusy ? 0.6 : 1 }}>
+                {bankBusy ? 'Saving...' : bankDetails ? 'Update bank details' : 'Save bank details'}
+              </button>
+            </form>
+            {bankError && <p role="alert" style={{ color: '#b91c1c' }}>{bankError}</p>}
+            {bankMessage && <p role="status" style={{ color: '#166534' }}>{bankMessage}</p>}
+          </article>
+
+          <article style={cardStyle}>
+            <h2 style={{ margin: '0 0 12px', color: '#14532d' }}>Accepted Terms</h2>
+            <p style={{ margin: '4px 0' }}>
+              <strong>Version:</strong> {terms?.version || 'Not recorded'}
+            </p>
+            <p style={{ margin: '4px 0' }}>
+              <strong>Accepted:</strong> {terms?.accepted_at
+                ? new Date(terms.accepted_at).toLocaleString('en-IN')
+                : 'Not recorded'}
+            </p>
+            <p style={{ margin: '4px 0' }}>
+              <strong>Status:</strong> {terms?.accepted ? 'Accepted' : 'Not accepted'}
+            </p>
+          </article>
         </section>
 
         {actionError && <p role="alert" style={{ ...cardStyle, color: '#b91c1c', marginBottom: '16px' }}>{actionError}</p>}

@@ -61,9 +61,6 @@ const NgoDetails = ({ organization }) => {
         <br />
         <strong>Veterinary support:</strong> {organization.has_vet ? "Yes" : "No"}
         <br />
-        <strong>Bank account:</strong> {organization.bank_account_number || "—"}
-        <br />
-        <strong>IFSC:</strong> {organization.bank_ifsc || "—"}
       </div>
       <div>
         <strong>Exact coordinates:</strong> {coordinates || "Not provided"}

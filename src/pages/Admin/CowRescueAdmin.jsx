@@ -42,7 +42,6 @@ const CowRescueAdmin = ({ token }) => {
   const [alertPriority, setAlertPriority] = useState(1);
   const [alertChannel, setAlertChannel] = useState("EMAIL");
   const [alertNote, setAlertNote] = useState("");
-  const [alertDeadline, setAlertDeadline] = useState(24);
   const [availableNgos, setAvailableNgos] = useState([]);
   const [actionLoading, setActionLoading] = useState(false);
   const [toast, setToast] = useState(null);
@@ -88,7 +87,6 @@ const CowRescueAdmin = ({ token }) => {
     setAlertPriority(1);
     setAlertChannel("EMAIL");
     setAlertNote("");
-    setAlertDeadline(24);
     setAvailableNgos([]);
     setShowAlertModal(true);
 
@@ -135,7 +133,6 @@ const CowRescueAdmin = ({ token }) => {
         priority: parseInt(alertPriority),
         channel: alertChannel,
         note: alertNote,
-        response_deadline_hours: parseInt(alertDeadline),
       });
       showToast("Alert sent successfully!");
       setShowAlertModal(false);
@@ -350,7 +347,7 @@ const CowRescueAdmin = ({ token }) => {
                 <option key={n.id} value={n.id}>{n.name} — {[n.city, n.state].filter(Boolean).join(", ")}</option>
               ))}
             </select>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginTop: "12px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "12px" }}>
               <div>
                 <label style={{ display: "block", marginBottom: "4px", fontWeight: 600, fontSize: "0.85rem" }}>Priority</label>
                 <select value={alertPriority} onChange={(e) => setAlertPriority(e.target.value)} style={{ width: "100%", padding: "8px", border: "1px solid #cbd5e1", borderRadius: "6px" }}>
@@ -367,11 +364,8 @@ const CowRescueAdmin = ({ token }) => {
                   <option value="WHATSAPP">WHATSAPP</option>
                 </select>
               </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontWeight: 600, fontSize: "0.85rem" }}>Deadline (hrs)</label>
-                <input type="number" value={alertDeadline} onChange={(e) => setAlertDeadline(e.target.value)} style={{ width: "100%", padding: "8px", border: "1px solid #cbd5e1", borderRadius: "6px" }} />
-              </div>
             </div>
+            <p style={{ margin: "10px 0 0", color: "#475569", fontSize: "0.9rem" }}>The Gaushala must accept within 10 minutes.</p>
             <label style={{ display: "block", marginTop: "12px", marginBottom: "4px", fontWeight: 600 }}>Note</label>
             <textarea value={alertNote} onChange={(e) => setAlertNote(e.target.value)} rows="3" style={{ width: "100%", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
             <div style={{ display: "flex", gap: "10px", marginTop: "16px", justifyContent: "flex-end" }}>

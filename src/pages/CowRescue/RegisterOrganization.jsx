@@ -14,7 +14,7 @@ const RegisterOrganization = () => {
   const [formData, setFormData] = useState({
     orgName: '', orgType: '', regNumber: '', contactPerson: '', phone: '', email: '',
     password: '', address: '', city: '', state: '', pincode: '', lat: '', lng: '',
-    capacity: '', hasAmbulance: false, hasVet: false, bankAccount: '', ifsc: ''
+    capacity: '', hasAmbulance: false, hasVet: false
   });
   const handleMapLocationChange = useCallback((lat, lng) => {
     setFormData((previous) => ({ ...previous, lat, lng }));
@@ -77,8 +77,7 @@ const RegisterOrganization = () => {
       registrationData.append('capacity', formData.capacity);
       registrationData.append('hasAmbulance', String(formData.hasAmbulance));
       registrationData.append('hasVet', String(formData.hasVet));
-      registrationData.append('bankAccount', formData.bankAccount);
-      registrationData.append('ifsc', formData.ifsc);
+      registrationData.append('terms_accepted', 'true');
       if (registrationCertificate) {
         registrationData.append('registrationCertificate', registrationCertificate);
       }
@@ -118,7 +117,10 @@ const RegisterOrganization = () => {
         <p>Register your Gaushala, NGO, or Animal Shelter to become a verified partner in our regional emergency cow rescue network.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form
+        onSubmit={handleSubmit}
+        className={styles.form}
+      >
         
         <div className={styles.section}>
           <h2>🏢 1. Organization Information</h2>
@@ -188,15 +190,6 @@ const RegisterOrganization = () => {
             </div>
           </div>
           {documentError && <p className={styles.note} role="alert">{documentError}</p>}
-        </div>
-
-        <div className={styles.section}>
-          <h2>🏦 6. Bank Account Details (Optional)</h2>
-          <p className={styles.note}>Provide bank account details for future direct donation settlement payouts.</p>
-          <div className={styles.grid}>
-            <input type="text" name="bankAccount" placeholder="Bank Account Number" onChange={handleChange} />
-            <input type="text" name="ifsc" placeholder="IFSC Code" onChange={handleChange} />
-          </div>
         </div>
 
         <button type="submit" className={styles.submitBtn} disabled={loading}>

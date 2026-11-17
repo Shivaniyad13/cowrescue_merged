@@ -51,11 +51,18 @@ const PrivacyPolicy = () => {
                 <li>Mobile number</li>
                 <li>Address where voluntarily provided</li>
                 <li>Account or registration information</li>
+                <li>Gaushala payout bank details, when provided for settlements</li>
                 <li>Campaign or NGO interaction information</li>
                 <li>Donation or contribution details</li>
                 <li>Transaction references or payment status</li>
                 <li>Technical information such as device, browser and IP-related information where collected through website services</li>
               </ul>
+              <div className={styles.highlightBox}>
+                <h4>🔒 Gaushala Bank Details</h4>
+                <p>
+                  Gaushala bank details are collected only to process eligible payouts, encrypted at rest, and restricted to the authenticated Gaushala owner and authorized administrators. They are not displayed on public profiles, listings, or search results.
+                </p>
+              </div>
               <div className={styles.highlightBox}>
                 <h4>🔒 Payment Credential Security</h4>
                 <p>

@@ -10,6 +10,8 @@ const SupportRescueModal = ({ caseData, onClose, onSuccess }) => {
   const [donorEmail, setDonorEmail] = useState("");
   const [donorPhone, setDonorPhone] = useState("");
   const [message, setMessage] = useState("");
+  const [donorCountry, setDonorCountry] = useState("");
+  const [domesticSourceConfirmed, setDomesticSourceConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -43,6 +45,10 @@ const SupportRescueModal = ({ caseData, onClose, onSuccess }) => {
       setError("Please enter a valid 10-digit mobile.");
       return;
     }
+    if (donorCountry !== "IN" || !domesticSourceConfirmed) {
+      setError("Foreign contributions are not accepted at this time.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -56,6 +62,8 @@ const SupportRescueModal = ({ caseData, onClose, onSuccess }) => {
         donor_email: donorEmail.trim() || "",
         donor_phone: donorPhone.trim() || "",
         message: message.trim() || "",
+        donor_country: donorCountry,
+        domestic_source_confirmed: domesticSourceConfirmed,
       });
 
       const cfMode = orderRes.environment === "production" ? "production" : "sandbox";
@@ -189,6 +197,36 @@ const SupportRescueModal = ({ caseData, onClose, onSuccess }) => {
             style={styles.input}
           />
 
+          <label style={styles.label} htmlFor="support-donor-country">Country of contribution *</label>
+          <select
+            id="support-donor-country"
+            value={donorCountry}
+            required
+            onChange={(event) => {
+              setDonorCountry(event.target.value);
+              setDomesticSourceConfirmed(false);
+            }}
+            style={styles.input}
+          >
+            <option value="">Select your country</option>
+            <option value="IN">India</option>
+            <option value="OTHER">Outside India</option>
+          </select>
+          <label style={{ ...styles.label, display: "flex", gap: "8px", alignItems: "flex-start", fontWeight: 400 }}>
+            <input
+              type="checkbox"
+              checked={domesticSourceConfirmed}
+              disabled={donorCountry !== "IN"}
+              onChange={(event) => setDomesticSourceConfirmed(event.target.checked)}
+            />
+            <span>I confirm that I am in India and this contribution is from Indian sources, not a foreign source.</span>
+          </label>
+          {(donorCountry === "OTHER" || (donorCountry === "IN" && !domesticSourceConfirmed)) && (
+            <p role="alert" style={{ color: "#991b1b", fontSize: "0.85rem", margin: "4px 0" }}>
+              Foreign contributions are not accepted at this time.
+            </p>
+          )}
+
           <label style={styles.label}>Message (optional)</label>
           <textarea
             rows="2"
@@ -204,17 +242,17 @@ const SupportRescueModal = ({ caseData, onClose, onSuccess }) => {
               <strong style={{ color: "#16a34a", fontSize: "1.1rem" }}>₹{finalAmount || 0}</strong>
             </div>
             <div style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: "4px" }}>
-              🐄 90% goes to NGO for cow care • 10% platform fee
+              🐄 95% goes to Gaushala for cow care • 5% platform fee
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || donorCountry !== "IN" || !domesticSourceConfirmed}
             style={{
               ...styles.submitBtn,
-              opacity: isSubmitting ? 0.6 : 1,
-              cursor: isSubmitting ? "not-allowed" : "pointer",
+              opacity: isSubmitting || donorCountry !== "IN" || !domesticSourceConfirmed ? 0.6 : 1,
+              cursor: isSubmitting || donorCountry !== "IN" || !domesticSourceConfirmed ? "not-allowed" : "pointer",
             }}
           >
             {isSubmitting ? "Processing..." : `💳 Pay ₹${finalAmount || 0} via Cashfree`}
