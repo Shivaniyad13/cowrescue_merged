@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './RegisterOrganization.module.css';
 import MapPicker from './components/MapPicker';
+import { API_BASE_URL } from '../../services/api';
 
 const RegisterOrganization = () => {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ const RegisterOrganization = () => {
       }
       if (identityProof) registrationData.append('identityProof', identityProof);
 
-      const response = await fetch('http://localhost:5000/api/ngo/register', {
+      const response = await fetch(`${API_BASE_URL}/ngo/register`, {
         method: 'POST',
         body: registrationData
       });

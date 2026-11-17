@@ -1,6 +1,20 @@
-const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const rawApiUrl = import.meta.env.VITE_API_URL?.trim() ||
+  (import.meta.env.DEV ? "http://localhost:5000/api" : "");
+if (!rawApiUrl) {
+  throw new Error("VITE_API_URL must be set to the deployed API URL for production builds.");
+}
+
+const parsedApiUrl = new URL(rawApiUrl);
+if (
+  import.meta.env.PROD &&
+  (parsedApiUrl.protocol !== "https:" ||
+    ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(parsedApiUrl.hostname))
+) {
+  throw new Error("Production VITE_API_URL must use the HTTPS URL of the deployed backend.");
+}
+
 const cleanBaseUrl = rawApiUrl.replace(/\/+$/, "").replace(/\/api$/, "");
-const API_BASE_URL = `${cleanBaseUrl}/api`;
+export const API_BASE_URL = `${cleanBaseUrl}/api`;
 
 // ==================== HELPERS ====================
 export const getUploadUrl = (path) => {

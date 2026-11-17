@@ -8,6 +8,7 @@ import {
   updateAdminContactStatus,
   getUploadUrl,
   getAdminNGOs,
+  API_BASE_URL,
 } from "../services/api";
 import CowRescueAdmin from "./Admin/CowRescueAdmin";
 import AdminSettlements from "./Admin/AdminSettlements";
@@ -164,7 +165,7 @@ const AdminDashboard = () => {
         setContacts(res.contacts || []);
       } else if (activeMainTab === "ngoRequests") {
         const [res, registeredRes] = await Promise.all([
-          fetch('http://localhost:5000/api/ngo/pending', {
+          fetch(`${API_BASE_URL}/ngo/pending`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           getAdminNGOs(token, 100),
@@ -249,7 +250,7 @@ const AdminDashboard = () => {
   const handleApproveNgo = async (req) => {
     setApprovingNgo(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/ngo/approve/${req.id}`, {
+      const res = await fetch(`${API_BASE_URL}/ngo/approve/${req.id}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });

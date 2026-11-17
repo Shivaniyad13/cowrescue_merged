@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './OrgLogin.module.css';
+import { API_BASE_URL } from '../../services/api';
 
 const OrgLogin = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const OrgLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/ngo/login', {
+      const response = await fetch(`${API_BASE_URL}/ngo/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './OrgLogin.module.css'; // Same CSS use kar rahe hain
+import { API_BASE_URL } from '../../services/api';
 
 const OrgResetPassword = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const OrgResetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/ngo/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/ngo/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -45,7 +46,7 @@ const OrgResetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/ngo/reset-password', {
+      const response = await fetch(`${API_BASE_URL}/ngo/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword })
