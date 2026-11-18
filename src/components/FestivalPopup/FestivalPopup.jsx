@@ -1,14 +1,44 @@
-import { useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import styles from "./FestivalPopup.module.css";
 
 const FestivalPopup = ({
   isOpen,
   onClose,
-  imageSrc = "\Chhath Puja at Sunrise.png",
-  alt = "Chhath Puja at Sunrise",
+  imageSrc = "",
+  alt = "Festival Image",
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Check whether image actually exists
   useEffect(() => {
-    if (!isOpen) return undefined;
+    setImageLoaded(false);
+
+    if (!isOpen || !imageSrc || !imageSrc.trim()) {
+      return;
+    }
+
+    const img = new Image();
+
+    img.onload = () => {
+      setImageLoaded(true);
+    };
+
+    img.onerror = () => {
+      setImageLoaded(false);
+    };
+
+    img.src = imageSrc;
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [isOpen, imageSrc]);
+
+  // Prevent scrolling only when a valid image is loaded
+  useEffect(() => {
+    if (!isOpen || !imageLoaded) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -25,9 +55,12 @@ const FestivalPopup = ({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, imageLoaded, onClose]);
 
-  if (!isOpen) return null;
+  // Do not display popup if image is missing or unavailable
+  if (!isOpen || !imageSrc || !imageLoaded) {
+    return null;
+  }
 
   return (
     <div
@@ -73,7 +106,6 @@ const FestivalPopup = ({
           alt={alt}
           className={styles.image}
           loading="eager"
-          fetchPriority="high"
         />
       </div>
     </div>
@@ -81,4 +113,3 @@ const FestivalPopup = ({
 };
 
 export default FestivalPopup;
-
