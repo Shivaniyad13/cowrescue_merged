@@ -1,257 +1,80 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import styles from "./MapPicker.module.css";
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-const DEFAULT_LAT = 28.6139; // Default Noida/Delhi coords
-const DEFAULT_LNG = 77.209;
+// Fix for default Leaflet marker icon
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
-function addDraggableMarker(map, markerRef, latitude, longitude, onChangeLocation, reverseGeocode) {
-  const marker = window.L.marker([latitude, longitude], { draggable: true }).addTo(map);
-  marker.on("dragend", () => {
-    const position = marker.getLatLng();
-    const newLat = position.lat.toFixed(6);
-    const newLng = position.lng.toFixed(6);
-    onChangeLocation(newLat, newLng);
-    reverseGeocode(newLat, newLng);
+const LocationMarker = ({ position, setPosition, onLocationChange }) => {
+  const map = useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+      onLocationChange(e.latlng.lat, e.latlng.lng);
+      map.flyTo(e.latlng, map.getZoom());
+    },
   });
-  markerRef.current = marker;
-  return marker;
-}
-
-const MapPicker = ({ lat, lng, onChangeLocation, onAddressGeocoded }) => {
-  const mapContainerRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const markerRef = useRef(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [geoError, setGeoError] = useState("");
-  const [isLocating, setIsLocating] = useState(false);
-
-  const parsedLat = Number(lat);
-  const parsedLng = Number(lng);
-  const hasCoordinates =
-    String(lat ?? "").trim() !== "" &&
-    String(lng ?? "").trim() !== "" &&
-    Number.isFinite(parsedLat) &&
-    Number.isFinite(parsedLng) &&
-    parsedLat >= -90 &&
-    parsedLat <= 90 &&
-    parsedLng >= -180 &&
-    parsedLng <= 180;
-  const initialLat = hasCoordinates ? parsedLat : DEFAULT_LAT;
-  const initialLng = hasCoordinates ? parsedLng : DEFAULT_LNG;
-
-  const triggerReverseGeocode = useCallback(async (latitude, longitude) => {
-    if (!onAddressGeocoded) return;
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-      );
-      const data = await res.json();
-      if (data && data.address) {
-        const city =
-          data.address.city ||
-          data.address.town ||
-          data.address.village ||
-          data.address.suburb ||
-          data.address.county ||
-          "";
-        const state =
-          data.address.state || data.address.state_district || "";
-        const pincode = data.address.postcode || "";
-        const address =
-          data.display_name ||
-          [data.address.road, data.address.suburb, city, state]
-            .filter(Boolean)
-            .join(", ");
-        onAddressGeocoded({ address, city, state, pincode });
-      }
-    } catch (err) {
-      console.warn("Reverse Geocode Warning:", err.message);
-    }
-  }, [onAddressGeocoded]);
 
   useEffect(() => {
-    let isMounted = true;
+    if (position) {
+      map.flyTo(position, map.getZoom());
+    }
+  }, [position, map]);
 
-    // Dynamically inject Leaflet CSS & JS if not already loaded
-    const loadLeaflet = async () => {
-      if (window.L) {
-        if (isMounted) setMapLoaded(true);
-        return;
-      }
+  return position === null ? null : (
+    <Marker
+      position={position}
+      draggable={true}
+      eventHandlers={{
+        dragend: (e) => {
+          const marker = e.target;
+          const newPos = marker.getLatLng();
+          setPosition(newPos);
+          onLocationChange(newPos.lat, newPos.lng);
+        },
+      }}
+    />
+  );
+};
 
-      if (!document.getElementById("leaflet-css")) {
-        const link = document.createElement("link");
-        link.id = "leaflet-css";
-        link.rel = "stylesheet";
-        link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-        document.head.appendChild(link);
-      }
-
-      if (!document.getElementById("leaflet-js")) {
-        const script = document.createElement("script");
-        script.id = "leaflet-js";
-        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-        script.onload = () => {
-          if (isMounted) setMapLoaded(true);
-        };
-        document.body.appendChild(script);
-      } else {
-        const checkL = setInterval(() => {
-          if (window.L) {
-            clearInterval(checkL);
-            if (isMounted) setMapLoaded(true);
-          }
-        }, 100);
-      }
-    };
-
-    loadLeaflet();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+const MapPicker = ({ lat, lng, onChangeLocation }) => {
+  const [position, setPosition] = useState(
+    lat && lng ? { lat: parseFloat(lat), lng: parseFloat(lng) } : null
+  );
 
   useEffect(() => {
-    if (!mapLoaded || !mapContainerRef.current || !window.L) return;
-
-    const L = window.L;
-
-    if (!mapInstanceRef.current) {
-      // Initialize Leaflet map
-      const map = L.map(mapContainerRef.current).setView(
-        [initialLat, initialLng],
-        13
-      );
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
-
-      map.on("click", (e) => {
-        const { lat: clickLat, lng: clickLng } = e.latlng;
-        const newLat = clickLat.toFixed(6);
-        const newLng = clickLng.toFixed(6);
-        const marker = markerRef.current || addDraggableMarker(
-          map,
-          markerRef,
-          clickLat,
-          clickLng,
-          onChangeLocation,
-          triggerReverseGeocode
-        );
-        marker.setLatLng([clickLat, clickLng]);
-        onChangeLocation(newLat, newLng);
-        triggerReverseGeocode(newLat, newLng);
-      });
-
-      mapInstanceRef.current = map;
+    if (lat && lng) {
+      setPosition({ lat: parseFloat(lat), lng: parseFloat(lng) });
     }
+  }, [lat, lng]);
 
-    if (hasCoordinates) {
-      if (markerRef.current) {
-        markerRef.current.setLatLng([initialLat, initialLng]);
-      } else {
-        addDraggableMarker(
-          mapInstanceRef.current,
-          markerRef,
-          initialLat,
-          initialLng,
-          onChangeLocation,
-          triggerReverseGeocode
-        );
-      }
-      mapInstanceRef.current.setView([initialLat, initialLng], 13);
-    }
-  }, [mapLoaded, initialLat, initialLng, hasCoordinates, onChangeLocation, triggerReverseGeocode]);
-
-  const handleGetCurrentLocation = () => {
-    setGeoError("");
-    if (!navigator.geolocation) {
-      setGeoError("Geolocation is not supported by your browser.");
-      return;
-    }
-
-    setIsLocating(true);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const currentLat = position.coords.latitude.toFixed(6);
-        const currentLng = position.coords.longitude.toFixed(6);
-
-        onChangeLocation(currentLat, currentLng);
-        triggerReverseGeocode(currentLat, currentLng);
-
-        if (mapInstanceRef.current && window.L) {
-          if (markerRef.current) {
-            markerRef.current.setLatLng([currentLat, currentLng]);
-          } else {
-            addDraggableMarker(
-              mapInstanceRef.current,
-              markerRef,
-              currentLat,
-              currentLng,
-              onChangeLocation,
-              triggerReverseGeocode
-            );
-          }
-          mapInstanceRef.current.setView([currentLat, currentLng], 15);
-        }
-
-        setIsLocating(false);
-      },
-      (err) => {
-        console.warn("Geolocation Error:", err);
-        setIsLocating(false);
-        if (err.code === err.PERMISSION_DENIED) {
-          setGeoError(
-            "Location permission denied. Please click the map to set the exact location."
-          );
-        } else {
-          setGeoError(
-            "Unable to retrieve current location. Please click the map to set the exact location."
-          );
-        }
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
+  const defaultCenter = position || { lat: 20.5937, lng: 78.9629 }; // India center
 
   return (
-    <div className={styles.mapPickerWrapper}>
-      <div className={styles.mapHeader}>
-        <div className={styles.locationInfo}>
-          <span className={styles.pinIcon}>📍</span>
-          <span>
-            Selected Coordinates: <strong>{hasCoordinates ? lat : "—"}</strong>,{" "}
-            <strong>{hasCoordinates ? lng : "—"}</strong>
-          </span>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleGetCurrentLocation}
-          className={styles.btnGPS}
-          disabled={isLocating}
-        >
-          {isLocating ? "⏳ Locating..." : "🎯 Use My Current Location"}
-        </button>
+    <div style={{ marginTop: '15px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #ccc' }}>
+      <MapContainer
+        center={defaultCenter}
+        zoom={position ? 15 : 5}
+        style={{ height: '300px', width: '100%' }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <LocationMarker
+          position={position}
+          setPosition={setPosition}
+          onLocationChange={onChangeLocation}
+        />
+      </MapContainer>
+      <div style={{ padding: '10px', fontSize: '0.85rem', backgroundColor: '#f8f9fa', color: '#555' }}>
+        💡 Map par click karein ya pin ko drag karein apni exact location set karne ke liye.
       </div>
-
-      {geoError && <div className={styles.geoErrorMsg}>⚠️ {geoError}</div>}
-
-      <div className={styles.mapContainer} ref={mapContainerRef}>
-        {!mapLoaded && (
-          <div className={styles.mapLoading}>
-            <span>🗺️</span> Loading Interactive Leaflet Map...
-          </div>
-        )}
-      </div>
-      <p className={styles.mapHint}>
-        💡 Use GPS or click the map to set the exact location. Drag the marker to refine it.
-      </p>
     </div>
   );
 };

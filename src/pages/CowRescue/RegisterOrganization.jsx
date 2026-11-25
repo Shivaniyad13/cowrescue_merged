@@ -1,12 +1,20 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './RegisterOrganization.module.css';
-import MapPicker from './components/MapPicker';
 import { API_BASE_URL } from '../../services/api';
+
+// India ke coordinates ka range check karne ka function
+const isInIndia = (lat, lng) => {
+  const latitude = parseFloat(lat);
+  const longitude = parseFloat(lng);
+  // India ka bounding box (Roughly)
+  return latitude >= 8.0 && latitude <= 37.0 && longitude >= 68.0 && longitude <= 97.5;
+};
 
 const RegisterOrganization = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [registrationCertificate, setRegistrationCertificate] = useState(null);
   const [identityProof, setIdentityProof] = useState(null);
   const [documentError, setDocumentError] = useState('');
@@ -16,12 +24,6 @@ const RegisterOrganization = () => {
     password: '', address: '', city: '', state: '', pincode: '', lat: '', lng: '',
     capacity: '', hasAmbulance: false, hasVet: false
   });
-  const handleMapLocationChange = useCallback((lat, lng) => {
-    setFormData((previous) => ({ ...previous, lat, lng }));
-  }, []);
-  const handleMapAddressGeocoded = useCallback((location) => {
-    setFormData((previous) => ({ ...previous, ...location }));
-  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -46,16 +48,75 @@ const RegisterOrganization = () => {
     setter(file);
   };
 
+  // USE MY CURRENT LOCATION with India Check
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+    
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        // INDIA CHECK: Agar location India ke bahar hai toh block karein
+        if (!isInIndia(latitude, longitude)) {
+          alert("⚠️ Location is outside India. This service is only available within India.");
+          setIsLocating(false);
+          return;
+        }
+        
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+          const data = await response.json();
+          const addr = data.address || {};
+
+          setFormData((prev) => ({
+            ...prev,
+            lat: latitude.toString(),
+            lng: longitude.toString(),
+            address: addr.road || addr.suburb || addr.neighbourhood || prev.address,
+            city: addr.city || addr.town || addr.village || addr.county || prev.city,
+            state: addr.state || prev.state,
+            pincode: addr.postcode || prev.pincode
+          }));
+          alert("✅ Location fetched successfully!");
+        } catch (error) {
+          console.error("Address fetch failed", error);
+          setFormData((prev) => ({ ...prev, lat: latitude.toString(), lng: longitude.toString() }));
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        console.error(error);
+        setIsLocating(false);
+        alert("Could not get your location. Please enable permissions.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const latitude = Number(formData.lat);
     const longitude = Number(formData.lng);
+    
+    // Validation: Coordinates zaroori hain aur India mein hone chahiye
     if (!formData.lat.trim() || !formData.lng.trim() ||
         !Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
         !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-      alert('Select the Gaushala’s exact location on the map before registering.');
+      alert('Please click "Use My Current Location" to fetch coordinates.');
       return;
     }
+
+    if (!isInIndia(latitude, longitude)) {
+      alert("⚠️ You can only register a Gaushala located within India.");
+      return;
+    }
+
     if (documentError) return;
     setLoading(true);
     
@@ -77,7 +138,7 @@ const RegisterOrganization = () => {
       registrationData.append('capacity', formData.capacity);
       registrationData.append('hasAmbulance', String(formData.hasAmbulance));
       registrationData.append('hasVet', String(formData.hasVet));
-      registrationData.append('terms_accepted', 'true');
+      
       if (registrationCertificate) {
         registrationData.append('registrationCertificate', registrationCertificate);
       }
@@ -93,10 +154,7 @@ const RegisterOrganization = () => {
       if (response.ok) {
         navigate('/cow-rescue/org/login', {
           replace: true,
-          state: {
-            email: formData.email.trim().toLowerCase(),
-            notice: "Your application was submitted. Sign in now to check verification status; rescue assignments require admin approval."
-          }
+          state: { email: formData.email.trim().toLowerCase(), notice: "Application submitted! Please wait for admin approval." }
         });
       } else {
         alert(data.error || data.message || "Registration failed");
@@ -114,13 +172,10 @@ const RegisterOrganization = () => {
       <div className={styles.header}>
         <Link to="/cow-rescue" className={styles.backLink}>← Back to Portal</Link>
         <h1>🤝 Join Verified Rescue Network</h1>
-        <p>Register your Gaushala, NGO, or Animal Shelter to become a verified partner in our regional emergency cow rescue network.</p>
+        <p>Register your Gaushala, NGO, or Animal Shelter to become a verified partner.</p>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className={styles.form}
-      >
+      <form onSubmit={handleSubmit} className={styles.form}>
         
         <div className={styles.section}>
           <h2>🏢 1. Organization Information</h2>
@@ -147,20 +202,40 @@ const RegisterOrganization = () => {
         </div>
 
         <div className={styles.section}>
-          <h2>📍 3. Address & GPS Coordinates</h2>
+          <h2>📍 3. Address & Exact Location</h2>
+          
+          <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#fffbeb', borderLeft: '4px solid #f59e0b', borderRadius: '4px' }}>
+            <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#b45309' }}>
+              ⚠️ Important: Please mention your correct Gaushala location.
+            </p>
+            <p style={{ margin: '0 0 15px 0', fontSize: '0.9rem', color: '#92400e' }}>
+              <strong>Option A:</strong> Type your full address below.
+              <br/>
+              <strong>Option B:</strong> Click "Use My Current Location" if you are physically present at the Gaushala (Only within India).
+            </p>
+            
+            <button 
+              type="button" 
+              onClick={handleUseCurrentLocation}
+              disabled={isLocating}
+              style={{ width: '100%', padding: '12px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+            >
+              {isLocating ? "📡 Fetching Location..." : "📡 Use My Current Location"}
+            </button>
+
+            {formData.lat && formData.lng && (
+              <p style={{ margin: '10px 0 0 0', fontSize: '0.85rem', color: '#16a34a', textAlign: 'center' }}>
+                ✅ Location set! (Lat: {formData.lat}, Lng: {formData.lng})
+              </p>
+            )}
+          </div>
+
           <div className={styles.grid}>
             <input type="text" name="address" placeholder="Full Address *" required value={formData.address} onChange={handleChange} />
             <input type="text" name="city" placeholder="City *" required value={formData.city} onChange={handleChange} />
             <input type="text" name="state" placeholder="State *" required value={formData.state} onChange={handleChange} />
             <input type="text" name="pincode" placeholder="Pincode *" required value={formData.pincode} onChange={handleChange} />
-            
           </div>
-          <MapPicker
-            lat={formData.lat}
-            lng={formData.lng}
-            onChangeLocation={handleMapLocationChange}
-            onAddressGeocoded={handleMapAddressGeocoded}
-          />
         </div>
 
         <div className={styles.section}>
@@ -175,8 +250,7 @@ const RegisterOrganization = () => {
         </div>
 
         <div className={styles.section}>
-          <h2>📄 5. Verification Documents Upload</h2>
-          <p className={styles.note}>Please upload clear PDF or image copies for admin verification (Max 5MB each).</p>
+          <h2>📄 5. Verification Documents</h2>
           <div className={styles.grid}>
             <div>
               <label>Registration Certificate:</label>

@@ -2,7 +2,6 @@ import { useCallback, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "./ReportCowWidget.module.css";
 import { reportCow } from "../../services/api";
-import MapPicker from "../../pages/CowRescue/components/MapPicker";
 
 const ANIMAL_CONDITIONS = [
   "Injured",
@@ -14,19 +13,19 @@ const ANIMAL_CONDITIONS = [
   "Other",
 ];
 
+
+// India ke coordinates ka range check
+const isInIndia = (lat, lng) => {
+  const latitude = parseFloat(lat);
+  const longitude = parseFloat(lng);
+  return latitude >= 8.0 && latitude <= 37.0 && longitude >= 68.0 && longitude <= 97.5;
+};
+
+
+
 // Profile / user icon (inline SVG)
 const ProfileIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    style={{ display: "inline-block", verticalAlign: "middle" }}
-  >
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle" }}>
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
     <circle cx="12" cy="7" r="4" />
   </svg>
@@ -34,17 +33,7 @@ const ProfileIcon = () => (
 
 // Plus icon (inline SVG)
 const PlusIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    style={{ display: "inline-block", verticalAlign: "middle" }}
-  >
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle" }}>
     <line x1="12" y1="5" x2="12" y2="19" />
     <line x1="5" y1="12" x2="19" y2="12" />
   </svg>
@@ -53,6 +42,7 @@ const PlusIcon = () => (
 const ReportCowWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(null);
   const [mediaType, setMediaType] = useState("image");
@@ -77,22 +67,65 @@ const ReportCowWidget = () => {
     city: "",
     pincode: "",
   });
-  const handleMapLocationChange = useCallback((latitude, longitude) => {
-    setForm((previous) => ({ ...previous, latitude, longitude }));
-    setFieldErrors((previous) => {
-      const next = { ...previous };
-      delete next.location;
-      return next;
-    });
-  }, []);
-  const handleMapAddressGeocoded = useCallback((locationData) => {
-    setForm((previous) => ({ ...previous, ...locationData }));
-  }, []);
 
-  // Hide button on dedicated report page
+  // NAYA: GPS Location Fetch with India Check
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+    
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        if (!isInIndia(latitude, longitude)) {
+          alert("⚠️ Location is outside India. This service is only available within India.");
+          setIsLocating(false);
+          return;
+        }
+        
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+          const data = await response.json();
+          const addr = data.address || {};
+
+          setForm((prev) => ({
+            ...prev,
+            latitude: latitude.toString(),
+            longitude: longitude.toString(),
+            address: addr.road || addr.suburb || addr.neighbourhood || prev.address,
+            city: addr.city || addr.town || addr.village || addr.county || prev.city,
+            state: addr.state || prev.state,
+            district: addr.state_district || addr.county || prev.district,
+            pincode: addr.postcode || prev.pincode
+          }));
+          
+          setFieldErrors((prev) => {
+            const n = { ...prev };
+            delete n.location;
+            delete n.address;
+            return n;
+          });
+        } catch (error) {
+          console.error("Address fetch failed", error);
+          setForm((prev) => ({ ...prev, latitude: latitude.toString(), longitude: longitude.toString() }));
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        console.error(error);
+        setIsLocating(false);
+        alert("Could not get your location. Please enable permissions.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   const isReportPage = location.pathname === "/cow-rescue/report";
 
-  // Reset on close
   useEffect(() => {
     if (!isOpen) {
       setError("");
@@ -105,24 +138,20 @@ const ReportCowWidget = () => {
     }
   }, [isOpen]);
 
-  // Lock body scroll
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  // Listen for external open event
   useEffect(() => {
     const handler = () => setIsOpen(true);
     window.addEventListener("openReportCowWidget", handler);
     return () => window.removeEventListener("openReportCowWidget", handler);
   }, []);
 
-  // EARLY RETURN — must be AFTER all hooks
   if (isReportPage) return null;
 
-  // Validators
   const isValidName = (n) => {
     const t = n.trim();
     if (t.length < 2) return false;
@@ -192,7 +221,9 @@ const ReportCowWidget = () => {
     if (!form.latitude.trim() || !form.longitude.trim() ||
         !Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
         !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-      errs.location = "Pinpoint the incident location on the map or use GPS.";
+      errs.location = "Please click 'Use My Current Location' to fetch coordinates.";
+    } else if (!isInIndia(latitude, longitude)) {
+      errs.location = "Location must be within India.";
     }
 
     return errs;
@@ -244,14 +275,12 @@ const ReportCowWidget = () => {
     setIsOpen(false);
   };
 
-  // ✅ NEW — Open Track Widget with prefilled Case ID
   const handleCheckStatus = () => {
     const caseId = success?.case_id;
     setIsOpen(false);
 
     if (!caseId) return;
 
-    // Give the report modal time to close, then open track modal
     setTimeout(() => {
       window.dispatchEvent(
         new CustomEvent("openTrackCowWidget", {
@@ -263,7 +292,6 @@ const ReportCowWidget = () => {
 
   return (
     <>
-      {/* Floating Button */}
       <button
         className={styles.floatingBtn}
         onClick={() => setIsOpen(true)}
@@ -276,11 +304,9 @@ const ReportCowWidget = () => {
         <span className={styles.btnLabel}>Report Incident</span>
       </button>
 
-      {/* Modal */}
       {isOpen && (
         <div className={styles.overlay} onClick={handleClose}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
             <div className={styles.modalHeader}>
               <div>
                 <h2 className={styles.modalTitle}>
@@ -293,12 +319,11 @@ const ReportCowWidget = () => {
                 onClick={handleClose}
                 disabled={isSubmitting}
                 aria-label="Close"
-              >
+              >   
                 ✕
               </button>
             </div>
 
-            {/* Body */}
             <div className={styles.modalBody}>
               {error && <div className={styles.errorBox}>⚠️ {error}</div>}
 
@@ -328,7 +353,6 @@ const ReportCowWidget = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className={styles.form}>
-                  {/* Reporter */}
                   <div className={styles.grid2}>
                     <div className={styles.fieldGroup}>
                       <label className={styles.label}>Your Name *</label>
@@ -377,7 +401,6 @@ const ReportCowWidget = () => {
                     )}
                   </div>
 
-                  {/* Condition */}
                   <div className={styles.fieldGroup}>
                     <label className={styles.label}>Cow's Condition *</label>
                     <select
@@ -392,7 +415,6 @@ const ReportCowWidget = () => {
                     </select>
                   </div>
 
-                  {/* Description */}
                   <div className={styles.fieldGroup}>
                     <label className={styles.label}>Describe the situation *</label>
                     <textarea
@@ -408,7 +430,6 @@ const ReportCowWidget = () => {
                     )}
                   </div>
 
-                  {/* Location */}
                   <div className={styles.fieldGroup}>
                     <label className={styles.label}>Please provide exact address *</label>
                     <input
@@ -423,17 +444,30 @@ const ReportCowWidget = () => {
                       <p className={styles.fieldError}>⚠️ {fieldErrors.address}</p>
                     )}
                   </div>
-                  <MapPicker
-                    lat={form.latitude}
-                    lng={form.longitude}
-                    onChangeLocation={handleMapLocationChange}
-                    onAddressGeocoded={handleMapAddressGeocoded}
-                  />
+                  
+                  {/* NAYA: GPS Location Button */}
+                  <div style={{ margin: '10px 0', padding: '15px', backgroundColor: '#fffbeb', borderLeft: '4px solid #f59e0b', borderRadius: '4px' }}>
+                    <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#92400e' }}>
+                      <strong>Note:</strong> Click the button below to fetch your exact GPS location.
+                    </p>
+                    <button 
+                      type="button" 
+                      onClick={handleUseCurrentLocation}
+                      disabled={isLocating}
+                      style={{ width: '100%', padding: '12px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      {isLocating ? "📡 Fetching Location..." : "📡 Use My Current Location"}
+                    </button>
+                    {form.latitude && form.longitude && (
+                      <p style={{ margin: '10px 0 0 0', fontSize: '0.85rem', color: '#16a34a', textAlign: 'center' }}>
+                        ✅ Location set! (Lat: {form.latitude}, Lng: {form.longitude})
+                      </p>
+                    )}
+                  </div>
                   {fieldErrors.location && (
                     <p className={styles.fieldError}>⚠️ {fieldErrors.location}</p>
                   )}
 
-                  {/* Media */}
                   <div className={styles.fieldGroup}>
                     <label className={styles.label}>Upload Evidence (Optional)</label>
                     <div className={styles.mediaRow}>
@@ -477,7 +511,6 @@ const ReportCowWidget = () => {
                     )}
                   </div>
 
-                  {/* Submit */}
                   <button type="submit" disabled={isSubmitting} className={styles.submitBtn}>
                     {isSubmitting ? "Submitting..." : "🚨 Submit Report"}
                   </button>

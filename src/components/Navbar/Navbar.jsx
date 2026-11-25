@@ -309,7 +309,7 @@ const Navbar = () => {
             </NavLink>
           </li>
 
-          {/* LANGUAGE SELECTOR */}
+          {/* LANGUAGE SELECTOR
           <li className={styles.languageItem}>
             <select
               className={styles.languageSelect}
@@ -320,7 +320,7 @@ const Navbar = () => {
               <option value="en">🇬🇧 English</option>
               <option value="hi">🇮🇳 हिंदी</option>
             </select>
-          </li>
+          </li> */}
 
           {/* DARK / LIGHT MODE */}
           

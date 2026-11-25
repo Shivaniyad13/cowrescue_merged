@@ -83,9 +83,9 @@ const Contact = () => {
                 <h4>Address</h4>
                 <p>
                   <strong>KHUSHI CENTRE FOR REHABILITATION AND RESEARCH</strong><br />
-                  65/4/2, Sant Kirandass Ashram,<br />
-                  Jaunti, Kanjhawala–Qutubgarh Road,<br />
-                  New Delhi – 110081, India
+                 T2 & S2/886, Sector 5, Kalinga Road,
+Vaishali, Ghaziabad,
+Uttar Pradesh – 201010, India
                 </p>
               </div>
             </div>
@@ -184,18 +184,7 @@ const Contact = () => {
         </div>
 
         {/* Google Map */}
-        <div className={styles.map}>
-          <iframe
-            src="https://maps.google.com/maps?q=65%2F4%2F2%2C+Sant+Kirandass+Ashram%2C+Jaunti%2C+Kanjhawala%E2%80%93Qutubgarh+Road%2C+New+Delhi+%E2%80%93+110081%2C+India&t=&z=15&ie=UTF8&iwloc=&output=embed"
-            width="100%"
-            height="350"
-            style={{ border: 0, borderRadius: "12px" }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="strict-origin-when-cross-origin"
-            title="Office location map"
-          ></iframe>
-        </div>
+        
       </div>
     </section>
   );
