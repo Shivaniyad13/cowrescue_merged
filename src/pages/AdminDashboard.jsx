@@ -85,15 +85,23 @@ const AdminDashboard = () => {
   
   // NGO Requests States
   const [ngoRequests, setNgoRequests] = useState([]);
+  const [rejectedNgoRequests, setRejectedNgoRequests] = useState([]);
   const [registeredNgos, setRegisteredNgos] = useState([]);
   const [expandedNgoId, setExpandedNgoId] = useState(null);
   const [approvingId, setApprovingId] = useState(null);
   const [approvingNgo, setApprovingNgo] = useState(false);
+  const [rejectingId, setRejectingId] = useState(null);
+  const [rejectingNgo, setRejectingNgo] = useState(false);
 
   // Pagination States for Pending NGOs
   const [ngoPage, setNgoPage] = useState(1);
   const [ngoTotalPages, setNgoTotalPages] = useState(1);
   const ngoLimit = 20;
+
+  // Pagination States for Rejected NGOs
+  const [rejectedPage, setRejectedPage] = useState(1);
+  const [rejectedTotalPages, setRejectedTotalPages] = useState(1);
+  const rejectedLimit = 20;
 
   // Pagination States for Approved NGOs
   const [approvedPage, setApprovedPage] = useState(1);
@@ -126,7 +134,7 @@ const AdminDashboard = () => {
       return;
     }
     fetchData();
-  }, [token, activeMainTab, ngoPage, approvedPage]); // Dependencies updated
+  }, [token, activeMainTab, ngoPage, approvedPage, rejectedPage]); // Dependencies updated
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -141,11 +149,14 @@ const AdminDashboard = () => {
         const res = await getAdminContacts(token);
         setContacts(res.contacts || []);
       } else if (activeMainTab === "ngoRequests") {
-        const [res, registeredRes] = await Promise.all([
+        const [res, registeredRes, rejectedRes] = await Promise.all([
           fetch(`${API_BASE_URL}/ngo/pending?page=${ngoPage}&limit=${ngoLimit}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${API_BASE_URL}/admin/ngos?page=${approvedPage}&limit=${approvedLimit}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_BASE_URL}/ngo/rejected?page=${rejectedPage}&limit=${rejectedLimit}`, {
             headers: { Authorization: `Bearer ${token}` },
           })
         ]);
@@ -158,6 +169,15 @@ const AdminDashboard = () => {
         } else {
           setNgoTotalPages(1); 
         }
+
+        const rejectedData = await rejectedRes.json();
+        if (!rejectedRes.ok) {
+          throw new Error(rejectedData.error || "Failed to fetch rejected Gaushalas.");
+        }
+        setRejectedNgoRequests(rejectedData.data || []);
+        const rejectedPages = Math.max(rejectedData.pagination?.totalPages || 1, 1);
+        setRejectedTotalPages(rejectedPages);
+        setRejectedPage((currentPage) => Math.min(currentPage, rejectedPages));
         
         const registeredData = await registeredRes.json();
         if (registeredRes.ok) {
@@ -218,6 +238,26 @@ const AdminDashboard = () => {
     } finally {
       setApprovingId(null);
       setApprovingNgo(false);
+    }
+  };
+
+  const handleRejectNgo = async (req) => {
+    setRejectingNgo(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/ngo/reject/${req.id}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to reject Gaushala request.");
+
+      showToast("Gaushala request rejected.", "success");
+      await fetchData();
+    } catch (err) {
+      showToast(err.message || "Failed to reject Gaushala request.", "error");
+    } finally {
+      setRejectingId(null);
+      setRejectingNgo(false);
     }
   };
 
@@ -340,6 +380,7 @@ const AdminDashboard = () => {
                       <td>{req.city}, {req.state}</td>
                       <td>{req.capacity || "N/A"} cows</td>
                       <td>
+                        <div className={styles.actionGroup}>
                         <button
                           onClick={() => setExpandedNgoId((current) => current === `pending-${req.id}` ? null : `pending-${req.id}`)}
                           style={{ padding: '6px', marginRight: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', cursor: 'pointer' }}
@@ -347,19 +388,39 @@ const AdminDashboard = () => {
                           {expandedNgoId === `pending-${req.id}` ? 'Hide details' : 'Full details'}
                         </button>
                         {approvingId === req.id ? (
-                          <div style={{ display: 'flex', gap: '5px', flexDirection: 'column' }}>
+                          <>
                             <button onClick={() => handleApproveNgo(req)} disabled={approvingNgo} style={{ padding: '6px', backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
                               {approvingNgo ? 'Approving...' : 'Confirm Approval'}
                             </button>
                             <button onClick={() => setApprovingId(null)} disabled={approvingNgo} style={{ padding: '6px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
                               Cancel
                             </button>
-                          </div>
+                          </>
+                        ) : rejectingId === req.id ? (
+                          <>
+                            <button onClick={() => handleRejectNgo(req)} disabled={rejectingNgo} className={`${styles.actionBtn} ${styles.btnReject}`}>
+                              {rejectingNgo ? 'Rejecting...' : 'Confirm Rejection'}
+                            </button>
+                            <button onClick={() => setRejectingId(null)} disabled={rejectingNgo} className={`${styles.actionBtn} ${styles.btnDetails}`}>
+                              Cancel
+                            </button>
+                          </>
                         ) : (
-                          <button onClick={() => setApprovingId(req.id)} className={`${styles.actionBtn} ${styles.btnVerify}`}>
-                            ✅ Approve
-                          </button>
+                          <>
+                            <button onClick={() => setApprovingId(req.id)} className={`${styles.actionBtn} ${styles.btnVerify}`}>
+                              ✅ Approve
+                            </button>
+                            <button
+                              onClick={() => setRejectingId(req.id)}
+                              disabled={expandedNgoId !== `pending-${req.id}`}
+                              title={expandedNgoId === `pending-${req.id}` ? "Reject this request" : "Open full details before rejecting"}
+                              className={`${styles.actionBtn} ${styles.btnReject}`}
+                            >
+                              Reject
+                            </button>
+                          </>
                         )}
+                        </div>
                       </td>
                     </tr>
                     {expandedNgoId === `pending-${req.id}` && (
@@ -390,6 +451,77 @@ const AdminDashboard = () => {
                 onClick={() => setNgoPage(prev => Math.min(prev + 1, ngoTotalPages))} 
                 disabled={ngoPage === ngoTotalPages}
                 style={{ padding: '8px 16px', backgroundColor: ngoPage === ngoTotalPages ? '#e2e8f0' : '#0f7631', color: ngoPage === ngoTotalPages ? '#94a3b8' : 'white', border: 'none', borderRadius: '6px', cursor: ngoPage === ngoTotalPages ? 'not-allowed' : 'pointer' }}
+              >
+                Next →
+              </button>
+            </div>
+          )}
+
+          <h3 style={{ margin: '28px 0 12px' }}>Rejected Gaushala Requests</h3>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Gaushala Name</th>
+                <th>Contact</th>
+                <th>Location</th>
+                <th>Capacity</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rejectedNgoRequests.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "24px", color: "#64748b" }}>
+                    No rejected Gaushala requests.
+                  </td>
+                </tr>
+              ) : rejectedNgoRequests.map((req) => (
+                <Fragment key={req.id}>
+                  <tr>
+                    <td>
+                      <strong>{req.name}</strong>
+                      <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{req.registration_number || "No Reg No."}</div>
+                    </td>
+                    <td>
+                      <div>{req.contact_person || "—"}</div>
+                      <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{req.phone} | {req.email}</div>
+                    </td>
+                    <td>{[req.city, req.state].filter(Boolean).join(", ") || "—"}</td>
+                    <td>{req.capacity ?? "N/A"} cows</td>
+                    <td>
+                      <button
+                        onClick={() => setExpandedNgoId((current) => current === `rejected-${req.id}` ? null : `rejected-${req.id}`)}
+                        style={{ padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        {expandedNgoId === `rejected-${req.id}` ? 'Hide details' : 'Full details'}
+                      </button>
+                    </td>
+                  </tr>
+                  {expandedNgoId === `rejected-${req.id}` && (
+                    <tr>
+                      <td colSpan={5} style={{ background: '#f8fafc', padding: '18px' }}>
+                        <NgoDetails organization={req} />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))}
+            </tbody>
+          </table>
+          {rejectedNgoRequests.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '20px', marginBottom: '40px' }}>
+              <button
+                onClick={() => setRejectedPage((page) => Math.max(page - 1, 1))}
+                disabled={rejectedPage === 1}
+                style={{ padding: '8px 16px', backgroundColor: rejectedPage === 1 ? '#e2e8f0' : '#0f7631', color: rejectedPage === 1 ? '#94a3b8' : 'white', border: 'none', borderRadius: '6px', cursor: rejectedPage === 1 ? 'not-allowed' : 'pointer' }}
+              >
+                ← Previous
+              </button>
+              <span style={{ fontWeight: 'bold', color: '#333' }}>Page {rejectedPage} of {rejectedTotalPages}</span>
+              <button
+                onClick={() => setRejectedPage((page) => Math.min(page + 1, rejectedTotalPages))}
+                disabled={rejectedPage === rejectedTotalPages}
+                style={{ padding: '8px 16px', backgroundColor: rejectedPage === rejectedTotalPages ? '#e2e8f0' : '#0f7631', color: rejectedPage === rejectedTotalPages ? '#94a3b8' : 'white', border: 'none', borderRadius: '6px', cursor: rejectedPage === rejectedTotalPages ? 'not-allowed' : 'pointer' }}
               >
                 Next →
               </button>

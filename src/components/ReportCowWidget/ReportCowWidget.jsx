@@ -130,6 +130,7 @@ const ReportCowWidget = () => {
   };
 
   const isReportPage = location.pathname === "/cow-rescue/report";
+  const isCowRescueHomePage = location.pathname === "/cow-rescue";
 
   useEffect(() => {
     if (!isOpen) {
@@ -289,17 +290,19 @@ const ReportCowWidget = () => {
 
   return (
     <>
-      <button
-        className={styles.floatingBtn}
-        onClick={() => setIsOpen(true)}
-        aria-label="Report Incident"
-        title="Report Incident"
-      >
-        <span className={styles.btnIcon}>
-          <PlusIcon />
-        </span>
-        <span className={styles.btnLabel}>Report Incident</span>
-      </button>
+      {!isCowRescueHomePage && (
+        <button
+          className={styles.floatingBtn}
+          onClick={() => setIsOpen(true)}
+          aria-label="Report Incident"
+          title="Report Incident"
+        >
+          <span className={styles.btnIcon}>
+            <PlusIcon />
+          </span>
+          <span className={styles.btnLabel}>Report Incident</span>
+        </button>
+      )}
 
       {isOpen && (
         <div className={styles.overlay} onClick={handleClose}>

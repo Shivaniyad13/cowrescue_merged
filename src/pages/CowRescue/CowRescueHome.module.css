@@ -1,28 +1,34 @@
 /* ═══════════════════════════════════════════════
-   COW RESCUE HOME PAGE — Minimal (2 buttons)
+   COW RESCUE HOME PAGE — Action cards and NGO map
 ═══════════════════════════════════════════════ */
 
 .container {
   width: 100%;
   min-height: calc(100vh - 72px);
   background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #f0fdf4 100%);
-  display: flex;
+  padding: 40px 24px;
+}
+
+.pageLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   align-items: center;
-  justify-content: center;
-  padding: 60px 24px;
+  gap: 32px;
+  width: min(1500px, 100%);
+  margin: 0 auto;
 }
 
 .heroSection {
-  max-width: 900px;
+  min-width: 0;
   width: 100%;
-  text-align: center;
+  text-align: left;
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(1.9rem, 3.2vw, 2.5rem);
   font-weight: 800;
   color: #14532d;
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   line-height: 1.15;
   letter-spacing: -0.02em;
 }
@@ -31,7 +37,7 @@
   font-size: 1.05rem;
   color: #4b5563;
   max-width: 560px;
-  margin: 0 auto 50px;
+  margin: 0 0 30px;
   line-height: 1.6;
 }
 
@@ -40,97 +46,118 @@
 ═══════════════════════════════════════════════ */
 .actionGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  width: 100%;
+  margin: 0;
 }
 
 .card {
   display: flex;
-  flex-direction: column;
-  padding: 34px 28px;
-  border-radius: 16px;
+  align-items: center;
+  gap: 14px;
+  min-height: 104px;
+  padding: 18px;
+  border: 1px solid #bbf7d0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #14532d;
   text-align: left;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.28s ease;
-  border: none;
+  text-decoration: none;
   width: 100%;
   position: relative;
-  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(22, 101, 52, 0.09);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.cardReport {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  color: #ffffff;
-  box-shadow: 0 12px 30px rgba(22, 163, 74, 0.3);
-}
-
-.cardReport:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 42px rgba(22, 163, 74, 0.4);
-}
-
-.cardJoin {
-  background: #ffffff;
-  border: 2px solid #86efac;
-  color: #166534;
-  box-shadow: 0 12px 30px rgba(22, 163, 74, 0.15);
-}
-
-.cardJoin:hover {
-  transform: translateY(-6px);
+.card:hover {
+  transform: translateY(-3px);
   border-color: #16a34a;
-  box-shadow: 0 20px 42px rgba(22, 163, 74, 0.25);
+  box-shadow: 0 14px 28px rgba(22, 101, 52, 0.15);
 }
 
-.cardIcon {
-  font-size: 2.5rem;
-  margin-bottom: 14px;
-  line-height: 1;
+.card:focus-visible {
+  outline: 3px solid #16a34a;
+  outline-offset: 3px;
+}
+
+.card::after {
+  content: "→";
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.card:hover::after {
+  transform: translateX(2px);
 }
 
 .card h3 {
-  margin: 0 0 10px;
-  font-size: 1.25rem;
-  font-weight: 800;
-  line-height: 1.3;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.35;
 }
 
-.card p {
-  margin: 0 0 20px;
-  font-size: 0.92rem;
-  line-height: 1.55;
-  opacity: 0.9;
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  line-height: 1;
 }
 
-.btnAction {
-  margin-top: auto;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
+.cardIcon svg {
+  width: 25px;
+  height: 25px;
 }
 
-.cardReport .btnAction {
-  color: #ffffff;
+.reportIcon {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
-.cardJoin .btnAction {
-  color: #16a34a;
+.trackIcon,
+.portalIcon {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.registerIcon {
+  background: #f0fdf4;
+  color: #15803d;
 }
 
 /* ═══════════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════════ */
 @media (max-width: 768px) {
+  .pageLayout {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 28px;
+  }
+
   .title {
     font-size: 2rem;
   }
 
   .lead {
     font-size: 0.98rem;
-    margin-bottom: 36px;
+    margin-bottom: 24px;
   }
 
   .actionGrid {
@@ -138,22 +165,22 @@
   }
 
   .card {
-    padding: 26px 22px;
+    padding: 16px;
   }
 }
 
 @media (max-width: 640px) {
   .container {
-    padding: 40px 16px;
+    padding: 28px 16px;
   }
 
   .title {
-    font-size: 1.65rem;
+    font-size: 1.8rem;
   }
 
   .lead {
     font-size: 0.92rem;
-    margin-bottom: 30px;
+    margin-bottom: 22px;
   }
 
   .actionGrid {
@@ -162,72 +189,11 @@
   }
 
   .card {
-    padding: 24px 20px;
-  }
-
-  .cardIcon {
-    font-size: 2rem;
+    min-height: 82px;
+    padding: 14px;
   }
 
   .card h3 {
-    font-size: 1.1rem;
-  }
-
-  .card p {
-    font-size: 0.88rem;
-  }
-}
-
-/* Title with cow icon */
-.title {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  /* baaki existing properties jaise margin, font-size, color etc. waise hi rakho */
-}
-
-.title svg {
-  stroke: currentColor;
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-}
-
-/* Card icon wrapper for SVG */
-.cardIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #991b1b;
-  margin-bottom: 12px;
-  line-height: 1;
-}
-
-.cardIcon svg {
-  stroke: currentColor;
-  width: 32px;
-  height: 32px;
-}
-
-/* Optional: different colors for the two cards */
-.cardJoin:first-child .cardIcon {
-  color: #991b1b;   /* red for Report Incident */
-}
-
-.cardJoin:last-child .cardIcon {
-  color: #16a34a;   /* green for Track Your Status */
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-  .title svg {
-    width: 32px;
-    height: 32px;
-  }
-
-  .cardIcon svg {
-    width: 28px;
-    height: 28px;
+    font-size: 1rem;
   }
 }

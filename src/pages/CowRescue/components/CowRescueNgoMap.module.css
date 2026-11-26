@@ -1,0 +1,254 @@
+.panel {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #86efac;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+  box-shadow: 0 16px 40px rgba(20, 83, 45, 0.12);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  color: #14532d;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.count {
+  flex: none;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.searchForm {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.searchForm input {
+  min-width: 0;
+  flex: 1;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  color: #0f172a;
+  font: inherit;
+}
+
+.searchForm input:focus {
+  outline: 3px solid rgba(22, 163, 74, 0.18);
+  border-color: #16a34a;
+}
+
+.searchForm button,
+.mapError button,
+.retryButton {
+  border: 0;
+  border-radius: 9px;
+  background: #15803d;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.searchForm button {
+  padding: 0 16px;
+}
+
+.searchForm button:hover,
+.mapError button:hover,
+.retryButton:hover {
+  background: #166534;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 12px;
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend i {
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  border-radius: 50%;
+}
+
+.mapFrame {
+  height: 520px;
+  overflow: hidden;
+  border: 2px solid #86efac;
+  border-radius: 16px;
+  background: #ecfdf5;
+  box-shadow: inset 0 0 0 1px rgba(22, 101, 52, 0.08);
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: #ecfdf5;
+}
+
+.map :global(.leaflet-control-zoom a) {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.map :global(.leaflet-control-zoom a:hover) {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.map :global(.leaflet-control-attribution) {
+  background: rgba(240, 253, 244, 0.92);
+  color: #14532d;
+}
+
+.map :global(.leaflet-popup-content-wrapper),
+.map :global(.leaflet-popup-tip) {
+  border: 1px solid #bbf7d0;
+  background: #ffffff;
+}
+
+.map :global(.leaflet-popup-content-wrapper) {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(20, 83, 45, 0.16);
+}
+
+.mapMessage {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.mapMessage {
+  min-height: 18px;
+}
+
+.mapError {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 0.86rem;
+}
+
+.mapError button,
+.retryButton {
+  padding: 7px 10px;
+  font-size: 0.8rem;
+}
+
+.popupDetails {
+  min-width: 190px;
+  color: #334155;
+  font-size: 0.83rem;
+}
+
+.popupDetails h3 {
+  margin: 9px 0;
+  color: #14532d;
+  font-size: 1rem;
+}
+
+.popupDetails p,
+.popupMessage p {
+  margin: 5px 0;
+  line-height: 1.45;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--status-color) 14%, white);
+  color: var(--status-color);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.popupMessage {
+  max-width: 230px;
+  margin: 0;
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 760px) {
+  .panel {
+    padding: 17px;
+  }
+
+  .mapFrame {
+    height: 420px;
+  }
+}
+
+@media (max-width: 440px) {
+  .panelHeader {
+    align-items: flex-start;
+  }
+
+  .panelHeader h2 {
+    font-size: 1.1rem;
+  }
+
+  .count {
+    font-size: 0.72rem;
+  }
+
+  .searchForm button {
+    padding: 0 12px;
+  }
+
+  .mapFrame {
+    height: 360px;
+  }
+}

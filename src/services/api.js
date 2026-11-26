@@ -24,6 +24,23 @@ export const getPublicConfig = async () => {
   return result;
 };
 
+export const getPublicCowRescueNGOs = async ({ signal } = {}) => {
+  const response = await fetch(`${API_BASE_URL}/cow-rescue/ngos`, { signal });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch the NGO directory.");
+  return result;
+};
+
+export const getPublicCowRescueNGODetails = async (kind, id, { signal } = {}) => {
+  const response = await fetch(
+    `${API_BASE_URL}/cow-rescue/ngos/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`,
+    { signal }
+  );
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch NGO details.");
+  return result;
+};
+
 // ==================== CONTACT ====================
 export const submitContact = async (data) => {
   const response = await fetch(`${API_BASE_URL}/contact`, {

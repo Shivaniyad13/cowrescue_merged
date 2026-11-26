@@ -71,6 +71,7 @@ const TrackCowWidget = () => {
 
   const location = useLocation();
   const isTrackPage = location.pathname === "/cow-rescue/track";
+  const isCowRescueHomePage = location.pathname === "/cow-rescue";
 
   // Load config
   useEffect(() => {
@@ -411,18 +412,19 @@ const TrackCowWidget = () => {
 
   return (
     <>
-      {/* Floating Button — profile icon + "Track Your Status" */}
-      <button
-        className={styles.floatingBtn}
-        onClick={() => setIsOpen(true)}
-        aria-label="Track Status"
-        title="Track Status"
-      >
-        <span className={styles.btnIcon}>
-          <ProfileIcon />
-        </span>
-        <span className={styles.btnLabel}>Track Your Status</span>
-      </button>
+      {!isCowRescueHomePage && (
+        <button
+          className={styles.floatingBtn}
+          onClick={() => setIsOpen(true)}
+          aria-label="Track Status"
+          title="Track Status"
+        >
+          <span className={styles.btnIcon}>
+            <ProfileIcon />
+          </span>
+          <span className={styles.btnLabel}>Track Your Status</span>
+        </button>
+      )}
 
       {isOpen && (
         <div className={styles.overlay} onClick={handleClose}>

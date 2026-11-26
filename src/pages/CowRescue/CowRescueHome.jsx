@@ -1,6 +1,6 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./CowRescueHome.module.css";
+import CowRescueNgoMap from "./components/CowRescueNgoMap";
 
 // Cow icon (inline SVG)
 const CowIcon = () => (
@@ -96,77 +96,54 @@ const CowRescueHome = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.heroSection}>
-       <h1 className={styles.title}>
-  <img
-    src="/campaign-panchgavy.png"
-    alt="Cow Rescue Network"
-    className={styles.titleLogo}
-  />
-  Cow Rescue Network
-</h1>
-        <p className={styles.lead}>
-          Report an injured cow or track your existing rescue case
-        </p>
+      <div className={styles.pageLayout}>
+        <div className={styles.heroSection}>
+          <h1 className={styles.title}>
+            Cow Rescue Network
+          </h1>
+          <p className={styles.lead}>
+            Report an injured cow or track your existing rescue case
+          </p>
 
-        {/* Yahan 4 boxes hain */}
-        <div className={styles.actionGrid}>
-          
-          {/* 1. PURANA BOX: Report Incident */}
-          <button
-            className={`${styles.card} ${styles.cardJoin}`}
-            onClick={handleOpenReport}
-          >
-            <div className={styles.cardIcon}>
-              <PlusIcon />
-            </div>
-            <h3>Report Incident</h3>
-            <p>Spotted a sick, injured, or trapped cow? Submit a rescue request now.</p>
-            <span className={styles.btnAction}>Open Report Form →</span>
-          </button>
+          <div className={styles.actionGrid}>
+            <button
+              className={styles.card}
+              onClick={handleOpenReport}
+              type="button"
+            >
+              <span className={`${styles.cardIcon} ${styles.reportIcon}`} aria-hidden="true">
+                <PlusIcon />
+              </span>
+              <h3>Report Incident</h3>
+            </button>
 
-          {/* 2. PURANA BOX: Track Your Status */}
-          <button
-            className={`${styles.card} ${styles.cardJoin}`}
-            onClick={handleOpenTrack}
-          >
-            <div className={styles.cardIcon}>
-              <ProfileIcon />
-            </div>
-            <h3>Track Your Status</h3>
-            <p>Already reported a cow? Enter your Case ID to see live status.</p>
-            <span className={styles.btnAction}>Open Track Form →</span>
-          </button>
+            <button
+              className={styles.card}
+              onClick={handleOpenTrack}
+              type="button"
+            >
+              <span className={`${styles.cardIcon} ${styles.trackIcon}`} aria-hidden="true">
+                <ProfileIcon />
+              </span>
+              <h3>Track Your Status</h3>
+            </button>
 
-          {/* 3. NAYA BOX: Join Verified Rescue Network */}
-          <Link
-            to="/cow-rescue/register"
-            className={`${styles.card} ${styles.cardJoin}`}
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <div className={styles.cardIcon}>
-              <CowIcon />
-            </div>
-            <h3>Join Verified Rescue Network</h3>
-            <p>Register your Gaushala, NGO, or Animal Shelter to become a verified partner.</p>
-            <span className={styles.btnAction}>Register Now →</span>
-          </Link>
+            <Link to="/cow-rescue/register" className={styles.card}>
+              <span className={`${styles.cardIcon} ${styles.registerIcon}`} aria-hidden="true">
+                <CowIcon />
+              </span>
+              <h3>Register Your Gaushala</h3>
+            </Link>
 
-          {/* 4. NAYA BOX: Gaushala / NGO Portal Login */}
-          <Link
-            to="/cow-rescue/org/login"
-            className={`${styles.card} ${styles.cardJoin}`}
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <div className={styles.cardIcon}>
-              <BuildingIcon />
-            </div>
-            <h3>Gaushala / NGO Portal</h3>
-            <p>Access your organization's emergency rescue dashboard and active dispatches.</p>
-            <span className={styles.btnAction}>Login to Portal →</span>
-          </Link>
-
+            <Link to="/cow-rescue/org/login" className={styles.card}>
+              <span className={`${styles.cardIcon} ${styles.portalIcon}`} aria-hidden="true">
+                <BuildingIcon />
+              </span>
+              <h3>Login to Your Verified Portal</h3>
+            </Link>
+          </div>
         </div>
+        <CowRescueNgoMap />
       </div>
     </div>
   );
