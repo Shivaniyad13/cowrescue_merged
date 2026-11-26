@@ -90,10 +90,19 @@ const AdminDashboard = () => {
   const [approvingId, setApprovingId] = useState(null);
   const [approvingNgo, setApprovingNgo] = useState(false);
 
+  // Pagination States for Pending NGOs
+  const [ngoPage, setNgoPage] = useState(1);
+  const [ngoTotalPages, setNgoTotalPages] = useState(1);
+  const ngoLimit = 20;
+
+  // Pagination States for Approved NGOs
+  const [approvedPage, setApprovedPage] = useState(1);
+  const [approvedTotalPages, setApprovedTotalPages] = useState(1);
+  const approvedLimit = 20;
+
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
-
 
   const [toast, setToast] = useState(null);
 
@@ -110,14 +119,14 @@ const AdminDashboard = () => {
     if (
       activeMainTab === "cowRescue" ||
       activeMainTab === "news" ||
-      activeMainTab === "gallery"
-      || activeMainTab === "panchgavyaSellers"
+      activeMainTab === "gallery" ||
+      activeMainTab === "panchgavyaSellers"
     ) {
       setLoading(false);
       return;
     }
     fetchData();
-  }, [token, activeMainTab]);
+  }, [token, activeMainTab, ngoPage, approvedPage]); // Dependencies updated
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -133,15 +142,32 @@ const AdminDashboard = () => {
         setContacts(res.contacts || []);
       } else if (activeMainTab === "ngoRequests") {
         const [res, registeredRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/ngo/pending`, {
+          fetch(`${API_BASE_URL}/ngo/pending?page=${ngoPage}&limit=${ngoLimit}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          getAdminNGOs(token, 100),
+          fetch(`${API_BASE_URL}/admin/ngos?page=${approvedPage}&limit=${approvedLimit}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
         ]);
+        
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch pending Gaushalas.");
         setNgoRequests(data.data || []);
-        setRegisteredNgos(registeredRes.data || []);
+        if (data.pagination && data.pagination.totalPages) {
+          setNgoTotalPages(data.pagination.totalPages);
+        } else {
+          setNgoTotalPages(1); 
+        }
+        
+        const registeredData = await registeredRes.json();
+        if (registeredRes.ok) {
+          setRegisteredNgos(registeredData.data || []);
+          if (registeredData.pagination && registeredData.pagination.totalPages) {
+            setApprovedTotalPages(registeredData.pagination.totalPages);
+          } else {
+            setApprovedTotalPages(1);
+          }
+        }
       }
     } catch (err) {
       if (
@@ -280,9 +306,11 @@ const AdminDashboard = () => {
         <CowRescueAdmin token={token} />
       ) : activeMainTab === "ngoRequests" ? (
         <div className={styles.tableWrapper}>
+          
+          {/* Pending NGOs Table */}
           <table className={styles.table}>
             <thead>
-                  <tr>
+              <tr>
                 <th>Gaushala Name</th>
                 <th>Contact</th>
                 <th>Location</th>
@@ -300,52 +328,74 @@ const AdminDashboard = () => {
               ) : (
                 ngoRequests.map((req) => (
                   <Fragment key={req.id}>
-                          <tr>
-                    <td>
-                      <strong>{req.name}</strong>
-                      <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{req.registration_number || "No Reg No."}</div>
-                    </td>
-                    <td>
-                      <div>{req.contact_person}</div>
-                      <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{req.phone} | {req.email}</div>
-                    </td>
-                    <td>{req.city}, {req.state}</td>
-                    <td>{req.capacity || "N/A"} cows</td>
-                    <td>
-                      <button
-                        onClick={() => setExpandedNgoId((current) => current === `pending-${req.id}` ? null : `pending-${req.id}`)}
-                        style={{ padding: '6px', marginRight: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', cursor: 'pointer' }}
-                      >
-                        {expandedNgoId === `pending-${req.id}` ? 'Hide details' : 'Full details'}
-                      </button>
-                      {approvingId === req.id ? (
-                        <div style={{ display: 'flex', gap: '5px', flexDirection: 'column' }}>
-                          <button onClick={() => handleApproveNgo(req)} disabled={approvingNgo} style={{ padding: '6px', backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
-                            {approvingNgo ? 'Approving...' : 'Confirm Approval'}
-                          </button>
-                          <button onClick={() => setApprovingId(null)} disabled={approvingNgo} style={{ padding: '6px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button onClick={() => setApprovingId(req.id)} className={`${styles.actionBtn} ${styles.btnVerify}`}>
-                          ✅ Approve
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                  {expandedNgoId === `pending-${req.id}` && (
                     <tr>
-                      <td colSpan={5} style={{ background: '#f8fafc', padding: '18px' }}>
-                        <NgoDetails organization={req} />
+                      <td>
+                        <strong>{req.name}</strong>
+                        <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{req.registration_number || "No Reg No."}</div>
+                      </td>
+                      <td>
+                        <div>{req.contact_person}</div>
+                        <div style={{ fontSize: "0.8rem", color: "#64748b" }}>{req.phone} | {req.email}</div>
+                      </td>
+                      <td>{req.city}, {req.state}</td>
+                      <td>{req.capacity || "N/A"} cows</td>
+                      <td>
+                        <button
+                          onClick={() => setExpandedNgoId((current) => current === `pending-${req.id}` ? null : `pending-${req.id}`)}
+                          style={{ padding: '6px', marginRight: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                          {expandedNgoId === `pending-${req.id}` ? 'Hide details' : 'Full details'}
+                        </button>
+                        {approvingId === req.id ? (
+                          <div style={{ display: 'flex', gap: '5px', flexDirection: 'column' }}>
+                            <button onClick={() => handleApproveNgo(req)} disabled={approvingNgo} style={{ padding: '6px', backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
+                              {approvingNgo ? 'Approving...' : 'Confirm Approval'}
+                            </button>
+                            <button onClick={() => setApprovingId(null)} disabled={approvingNgo} style={{ padding: '6px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button onClick={() => setApprovingId(req.id)} className={`${styles.actionBtn} ${styles.btnVerify}`}>
+                            ✅ Approve
+                          </button>
+                        )}
                       </td>
                     </tr>
-                  )}
-          </Fragment>
+                    {expandedNgoId === `pending-${req.id}` && (
+                      <tr>
+                        <td colSpan={5} style={{ background: '#f8fafc', padding: '18px' }}>
+                          <NgoDetails organization={req} />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))
               )}
             </tbody>
           </table>
+          
+          {/* Pagination for Pending NGOs */}
+          {ngoRequests.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '20px', marginBottom: '40px' }}>
+              <button 
+                onClick={() => setNgoPage(prev => Math.max(prev - 1, 1))} 
+                disabled={ngoPage === 1}
+                style={{ padding: '8px 16px', backgroundColor: ngoPage === 1 ? '#e2e8f0' : '#0f7631', color: ngoPage === 1 ? '#94a3b8' : 'white', border: 'none', borderRadius: '6px', cursor: ngoPage === 1 ? 'not-allowed' : 'pointer' }}
+              >
+                ← Previous
+              </button>
+              <span style={{ fontWeight: 'bold', color: '#333' }}>Page {ngoPage} of {ngoTotalPages}</span>
+              <button 
+                onClick={() => setNgoPage(prev => Math.min(prev + 1, ngoTotalPages))} 
+                disabled={ngoPage === ngoTotalPages}
+                style={{ padding: '8px 16px', backgroundColor: ngoPage === ngoTotalPages ? '#e2e8f0' : '#0f7631', color: ngoPage === ngoTotalPages ? '#94a3b8' : 'white', border: 'none', borderRadius: '6px', cursor: ngoPage === ngoTotalPages ? 'not-allowed' : 'pointer' }}
+              >
+                Next →
+              </button>
+            </div>
+          )}
+
           <h3 style={{ margin: '28px 0 12px' }}>Approved Gaushalas &amp; rescue partners</h3>
           <table className={styles.table}>
             <thead>
@@ -387,6 +437,27 @@ const AdminDashboard = () => {
               ))}
             </tbody>
           </table>
+
+          {/* NAYA: Pagination for Approved NGOs */}
+          {registeredNgos.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '20px', marginBottom: '40px' }}>
+              <button 
+                onClick={() => setApprovedPage(prev => Math.max(prev - 1, 1))} 
+                disabled={approvedPage === 1}
+                style={{ padding: '8px 16px', backgroundColor: approvedPage === 1 ? '#e2e8f0' : '#0f7631', color: approvedPage === 1 ? '#94a3b8' : 'white', border: 'none', borderRadius: '6px', cursor: approvedPage === 1 ? 'not-allowed' : 'pointer' }}
+              >
+                ← Previous
+              </button>
+              <span style={{ fontWeight: 'bold', color: '#333' }}>Page {approvedPage} of {approvedTotalPages}</span>
+              <button 
+                onClick={() => setApprovedPage(prev => Math.min(prev + 1, approvedTotalPages))} 
+                disabled={approvedPage === approvedTotalPages}
+                style={{ padding: '8px 16px', backgroundColor: approvedPage === approvedTotalPages ? '#e2e8f0' : '#0f7631', color: approvedPage === approvedTotalPages ? '#94a3b8' : 'white', border: 'none', borderRadius: '6px', cursor: approvedPage === approvedTotalPages ? 'not-allowed' : 'pointer' }}
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       ) : loading ? (
         <div style={{ textAlign: "center", padding: "60px", color: "#64748b" }}>
