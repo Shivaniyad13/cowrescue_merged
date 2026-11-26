@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './RegisterOrganization.module.css';
 import { API_BASE_URL } from '../../services/api';
+import {
+  isValidIndianMobile,
+  isValidPersonName,
+  isValidReportEmail,
+} from '../../utils/reportContactValidation';
 
 // India ke coordinates ka range check karne ka function
 const isInIndia = (lat, lng) => {
@@ -18,6 +23,7 @@ const RegisterOrganization = () => {
   const [registrationCertificate, setRegistrationCertificate] = useState(null);
   const [identityProof, setIdentityProof] = useState(null);
   const [documentError, setDocumentError] = useState('');
+  const [contactErrors, setContactErrors] = useState({});
   
   const [formData, setFormData] = useState({
     orgName: '', orgType: '', regNumber: '', contactPerson: '', phone: '', email: '',
@@ -27,7 +33,17 @@ const RegisterOrganization = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+    const updatedValue = name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value;
+    setFormData((previous) => ({
+      ...previous,
+      [name]: type === 'checkbox' ? checked : updatedValue
+    }));
+    setContactErrors((previous) => {
+      if (!previous[name]) return previous;
+      const next = { ...previous };
+      delete next[name];
+      return next;
+    });
   };
 
   const handleDocumentChange = (setter) => (event) => {
@@ -100,6 +116,19 @@ const RegisterOrganization = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errors = {};
+    if (!isValidPersonName(formData.contactPerson)) {
+      errors.contactPerson = 'Name should contain letters only (at least 2 characters).';
+    }
+    if (!isValidIndianMobile(formData.phone)) {
+      errors.phone = 'Please provide 10 digit number.';
+    }
+    if (!isValidReportEmail(formData.email)) {
+      errors.email = 'Please provide a valid email address (e.g. example@gmail.com).';
+    }
+    setContactErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     const latitude = Number(formData.lat);
     const longitude = Number(formData.lng);
@@ -194,9 +223,52 @@ const RegisterOrganization = () => {
         <div className={styles.section}>
           <h2>📞 2. Contact Details & Credentials</h2>
           <div className={styles.grid}>
-            <input type="text" name="contactPerson" placeholder="Contact Person Name *" required onChange={handleChange} />
-            <input type="tel" name="phone" placeholder="Mobile Number *" required onChange={handleChange} />
-            <input type="email" name="email" placeholder="Email Address *" required onChange={handleChange} />
+            <div>
+              <input
+                type="text"
+                name="contactPerson"
+                placeholder="Contact Person Name *"
+                required
+                value={formData.contactPerson}
+                onChange={handleChange}
+                aria-invalid={Boolean(contactErrors.contactPerson)}
+                aria-describedby={contactErrors.contactPerson ? 'contact-person-error' : undefined}
+              />
+              {contactErrors.contactPerson && <p id="contact-person-error" className={styles.fieldError} role="alert">{contactErrors.contactPerson}</p>}
+            </div>
+            <div>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Mobile Number *"
+                required
+                value={formData.phone}
+                onChange={handleChange}
+                inputMode="numeric"
+                maxLength={10}
+                pattern="[6-9][0-9]{9}"
+                aria-invalid={Boolean(contactErrors.phone)}
+                aria-describedby={contactErrors.phone ? 'phone-error' : undefined}
+                onInvalid={(event) => event.currentTarget.setCustomValidity('Please provide 10 digit number.')}
+                onInput={(event) => event.currentTarget.setCustomValidity('')}
+              />
+              {contactErrors.phone && <p id="phone-error" className={styles.fieldError} role="alert">{contactErrors.phone}</p>}
+            </div>
+            <div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address *"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                aria-invalid={Boolean(contactErrors.email)}
+                aria-describedby={contactErrors.email ? 'email-error' : undefined}
+                onInvalid={(event) => event.currentTarget.setCustomValidity('Please provide a valid email address (e.g. example@gmail.com).')}
+                onInput={(event) => event.currentTarget.setCustomValidity('')}
+              />
+              {contactErrors.email && <p id="email-error" className={styles.fieldError} role="alert">{contactErrors.email}</p>}
+            </div>
             <input type="password" name="password" placeholder="Create a Password *" required minLength={6} onChange={handleChange} />
           </div>
         </div>

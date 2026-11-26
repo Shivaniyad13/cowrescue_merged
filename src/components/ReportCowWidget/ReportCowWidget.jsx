@@ -2,6 +2,11 @@ import { useCallback, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "./ReportCowWidget.module.css";
 import { reportCow } from "../../services/api";
+import {
+  isValidIndianMobile,
+  isValidPersonName,
+  isValidReportEmail,
+} from "../../utils/reportContactValidation";
 
 const ANIMAL_CONDITIONS = [
   "Injured",
@@ -152,14 +157,6 @@ const ReportCowWidget = () => {
 
   if (isReportPage) return null;
 
-  const isValidName = (n) => {
-    const t = n.trim();
-    if (t.length < 2) return false;
-    return /^[a-zA-Z\s]+$/.test(t);
-  };
-  const isValidPhone = (p) => /^[6-9]\d{9}$/.test(p);
-  const isValidEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFieldErrors((prev) => {
@@ -203,13 +200,13 @@ const ReportCowWidget = () => {
   const validate = () => {
     const errs = {};
     if (!form.reporter_name.trim()) errs.reporter_name = "Name is required";
-    else if (!isValidName(form.reporter_name)) errs.reporter_name = "Only letters and spaces allowed";
+    else if (!isValidPersonName(form.reporter_name)) errs.reporter_name = "Name should contain letters only (at least 2 characters).";
 
     if (!form.reporter_phone.trim()) errs.reporter_phone = "Mobile number is required";
-    else if (!isValidPhone(form.reporter_phone)) errs.reporter_phone = "Enter valid 10-digit mobile";
+    else if (!isValidIndianMobile(form.reporter_phone)) errs.reporter_phone = "Please provide 10 digit number.";
 
     if (!form.reporter_email.trim()) errs.reporter_email = "Email is required";
-    else if (!isValidEmail(form.reporter_email)) errs.reporter_email = "Enter valid email";
+    else if (!isValidReportEmail(form.reporter_email)) errs.reporter_email = "Please provide a valid email address (e.g. example@gmail.com).";
 
     if (!form.description.trim()) errs.description = "Please describe the situation";
     else if (form.description.trim().length < 10) errs.description = "Minimum 10 characters";
@@ -352,7 +349,7 @@ const ReportCowWidget = () => {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className={styles.form}>
+                <form onSubmit={handleSubmit} className={styles.form} noValidate>
                   <div className={styles.grid2}>
                     <div className={styles.fieldGroup}>
                       <label className={styles.label}>Your Name *</label>
@@ -362,6 +359,7 @@ const ReportCowWidget = () => {
                         value={form.reporter_name}
                         onChange={handleChange}
                         placeholder="Enter your name"
+                        required
                         className={`${styles.input} ${fieldErrors.reporter_name ? styles.inputError : ""}`}
                       />
                       {fieldErrors.reporter_name && (
@@ -378,6 +376,9 @@ const ReportCowWidget = () => {
                         placeholder="10-digit mobile"
                         maxLength={10}
                         inputMode="numeric"
+                        autoComplete="tel-national"
+                        pattern="[6-9][0-9]{9}"
+                        required
                         className={`${styles.input} ${fieldErrors.reporter_phone ? styles.inputError : ""}`}
                       />
                       {fieldErrors.reporter_phone && (
@@ -394,6 +395,9 @@ const ReportCowWidget = () => {
                       value={form.reporter_email}
                       onChange={handleChange}
                       placeholder="your.email@example.com"
+                      autoComplete="email"
+                      maxLength={254}
+                      required
                       className={`${styles.input} ${fieldErrors.reporter_email ? styles.inputError : ""}`}
                     />
                     {fieldErrors.reporter_email && (

@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import styles from "./ReportIncident.module.css";
 import { reportCow } from "../../services/api";
 import MapPicker from "./components/MapPicker";
+import {
+  isValidIndianMobile,
+  isValidPersonName,
+  isValidReportEmail,
+} from "../../utils/reportContactValidation";
 
 const ANIMAL_CONDITIONS = [
   "Injured",
@@ -59,36 +64,25 @@ const ReportIncident = () => {
   }, []);
 
   // ==================== VALIDATION ====================
-  const isValidName = (name) => {
-    const trimmed = name.trim();
-    if (trimmed.length < 2) return false;
-    return /^[a-zA-Z\s]+$/.test(trimmed);
-  };
-
-  const isValidPhone = (phone) => /^[6-9]\d{9}$/.test(phone);
-  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
   const validateForm = () => {
     const errors = {};
 
     if (!formData.reporter_name.trim()) {
       errors.reporter_name = "Name is required.";
-    } else if (formData.reporter_name.trim().length < 2) {
-      errors.reporter_name = "Name must be at least 2 characters.";
-    } else if (!isValidName(formData.reporter_name)) {
-      errors.reporter_name = "Name can only contain letters and spaces.";
+    } else if (!isValidPersonName(formData.reporter_name)) {
+      errors.reporter_name = "Name should contain letters only (at least 2 characters).";
     }
 
     if (!formData.reporter_phone.trim()) {
       errors.reporter_phone = "Mobile number is required.";
-    } else if (!isValidPhone(formData.reporter_phone)) {
-      errors.reporter_phone = "Enter a valid 10-digit Indian mobile (starts with 6-9).";
+    } else if (!isValidIndianMobile(formData.reporter_phone)) {
+      errors.reporter_phone = "Please provide 10 digit number.";
     }
 
     if (!formData.reporter_email.trim()) {
       errors.reporter_email = "Email address is required.";
-    } else if (!isValidEmail(formData.reporter_email)) {
-      errors.reporter_email = "Enter a valid email (e.g. name@example.com).";
+    } else if (!isValidReportEmail(formData.reporter_email)) {
+      errors.reporter_email = "Please provide a valid email address (e.g. example@gmail.com).";
     }
 
     if (!formData.description.trim()) {
@@ -336,6 +330,8 @@ const ReportIncident = () => {
                 className={fieldClass("reporter_phone")}
                 inputMode="numeric"
                 maxLength={10}
+                autoComplete="tel-national"
+                pattern="[6-9][0-9]{9}"
                 required
               />
               {fieldErrors.reporter_phone && (
@@ -355,6 +351,8 @@ const ReportIncident = () => {
               value={formData.reporter_email}
               onChange={handleChange}
               className={fieldClass("reporter_email")}
+              maxLength={254}
+              autoComplete="email"
               required
             />
             {fieldErrors.reporter_email && (

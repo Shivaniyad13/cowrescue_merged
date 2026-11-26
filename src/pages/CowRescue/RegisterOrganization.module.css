@@ -22,6 +22,7 @@
 .checkboxGroup { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
 .mapPlaceholder { grid-column: 1 / -1; background: #e9f5ec; padding: 20px; text-align: center; border-radius: 8px; border: 1px dashed #28a745; }
 .note { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
+.fieldError { margin: 6px 0 0; color: #b91c1c; font-size: 0.875rem; }
 .submitBtn { background-color: #006400; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
 .submitBtn:hover { background-color: #004d00; }
 .submitBtn:disabled, .submitBtn:disabled:hover { background-color: #9ca3af; cursor: not-allowed; }
