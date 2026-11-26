@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import styles from './OrgDashboard.module.css';
 import {
   acceptNgoAlert,
   completeNgoTreatment,
@@ -46,6 +47,19 @@ function mapLink(item) {
   return `https://www.google.com/maps?q=${encodeURIComponent(`${item.latitude},${item.longitude}`)}`;
 }
 
+function statusStyle(status, treatmentStatus) {
+  if (status === 'COMPLETED' || treatmentStatus === 'COMPLETED') {
+    return { label: 'Completed', className: 'completed' };
+  }
+  if (status === 'IN_PROGRESS' || treatmentStatus === 'UNDER_TREATMENT') {
+    return { label: 'Treatment active', className: 'active' };
+  }
+  if (status === 'NGO_ASSIGNED') {
+    return { label: 'Accepted - Treatment action', className: 'pending' };
+  }
+  return { label: (status || 'REPORTED').replaceAll('_', ' '), className: 'reported' };
+}
+
 const OrgDashboard = () => {
   const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(null);
@@ -55,6 +69,7 @@ const OrgDashboard = () => {
   const [actionError, setActionError] = useState('');
   const [busyAction, setBusyAction] = useState('');
   const [treatmentPhotos, setTreatmentPhotos] = useState({});
+  const [treatmentVideos, setTreatmentVideos] = useState({});
   const [refreshKey, setRefreshKey] = useState(0);
   const [bankForm, setBankForm] = useState({ bank_account_number: '', bank_ifsc: '' });
   const [revealedAccount, setRevealedAccount] = useState('');
@@ -62,6 +77,8 @@ const OrgDashboard = () => {
   const [bankBusy, setBankBusy] = useState(false);
   const [bankError, setBankError] = useState('');
   const [bankMessage, setBankMessage] = useState('');
+  const [selectedCaseId, setSelectedCaseId] = useState(null);
+  const [caseFilter, setCaseFilter] = useState('ALL');
 
   useEffect(() => {
     const token = localStorage.getItem('ngoToken');
@@ -121,23 +138,84 @@ const OrgDashboard = () => {
 
   const handleStartTreatment = (item) => {
     const photo = treatmentPhotos[item.case_id];
+    const video = treatmentVideos[item.case_id];
     if (!photo) {
       setActionError('Choose a treatment photo before starting treatment.');
       return;
     }
-    const formData = new FormData();
-    formData.append('treatmentPhoto', photo);
-    return runAction(
-      `start-${item.case_id}`,
-      (token) => startNgoTreatment(token, item.case_id, formData)
+    if (!video) {
+      setActionError('Choose a live treatment video before starting treatment.');
+      return;
+    }
+    if (!navigator.geolocation) {
+      setActionError('Geolocation is not supported by this browser.');
+      return;
+    }
+    setBusyAction(`start-${item.case_id}`);
+    setActionError('');
+    setActionMessage('');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const formData = new FormData();
+        formData.append('treatmentPhoto', photo);
+        if (video) formData.append('treatmentVideo', video);
+        formData.append('latitude', String(position.coords.latitude));
+        formData.append('longitude', String(position.coords.longitude));
+        formData.append('accuracy', String(position.coords.accuracy));
+        runAction(
+          `start-${item.case_id}`,
+          (token) => startNgoTreatment(token, item.case_id, formData)
+        );
+      },
+      (locationError) => {
+        setBusyAction('');
+        setActionError(locationError.code === 1
+          ? 'Location permission is required to verify treatment at the registered Gaushala.'
+          : 'Could not fetch GPS location. Please try again outdoors.');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
 
   const handleCompleteTreatment = (item) => {
+    const photo = treatmentPhotos[item.case_id];
+    const video = treatmentVideos[item.case_id];
+    if (!photo) {
+      setActionError('Choose a completion photo before completing treatment.');
+      return;
+    }
+    if (!video) {
+      setActionError('Choose a live completion video before completing treatment.');
+      return;
+    }
     if (!window.confirm(`Mark treatment for ${item.case_id} as completed?`)) return;
-    return runAction(
-      `complete-${item.case_id}`,
-      (token) => completeNgoTreatment(token, item.case_id)
+    if (!navigator.geolocation) {
+      setActionError('Geolocation is not supported by this browser.');
+      return;
+    }
+    setBusyAction(`complete-${item.case_id}`);
+    setActionError('');
+    setActionMessage('');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const formData = new FormData();
+        formData.append('treatmentPhoto', photo);
+        if (video) formData.append('treatmentVideo', video);
+        formData.append('latitude', String(position.coords.latitude));
+        formData.append('longitude', String(position.coords.longitude));
+        formData.append('accuracy', String(position.coords.accuracy));
+        runAction(
+          `complete-${item.case_id}`,
+          (token) => completeNgoTreatment(token, item.case_id, formData)
+        );
+      },
+      (locationError) => {
+        setBusyAction('');
+        setActionError(locationError.code === 1
+          ? 'Location permission is required to verify completion at the registered Gaushala.'
+          : 'Could not fetch GPS location. Please try again outdoors.');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
 
@@ -206,14 +284,26 @@ const OrgDashboard = () => {
         : 'Not part of the verified rescue network';
   const statusColor = verification.isNetworkMember ? '#166534' : '#92400e';
   const statusBackground = verification.isNetworkMember ? '#dcfce7' : '#fef3c7';
+  const selectedCase = cases.find((item) => item.case_id === selectedCaseId) || null;
+  const filteredCases = cases.filter((item) => {
+    if (caseFilter === 'PENDING') {
+      return ['REPORTED', 'DISPATCHED', 'PARTNER_ALERTED', 'PARTNER_REJECTED'].includes(item.status);
+    }
+    if (caseFilter === 'ACTIVE') return item.status === 'NGO_ASSIGNED' || item.status === 'IN_PROGRESS';
+    if (caseFilter === 'COMPLETED') return item.status === 'COMPLETED';
+    return true;
+  });
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 20px', fontFamily: 'sans-serif' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        <header style={{ ...cardStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-          <div>
-            <h1 style={{ margin: 0, color: '#14532d' }}>Welcome, {ngo.name}</h1>
-            <p style={{ margin: '8px 0 0', color: '#64748b' }}>{ngo.city || 'Location not set'}{ngo.state ? `, ${ngo.state}` : ''}</p>
+    <main className={styles.dashboard}>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <div className={styles.brand}>
+            <div className={styles.brandMark} aria-hidden="true">🐄</div>
+            <div>
+              <h1 style={{ margin: 0, color: '#14532d' }}>Welcome, {ngo.name}</h1>
+              <p style={{ margin: '6px 0 0', color: '#64748b' }}>{ngo.city || 'Location not set'}{ngo.state ? `, ${ngo.state}` : ''}</p>
+            </div>
           </div>
           <button onClick={handleLogout} style={{ padding: '10px 16px', border: 0, borderRadius: '8px', background: '#dc2626', color: '#fff', cursor: 'pointer' }}>
             Sign Out
@@ -232,15 +322,15 @@ const OrgDashboard = () => {
           </p>
         </section>
 
-        <section aria-label="Rescue case summary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+        <section className={styles.summaryGrid} aria-label="Rescue case summary">
           {[
-            ['Assigned cases', stats.totalCases],
-            ['Active cases', stats.activeCases],
-            ['Completed cases', stats.completedCases]
-          ].map(([label, value]) => (
-            <div key={label} style={cardStyle}>
-              <div style={{ color: '#64748b', fontSize: '0.95rem' }}>{label}</div>
-              <strong style={{ display: 'block', marginTop: '8px', color: '#14532d', fontSize: '1.8rem' }}>{value}</strong>
+            ['Total assigned', stats.totalCases, '📋'],
+            ['Active rescues', stats.activeCases, '🚑'],
+            ['Completed rescues', stats.completedCases, '✅']
+          ].map(([label, value, icon]) => (
+            <div key={label} className={styles.summaryCard}>
+              <span style={{ color: '#64748b', fontWeight: 700 }}>{icon} {label}</span>
+              <strong>{value}</strong>
             </div>
           ))}
         </section>
@@ -373,122 +463,299 @@ const OrgDashboard = () => {
           )}
         </section>
 
-        <section style={{ ...cardStyle, marginBottom: '20px' }}>
-          <h2 style={{ margin: '0 0 16px', color: '#1f2937' }}>Rescue cases handled by your organization</h2>
-          {cases.length === 0 ? (
-            <p style={{ margin: 0, color: '#64748b' }}>
-              No cases have been assigned yet. Accept an incoming alert to start handling a case.
-            </p>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
-                <thead>
-                  <tr style={{ textAlign: 'left', color: '#64748b', borderBottom: '1px solid #e5e7eb' }}>
-                    <th style={{ padding: '12px 8px' }}>Case ID</th>
-                    <th style={{ padding: '12px 8px' }}>Incident</th>
-                    <th style={{ padding: '12px 8px' }}>Location</th>
-                    <th style={{ padding: '12px 8px' }}>Status</th>
-                    <th style={{ padding: '12px 8px' }}>Reported</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cases.map((item) => (
-                    <tr key={item.case_id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: 600 }}>{item.case_id}</td>
-                      <td style={{ padding: '12px 8px' }}>
-                        <div>{item.animal_condition || 'Cow rescue'}</div>
-                        <small style={{ color: '#64748b' }}>{item.description}</small>
-                      </td>
-                      <td style={{ padding: '12px 8px' }}>
-                        {caseLocation(item)}
-                        {mapLink(item) && <> · <a href={mapLink(item)} target="_blank" rel="noreferrer">Map</a></>}
-                      </td>
-                      <td style={{ padding: '12px 8px' }}>{(item.status || 'REPORTED').replaceAll('_', ' ')}</td>
-                      <td style={{ padding: '12px 8px' }}>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <section style={{ marginBottom: '20px' }} aria-label="Handled rescue cases">
+          <div className={styles.caseToolbar}>
+            <div>
+              <h2 style={{ margin: 0, color: '#1f2937' }}>Rescue case desk</h2>
+              <p style={{ margin: '5px 0 0', color: '#64748b', fontSize: '0.9rem' }}>Review reports, location and treatment progress.</p>
             </div>
-          )}
+            <div className={styles.filters}>
+              {[
+                ['ALL', 'All cases'],
+                ['PENDING', 'Pending'],
+                ['ACTIVE', 'In treatment'],
+                ['COMPLETED', 'Completed']
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`${styles.filterButton} ${caseFilter === value ? styles.activeFilter : ''}`}
+                  onClick={() => setCaseFilter(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.caseGrid}>
+            {filteredCases.length === 0 ? (
+              <div className={styles.emptyState}>No rescue cases match this view.</div>
+            ) : filteredCases.map((item) => {
+              const status = statusStyle(item.status, item.treatment_status);
+              const locationUrl = mapLink(item);
+              const evidenceEntries = (item.case_timeline || [])
+                .filter((entry) => entry.metadata?.treatment_photo_url || entry.metadata?.treatment_video_url)
+                .slice()
+                .reverse();
+              const latestEvidence = evidenceEntries[0];
+              const evidencePhoto = latestEvidence?.metadata?.treatment_photo_url;
+              const evidenceVideo = latestEvidence?.metadata?.treatment_video_url;
+              const evidenceLocation = latestEvidence?.metadata?.location_verification;
+              return (
+                <article key={item.case_id} className={styles.caseCard}>
+                  <div className={styles.caseTop}>
+                    <div>
+                      <div style={{ color: '#14532d', fontWeight: 900, fontSize: '1.05rem' }}>{item.case_id}</div>
+                      <div style={{ marginTop: '5px', color: '#475569' }}>{item.animal_condition || 'Cow rescue'}</div>
+                    </div>
+                    <span className={`${styles.statusBadge} ${styles[status.className]}`}>{status.label}</span>
+                  </div>
+
+                  <div className={styles.locationRow}>
+                    <span aria-hidden="true">📍</span>
+                    <span>{caseLocation(item)}</span>
+                  </div>
+                  {locationUrl && (
+                    <a className={styles.mapLink} href={locationUrl} target="_blank" rel="noreferrer">
+                      Open exact rescue location
+                      <span className={styles.mapTooltip}>Click to get exact location of the rescued cow</span>
+                    </a>
+                  )}
+                  {(evidencePhoto || evidenceVideo || evidenceLocation) && (
+                    <div style={{ marginTop: '14px', padding: '12px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+                      <strong style={{ display: 'block', color: '#14532d', marginBottom: '8px' }}>Live treatment evidence</strong>
+                      {evidencePhoto && (
+                        <a href={evidencePhoto} target="_blank" rel="noreferrer">
+                          <img
+                            src={evidencePhoto}
+                            alt={`Live treatment evidence for ${item.case_id}`}
+                            style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px', display: 'block', marginBottom: '8px' }}
+                          />
+                        </a>
+                      )}
+                      {evidenceVideo && (
+                        <video
+                          src={evidenceVideo}
+                          controls
+                          preload="metadata"
+                          style={{ width: '100%', maxHeight: '220px', borderRadius: '8px', display: 'block', marginBottom: '8px' }}
+                        />
+                      )}
+                      {evidenceLocation && (
+                        <div style={{ color: '#166534', fontSize: '0.82rem' }}>
+                          GPS verified: {evidenceLocation.latitude}, {evidenceLocation.longitude}
+                          {evidenceLocation.distanceMeters != null ? ` (${evidenceLocation.distanceMeters} m from registered location)` : ''}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {item.status === 'NGO_ASSIGNED' && (
+                    <div className={styles.cardUpload}>
+                      <strong style={{ display: 'block', marginBottom: '8px', color: '#14532d' }}>Start treatment evidence</strong>
+                      <label htmlFor={`card-photo-${item.case_id}`}>
+                        Live treatment photo *
+                      </label>
+                      <input
+                        id={`card-photo-${item.case_id}`}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(event) => setTreatmentPhotos((current) => ({
+                          ...current,
+                          [item.case_id]: event.target.files?.[0] || null
+                        }))}
+                      />
+                      <label htmlFor={`card-video-${item.case_id}`}>
+                        Live treatment video *
+                      </label>
+                      <input
+                        id={`card-video-${item.case_id}`}
+                        type="file"
+                        accept="video/mp4,video/webm,video/quicktime"
+                        onChange={(event) => setTreatmentVideos((current) => ({
+                          ...current,
+                          [item.case_id]: event.target.files?.[0] || null
+                        }))}
+                      />
+                      <small>
+                        GPS location will be verified at the registered Gaushala.
+                      </small>
+                      <button
+                        type="button"
+                        className={styles.cardActionButton}
+                        disabled={
+                          busyAction === `start-${item.case_id}` ||
+                          !treatmentPhotos[item.case_id] ||
+                          !treatmentVideos[item.case_id]
+                        }
+                        onClick={() => handleStartTreatment(item)}
+                      >
+                        {busyAction === `start-${item.case_id}` ? 'Starting...' : 'Start treatment'}
+                      </button>
+                    </div>
+                  )}
+
+                  {item.status === 'IN_PROGRESS' && item.treatment_status === 'UNDER_TREATMENT' && (
+                    <div className={styles.cardUpload}>
+                      <strong style={{ display: 'block', marginBottom: '8px', color: '#14532d' }}>Complete treatment evidence</strong>
+                      <label htmlFor={`card-completion-photo-${item.case_id}`}>
+                        Completion photo *
+                      </label>
+                      <input
+                        id={`card-completion-photo-${item.case_id}`}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(event) => setTreatmentPhotos((current) => ({
+                          ...current,
+                          [item.case_id]: event.target.files?.[0] || null
+                        }))}
+                      />
+                      <label htmlFor={`card-completion-video-${item.case_id}`}>
+                        Live completion video *
+                      </label>
+                      <input
+                        id={`card-completion-video-${item.case_id}`}
+                        type="file"
+                        accept="video/mp4,video/webm,video/quicktime"
+                        onChange={(event) => setTreatmentVideos((current) => ({
+                          ...current,
+                          [item.case_id]: event.target.files?.[0] || null
+                        }))}
+                      />
+                      <small>
+                        GPS location will be verified before completion.
+                      </small>
+                      <button
+                        type="button"
+                        className={styles.cardActionButton}
+                        disabled={
+                          busyAction === `complete-${item.case_id}` ||
+                          !treatmentPhotos[item.case_id] ||
+                          !treatmentVideos[item.case_id]
+                        }
+                        onClick={() => handleCompleteTreatment(item)}
+                      >
+                        {busyAction === `complete-${item.case_id}` ? 'Completing...' : 'Mark treatment completed'}
+                      </button>
+                    </div>
+                  )}
+                  <p style={{ margin: '12px 0 0', color: '#64748b', fontSize: '0.86rem' }}>
+                    Reported {item.created_at ? new Date(item.created_at).toLocaleString() : 'date unavailable'}
+                  </p>
+                  <div className={styles.cardActions}>
+                    <button type="button" className={styles.detailsButton} onClick={() => setSelectedCaseId(item.case_id)}>
+                      See full details
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </section>
 
-        <section aria-label="Case workflow and progress" style={{ display: 'grid', gap: '16px' }}>
-          {cases.map((item) => {
-            const actionId = item.status === 'NGO_ASSIGNED'
-              ? `start-${item.case_id}`
-              : `complete-${item.case_id}`;
-            const timeline = item.case_timeline || [];
-            return (
-              <article key={item.case_id} style={cardStyle}>
-                <h2 style={{ margin: '0 0 8px', color: '#14532d' }}>{item.case_id} - Case workflow</h2>
-                <p style={{ margin: '4px 0 14px', color: '#475569' }}>
-                  Current status: {(item.status || 'REPORTED').replaceAll('_', ' ')}
-                  {item.treatment_status ? ` · Treatment: ${item.treatment_status.replaceAll('_', ' ')}` : ''}
-                </p>
+        {selectedCase && (
+          <div
+            className={styles.modalBackdrop}
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setSelectedCaseId(null);
+            }}
+          >
+            <section
+              className={styles.modal}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`case-title-${selectedCase.case_id}`}
+            >
+              <header className={styles.modalHeader}>
+                <div>
+                  <h2 id={`case-title-${selectedCase.case_id}`} style={{ margin: 0, color: '#14532d' }}>
+                    {selectedCase.case_id}
+                  </h2>
+                  <p style={{ margin: '5px 0 0', color: '#64748b' }}>Complete rescue and treatment record</p>
+                </div>
+                <button type="button" className={styles.closeButton} aria-label="Close case details" onClick={() => setSelectedCaseId(null)}>×</button>
+              </header>
 
-                {item.status === 'NGO_ASSIGNED' && (
-                  <div style={{ marginBottom: '16px' }}>
-                    <label htmlFor={`photo-${item.case_id}`} style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>
-                      Upload a treatment progress photo to start treatment
-                    </label>
-                    <input
-                      id={`photo-${item.case_id}`}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={(event) => setTreatmentPhotos((current) => ({
-                        ...current,
-                        [item.case_id]: event.target.files?.[0] || null
-                      }))}
-                    />
-                    <button
-                      type="button"
-                      disabled={busyAction === actionId || !treatmentPhotos[item.case_id]}
-                      onClick={() => handleStartTreatment(item)}
-                      style={{ ...primaryButtonStyle, display: 'block', marginTop: '10px', opacity: busyAction === actionId || !treatmentPhotos[item.case_id] ? 0.6 : 1 }}
-                    >
-                      {busyAction === actionId ? 'Saving...' : 'Start treatment'}
-                    </button>
+              <div className={styles.modalBody}>
+                <div className={styles.detailGrid}>
+                  <div className={styles.detailItem}>
+                    <strong>Incident</strong>
+                    <div style={{ marginTop: '6px' }}>{selectedCase.animal_condition || 'Cow rescue'}</div>
+                  </div>
+                  <div className={styles.detailItem}>
+                    <strong>Severity</strong>
+                    <div style={{ marginTop: '6px' }}>{selectedCase.severity || 'MEDIUM'}</div>
+                  </div>
+                  <div className={styles.detailItem}>
+                    <strong>Reported location</strong>
+                    <div style={{ marginTop: '6px' }}>{caseLocation(selectedCase)}</div>
+                    {mapLink(selectedCase) && (
+                      <a href={mapLink(selectedCase)} target="_blank" rel="noreferrer" className={styles.mapLink}>
+                        Open exact rescue location
+                        <span className={styles.mapTooltip}>Click to get exact location of the rescued cow</span>
+                      </a>
+                    )}
+                  </div>
+                  <div className={styles.detailItem}>
+                    <strong>Current status</strong>
+                    <div style={{ marginTop: '6px' }}>{(selectedCase.status || 'REPORTED').replaceAll('_', ' ')}</div>
+                    <div>Treatment: {(selectedCase.treatment_status || 'Not started').replaceAll('_', ' ')}</div>
+                  </div>
+                  <div className={styles.detailItem}>
+                    <strong>Reported on</strong>
+                    <div style={{ marginTop: '6px' }}>{selectedCase.created_at ? new Date(selectedCase.created_at).toLocaleString() : 'Not available'}</div>
+                  </div>
+                  <div className={styles.detailItem}>
+                    <strong>Completed on</strong>
+                    <div style={{ marginTop: '6px' }}>{selectedCase.completed_at ? new Date(selectedCase.completed_at).toLocaleString() : 'Pending completion'}</div>
+                  </div>
+                </div>
+
+                {selectedCase.description && (
+                  <div className={styles.detailItem} style={{ marginTop: '12px' }}>
+                    <strong>Description</strong>
+                    <p style={{ margin: '6px 0 0', color: '#475569' }}>{selectedCase.description}</p>
                   </div>
                 )}
 
-                {item.status === 'IN_PROGRESS' && item.treatment_status === 'UNDER_TREATMENT' && (
-                  <button
-                    type="button"
-                    disabled={busyAction === actionId}
-                    onClick={() => handleCompleteTreatment(item)}
-                    style={{ ...primaryButtonStyle, marginBottom: '16px', opacity: busyAction === actionId ? 0.6 : 1 }}
-                  >
-                    {busyAction === actionId ? 'Saving...' : 'Mark treatment completed'}
-                  </button>
+                {selectedCase.photo_url && (
+                  <div style={{ marginTop: '12px' }}>
+                    <a href={selectedCase.photo_url} target="_blank" rel="noreferrer" className={styles.detailsButton}>
+                      View reported incident photo
+                    </a>
+                  </div>
                 )}
 
-                {item.status === 'COMPLETED' && (
-                  <p style={{ color: '#166534', fontWeight: 600 }}>Treatment workflow completed.</p>
-                )}
-
-                <h3 style={{ margin: '8px 0', fontSize: '1rem' }}>Progress history</h3>
-                {timeline.length === 0 ? (
-                  <p style={{ margin: 0, color: '#64748b' }}>No workflow updates have been recorded yet.</p>
+                <h3 style={{ margin: '22px 0 10px', color: '#1f2937' }}>Case history</h3>
+                {(selectedCase.case_timeline || []).length === 0 ? (
+                  <p style={{ color: '#64748b' }}>No timeline updates are available yet.</p>
                 ) : (
-                  <ol style={{ margin: 0, paddingLeft: '22px', color: '#475569' }}>
-                    {timeline.map((entry, index) => {
+                  <ol className={styles.timeline}>
+                    {(selectedCase.case_timeline || []).map((entry, index) => {
                       const photoUrl = entry.metadata?.treatment_photo_url;
+                      const videoUrl = entry.metadata?.treatment_video_url;
+                      const location = entry.metadata?.location_verification;
                       return (
-                        <li key={`${entry.event}-${entry.created_at || index}`} style={{ marginBottom: '10px' }}>
+                        <li className={styles.timelineItem} key={`${entry.event}-${entry.created_at || index}`}>
                           <strong>{(entry.event || 'UPDATE').replaceAll('_', ' ')}</strong>
-                          {entry.created_at && <> · {new Date(entry.created_at).toLocaleString()}</>}
-                          {entry.description && <div>{entry.description}</div>}
-                          {photoUrl && <div><a href={photoUrl} target="_blank" rel="noreferrer">View treatment photo</a></div>}
+                          {entry.created_at && <div style={{ fontSize: '0.82rem', color: '#64748b' }}>{new Date(entry.created_at).toLocaleString()}</div>}
+                          {entry.description && <div style={{ marginTop: '4px' }}>{entry.description}</div>}
+                          {photoUrl && <a href={photoUrl} target="_blank" rel="noreferrer">View treatment photo</a>}
+                          {videoUrl && <div><a href={videoUrl} target="_blank" rel="noreferrer">View treatment video</a></div>}
+                          {location?.valid && <div style={{ color: '#166534', marginTop: '4px' }}>
+                            GPS verified at the registered Gaushala{location.distanceMeters != null ? ` · ${location.distanceMeters} m away` : ''}
+                          </div>}
                         </li>
                       );
                     })}
                   </ol>
                 )}
-              </article>
-            );
-          })}
-        </section>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
     </main>
   );

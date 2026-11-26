@@ -1,0 +1,361 @@
+.dashboard {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.10), transparent 28rem),
+    #f4f7f5;
+  padding: 32px 20px 48px;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSegoe UI, sans-serif;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  border: 1px solid #dfe8e1;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 30px rgba(20, 83, 45, 0.08);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brandMark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #14532d;
+  color: #fff;
+  font-size: 24px;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.summaryCard {
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px;
+  border: 1px solid #e1e9e3;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
+}
+
+.summaryCard strong {
+  color: #14532d;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.caseToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: 9px 13px;
+  border: 1px solid #d7e2da;
+  border-radius: 999px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.activeFilter {
+  border-color: #166534;
+  background: #166534;
+  color: #fff;
+}
+
+.caseGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.caseCard {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid #dde7df;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.caseCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(20, 83, 45, 0.12);
+}
+
+.caseTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.completed { background: #dcfce7; color: #166534; }
+.active { background: #dbeafe; color: #1d4ed8; }
+.pending { background: #fef3c7; color: #92400e; }
+.reported { background: #f1f5f9; color: #475569; }
+
+.locationRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #475569;
+}
+
+.mapLink {
+  position: relative;
+  display: inline-flex;
+  color: #166534;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.mapTooltip {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  width: max-content;
+  max-width: 230px;
+  transform: translateX(-50%) translateY(4px);
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #14532d;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: 150ms ease;
+  box-shadow: 0 8px 20px rgba(20, 83, 45, 0.22);
+}
+
+.mapLink:hover .mapTooltip,
+.mapLink:focus .mapTooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.detailsButton,
+.actionButton {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 13px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.detailsButton {
+  background: #14532d;
+  color: #fff;
+}
+
+.actionButton {
+  background: #e7f5ec;
+  color: #166534;
+}
+
+.cardUpload {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid #dbe7df;
+  border-radius: 10px;
+  background: #fbfdfb;
+}
+
+.cardUpload label {
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.cardUpload input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #fff;
+  font-size: 0.82rem;
+}
+
+.cardUpload small {
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.cardActionButton {
+  justify-self: start;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #166534;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cardActionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.modalBackdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: min(760px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.32);
+}
+
+.modalHeader {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.detailItem {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.timeline {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timelineItem {
+  position: relative;
+  margin-left: 8px;
+  padding: 0 0 18px 22px;
+  border-left: 2px solid #bbf7d0;
+  color: #475569;
+}
+
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px #bbf7d0;
+}
+
+.closeButton {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f5f9;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  padding: 28px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  background: #fff;
+  color: #64748b;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .dashboard { padding: 16px 12px 32px; }
+  .header, .caseToolbar { align-items: flex-start; flex-direction: column; }
+  .summaryGrid, .caseGrid, .detailGrid { grid-template-columns: 1fr; }
+  .summaryCard { min-height: 92px; }
+  .modalBackdrop { align-items: end; padding: 0; }
+  .modal { max-height: 92vh; border-radius: 18px 18px 0 0; }
+}

@@ -6,7 +6,8 @@ import { API_BASE_URL } from '../../services/api';
 const OrgLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState(location.state?.email || '');
+  const emailFromQuery = new URLSearchParams(location.search).get('email');
+  const [email, setEmail] = useState(location.state?.email || emailFromQuery || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');

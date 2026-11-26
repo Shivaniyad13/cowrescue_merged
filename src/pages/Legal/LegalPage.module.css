@@ -197,6 +197,17 @@
   font-weight: bold;
 }
 
+.numberedList {
+  margin: 14px 0;
+  padding-left: 24px;
+  line-height: 1.75;
+}
+
+.numberedList li {
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+
 .contactBox {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: 12px;

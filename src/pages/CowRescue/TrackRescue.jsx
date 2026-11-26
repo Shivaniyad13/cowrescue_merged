@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import styles from "./TrackRescue.module.css";
-import SupportRescueModal from "./components/SupportRescueModal";
 import {
   trackCase,
   getMyCasesByPhone,
@@ -23,6 +22,8 @@ const STATUS_LABELS = {
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",
 };
+
+const SUPPORT_URL = "https://support.khushicentre.in/";
 
 const TrackRescue = () => {
   const { caseId: paramCaseId } = useParams();
@@ -50,8 +51,6 @@ const TrackRescue = () => {
   const [actionMessage, setActionMessage] = useState("");
   const [helpLineNumber, setHelpLineNumber] = useState("1962");
   const [showHelpLine, setShowHelpLine] = useState(false);
-  const [showSupportModal, setShowSupportModal] = useState(false);
-  const [supportCaseData, setSupportCaseData] = useState(null);
 
   const [emergencyNumber, setEmergencyNumber] = useState("1962");
   const [emergencyLabel, setEmergencyLabel] = useState("Govt. Animal Ambulance");
@@ -240,8 +239,7 @@ const TrackRescue = () => {
         {accepted && (
           <button
             onClick={() => {
-              setSupportCaseData(data);
-              setShowSupportModal(true);
+              window.open(SUPPORT_URL, "_blank", "noopener,noreferrer");
             }}
             style={{
               marginTop: "16px",
@@ -681,26 +679,6 @@ const TrackRescue = () => {
         </>
       )}
 
-      {/* Support Modal */}
-      {showSupportModal && supportCaseData && (
-        <SupportRescueModal
-          caseData={supportCaseData}
-          onClose={() => {
-            setShowSupportModal(false);
-            setSupportCaseData(null);
-          }}
-          onSuccess={() => {
-            // Refetch phone reports if in phone mode
-            if (searchMode === "phone" && phoneInput) {
-              getMyCasesByPhone(phoneInput.trim()).then((res) => {
-                setMyCases(res.data || []);
-              });
-            } else if (caseData) {
-              fetchCase(caseData.case_id);
-            }
-          }}
-        />
-      )}
     </div>
   );
 };

@@ -16,13 +16,6 @@ if (
 const cleanBaseUrl = rawApiUrl.replace(/\/+$/, "").replace(/\/api$/, "");
 export const API_BASE_URL = `${cleanBaseUrl}/api`;
 
-// ==================== HELPERS ====================
-export const getUploadUrl = (path) => {
-  if (!path) return "";
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  return `${cleanBaseUrl}${path}`;
-};
-
 // ==================== PUBLIC CONFIG ====================
 export const getPublicConfig = async () => {
   const response = await fetch(`${API_BASE_URL}/config/public`);
@@ -94,30 +87,6 @@ export const getAdminMe = async (token) => {
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.message || "Failed to fetch profile.");
-  return result;
-};
-
-// ==================== ADMIN: DONATIONS ====================
-export const getAdminDonations = async (token) => {
-  const response = await fetch(`${API_BASE_URL}/admin/donations`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to fetch donation records.");
-  return result;
-};
-
-export const updateAdminDonationStatus = async (token, id, statusData) => {
-  const response = await fetch(`${API_BASE_URL}/admin/donations/${id}/status`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(statusData),
-  });
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to update donation status.");
   return result;
 };
 
@@ -305,10 +274,11 @@ export const startNgoTreatment = async (token, caseId, formData) => {
   return result;
 };
 
-export const completeNgoTreatment = async (token, caseId) => {
+export const completeNgoTreatment = async (token, caseId, formData) => {
   const response = await fetch(`${API_BASE_URL}/ngo/cases/${encodeURIComponent(caseId)}/treatment-completed`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
+    body: formData,
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.message || "Failed to complete treatment.");
@@ -502,41 +472,6 @@ export const submitNgoBankDetails = async (token, data) => {
   return result;
 };
 
-// =====================================================
-// SETTLEMENTS
-// =====================================================
-
-export const getPendingSettlements = async (token) => {
-  const response = await fetch(`${API_BASE_URL}/admin/settlements/pending`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to fetch settlements.");
-  return result;
-};
-
-export const getNgoSettlementDetail = async (token, ngoId) => {
-  const response = await fetch(`${API_BASE_URL}/admin/settlements/ngo/${ngoId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to fetch NGO detail.");
-  return result;
-};
-
-export const markNgoAsSettled = async (token, ngoId, utrReference, note = "") => {
-  const response = await fetch(`${API_BASE_URL}/admin/settlements/ngo/${ngoId}/mark-settled`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ utr_reference: utrReference, note }),
-  });
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to mark as settled.");
-  return result;
-};
 
 // =====================================================
 // NEWS
@@ -668,7 +603,45 @@ export const toggleGalleryPublish = async (token, id) => {
   return result;
 };
 
+export const getPublicPanchgavyaSellers = async () => {
+  const response = await fetch(`${API_BASE_URL}/panchgavya-sellers`);
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch verified sellers.");
+  return result;
+};
 
+export const submitPanchgavyaSeller = async (formData) => {
+  const response = await fetch(`${API_BASE_URL}/panchgavya-sellers/submit`, {
+    method: "POST",
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to submit seller details.");
+  return result;
+};
+
+export const getAdminPanchgavyaSellers = async (token) => {
+  const response = await fetch(`${API_BASE_URL}/panchgavya-sellers/admin/list`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to fetch seller submissions.");
+  return result;
+};
+
+export const reviewPanchgavyaSeller = async (token, id, status, rejectionReason = "") => {
+  const response = await fetch(`${API_BASE_URL}/panchgavya-sellers/admin/${id}/review`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status, rejectionReason }),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to review seller submission.");
+  return result;
+};
 
 export const getMyCasesByPhone = async (phone) => {
   const response = await fetch(`${API_BASE_URL}/cases/my-reports/${phone}`);

@@ -13,202 +13,163 @@ const PrivacyPolicy = () => {
           <span className={styles.badge}>Official Legal Policy</span>
           <h1 className={styles.heroTitle}>Privacy Policy</h1>
           <p className={styles.lastUpdated}>
-            <span>📅</span> Last Updated: August 31, 2026
+            <span>📅</span> Last Updated: 24/11/2026
           </p>
         </div>
       </header>
 
       <main className={styles.contentContainer}>
         <div className={styles.introBox}>
-          Panchgavya Se Panchparivartan respects the privacy of its users. This Privacy Policy explains how information may be collected, used, stored and protected when users access the website, register for services, submit information, support campaigns, make contributions or interact with the platform.
+          Khushi Centre for Rehabilitation and Research respects the privacy and confidentiality of all donors.
         </div>
 
         <div className={styles.sectionsWrapper}>
-          {/* Section 1 */}
           <article className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNumber}>1</span>
-              <h2 className={styles.sectionTitle}>Introduction</h2>
+              <h2 className={styles.sectionTitle}>Privacy Notice for Donors</h2>
             </div>
             <div className={styles.sectionBody}>
               <p>
-                Panchgavya Se Panchparivartan ("Platform") is dedicated to promoting cow welfare, rural development, and community support initiatives. We are committed to safeguarding the personal data and privacy of our visitors, donors, volunteers, and participating organizations.
+                When you make a donation through our website, we collect and process relevant personal information to facilitate payment, issue donation receipts, maintain financial records and fulfil statutory obligations.
+              </p>
+              <p>Your information may include:</p>
+              <ul className={styles.list}>
+                <li>Full name</li>
+                <li>Email address</li>
+                <li>Mobile number</li>
+                <li>Donation amount</li>
+                <li>Transaction reference number</li>
+                <li>Payment status and payment method</li>
+                <li>PAN and address, where required for statutory compliance</li>
+              </ul>
+              <p>
+                Online payments are facilitated through our authorised payment gateway and participating banking institutions.
+              </p>
+              <div className={styles.highlightBox}>
+                <h4>🔒 Payment Credentials</h4>
+                <p>
+                  The Centre does not ask donors to disclose their UPI PIN, OTP, internet banking password or any other confidential banking credentials.
+                </p>
+              </div>
+              <p>
+                Your personal information will be used only for authorised organisational, financial, administrative and legal purposes, subject to applicable law.
+              </p>
+              <p>
+                For complete details, please read our Privacy Policy at <a href="https://www.khushicentre.in" target="_blank" rel="noreferrer">www.khushicentre.in</a>.
               </p>
             </div>
           </article>
 
-          {/* Section 2 */}
           <article className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNumber}>2</span>
-              <h2 className={styles.sectionTitle}>Information We May Collect</h2>
+              <h2 className={styles.sectionTitle}>Donor Information Collection Notice</h2>
             </div>
             <div className={styles.sectionBody}>
-              <p>Information may include:</p>
-              <ul className={styles.list}>
-                <li>Name</li>
-                <li>Email address</li>
-                <li>Mobile number</li>
-                <li>Address where voluntarily provided</li>
-                <li>Account or registration information</li>
-                <li>Gaushala payout bank details, when provided for settlements</li>
-                <li>Campaign or NGO interaction information</li>
-                <li>Donation or contribution details</li>
-                <li>Transaction references or payment status</li>
-                <li>Technical information such as device, browser and IP-related information where collected through website services</li>
-              </ul>
-              <div className={styles.highlightBox}>
-                <h4>🔒 Gaushala Bank Details</h4>
-                <p>
-                  Gaushala bank details are collected only to process eligible payouts, encrypted at rest, and restricted to the authenticated Gaushala owner and authorized administrators. They are not displayed on public profiles, listings, or search results.
-                </p>
-              </div>
-              <div className={styles.highlightBox}>
-                <h4>🔒 Payment Credential Security</h4>
-                <p>
-                  Sensitive payment credentials such as card numbers or UPI credentials should not be stored by the platform unless specifically handled by the authorized payment provider according to applicable requirements.
-                </p>
-              </div>
+              <p><strong>Information collected:</strong> Name, contact details, donation amount, transaction reference and legally required donor information.</p>
+              <p>
+                <strong>Purpose:</strong> Payment processing, donation acknowledgement, receipts, financial accounting, statutory reporting and donor communication.
+              </p>
+              <p>
+                <strong>Recipients:</strong> Authorised payment gateway providers, banks, auditors, professional advisers and government authorities where legally required.
+              </p>
+              <p>
+                <strong>Retention:</strong> Information will be retained for the necessary period under applicable legal and accounting requirements.
+              </p>
+              <p>
+                <strong>Rights:</strong> Donors may exercise applicable rights concerning access, correction, erasure, withdrawal of consent and grievance redressal.
+              </p>
+              <p><strong>Contact:</strong> <a href="mailto:admin@khushicentre.in">admin@khushicentre.in</a></p>
             </div>
           </article>
 
-          {/* Section 3 */}
           <article className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNumber}>3</span>
-              <h2 className={styles.sectionTitle}>How Information May Be Used</h2>
+              <h2 className={styles.sectionTitle}>Donor Consent and Declaration</h2>
             </div>
             <div className={styles.sectionBody}>
-              <p>Information may be used to:</p>
-              <ul className={styles.list}>
-                <li>Provide platform services</li>
-                <li>Process registrations and requests</li>
-                <li>Facilitate campaign participation</li>
-                <li>Facilitate contributions and payments</li>
-                <li>Communicate transaction or service information</li>
-                <li>Improve website functionality</li>
-                <li>Maintain security and prevent misuse</li>
-                <li>Comply with applicable legal obligations</li>
-              </ul>
+              <p>By proceeding with the donation, I acknowledge and agree that:</p>
+              <ol className={styles.numberedList}>
+                <li>I am making a voluntary charitable contribution.</li>
+                <li>The information supplied by me is accurate.</li>
+                <li>I authorise the processing of information necessary to complete and record my donation.</li>
+                <li>I understand that my transaction information may be processed by the authorised payment gateway and participating banks.</li>
+                <li>I have read the Terms and Conditions, Privacy Policy and Refund and Cancellation Policy.</li>
+                <li>I understand that tax benefits are subject to applicable statutory approvals and eligibility.</li>
+                <li>I understand that my information may be retained where required by law.</li>
+              </ol>
             </div>
           </article>
 
-          {/* Section 4 */}
           <article className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNumber}>4</span>
-              <h2 className={styles.sectionTitle}>Payment Information</h2>
+              <h2 className={styles.sectionTitle}>Optional Consent for Communication</h2>
             </div>
             <div className={styles.sectionBody}>
               <p>
-                Payments may be processed through authorized third-party payment gateways.
+                I would like to receive information about Khushi Centre's charitable programmes, rehabilitation initiatives, healthcare activities, research, community development and future campaigns.
               </p>
               <p>
-                The platform does not intentionally store sensitive payment credentials such as complete card details or UPI PINs.
-              </p>
-              <p>
-                Users should review the relevant payment gateway's policies where applicable.
+                This consent is optional and may be withdrawn at any time.
               </p>
             </div>
           </article>
 
-          {/* Section 5 */}
           <article className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNumber}>5</span>
-              <h2 className={styles.sectionTitle}>Information Sharing</h2>
+              <h2 className={styles.sectionTitle}>Payment Security Declaration</h2>
             </div>
             <div className={styles.sectionBody}>
-              <p>Information may be shared where necessary with:</p>
-              <ul className={styles.list}>
-                <li>Authorized service providers</li>
-                <li>Payment service providers</li>
-                <li>Registered organizations or beneficiaries where necessary for service fulfilment</li>
-                <li>Government or regulatory authorities when legally required</li>
-              </ul>
               <p>
-                Personal information should not be sold for unrelated commercial purposes.
+                I understand that online donations are processed through authorised payment service providers using their applicable security mechanisms.
+              </p>
+              <p>
+                I will not disclose my UPI PIN, OTP, passwords or banking credentials to any person claiming to represent Khushi Centre.
               </p>
             </div>
           </article>
 
-          {/* Section 6 */}
           <article className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionNumber}>6</span>
-              <h2 className={styles.sectionTitle}>Data Security</h2>
+              <h2 className={styles.sectionTitle}>Grievance Redressal</h2>
             </div>
             <div className={styles.sectionBody}>
+              <p>For privacy, data protection and donation-related enquiries:</p>
+              <p><strong>Khushi Centre for Rehabilitation and Research</strong></p>
               <p>
-                Reasonable administrative and technical measures are used to protect information. However, no internet transmission or electronic storage system can be guaranteed to be completely secure.
+                Website: <a href="https://www.khushicentre.in" target="_blank" rel="noreferrer">www.khushicentre.in</a>
+              </p>
+              <p>Email: <a href="mailto:admin@khushicentre.in">admin@khushicentre.in</a></p>
+              <p><strong>Grievance Officer:</strong> Mandvi Kumari (Secretary General)</p>
+              <p>
+                <strong>Registered Office:</strong> T2 &amp; S2/886, Sector 5, Kalinga Road, Vaishali, Ghaziabad, Uttar Pradesh - 201010
               </p>
             </div>
           </article>
 
-          {/* Section 7 */}
           <article className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
-              <span className={styles.sectionNumber}>7</span>
-              <h2 className={styles.sectionTitle}>User Choices</h2>
+              <span className={styles.sectionNumber}>!</span>
+              <h2 className={styles.sectionTitle}>Disclaimer</h2>
             </div>
             <div className={styles.sectionBody}>
               <p>
-                Users may contact the platform regarding correction or update of information, subject to applicable legal and operational requirements.
+                This policy is applicable to all programmes, projects, campaigns, initiatives and activities organised, managed or supported by <strong>Khushi Centre for Rehabilitation and Research</strong>.
               </p>
-            </div>
-          </article>
-
-          {/* Section 8 */}
-          <article className={styles.sectionCard}>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionNumber}>8</span>
-              <h2 className={styles.sectionTitle}>Third Party Links</h2>
-            </div>
-            <div className={styles.sectionBody}>
               <p>
-                The website may contain links to third-party websites. The platform is not responsible for the privacy practices or content of external websites.
+                All donors, participants, beneficiaries, partners and other stakeholders are expected to comply with the applicable terms, conditions and guidelines outlined in this policy.
               </p>
+              <div className={styles.highlightBox}>
+                <h4>KHUSHI CENTRE FOR REHABILITATION AND RESEARCH</h4>
+                <p><em>Rehabilitation • Research • Healthcare • Social Inclusion</em></p>
+              </div>
             </div>
           </article>
-
-          {/* Section 9 */}
-          <article className={styles.sectionCard}>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionNumber}>9</span>
-              <h2 className={styles.sectionTitle}>Policy Updates</h2>
-            </div>
-            <div className={styles.sectionBody}>
-              <p>
-                This Privacy Policy may be updated from time to time. Updated versions will be posted on this page.
-              </p>
-            </div>
-          </article>
-
-          {/* Section 10 / Contact */}
-          <div className={styles.contactBox}>
-            <h3>10. Contact Us</h3>
-            <p>
-              For privacy-related questions or data inquiries, users may contact the organization using the official details below:
-            </p>
-            <div className={styles.officialAddressBlock}>
-              <strong>Official Contact Address:</strong><br />
-              KHUSHI CENTRE FOR REHABILITATION AND RESEARCH<br />
-              65/4/2, Sant Kirandass Ashram,<br />
-              Jaunti, Kanjhawala–Qutubgarh Road,<br />
-              New Delhi – 110081, India
-            </div>
-            <div className={styles.contactInfoRow}>
-              <a href="mailto:info@khushicentre.in" className={styles.contactLink}>
-                📧 info@khushicentre.in
-              </a>
-              <a href="mailto:khushicentre@gmail.com" className={styles.contactLink}>
-                📧 khushicentre@gmail.com
-              </a>
-              <a href="tel:+919350206124" className={styles.contactLink}>
-                📞 +91 9350206124
-              </a>
-            </div>
-          </div>
         </div>
       </main>
     </div>

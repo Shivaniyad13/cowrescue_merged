@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "./TrackCowWidget.module.css";
-import SupportRescueModal from "../../pages/CowRescue/components/SupportRescueModal";
 import {
   trackCase,
   getMyCasesByPhone,
@@ -23,6 +22,8 @@ const STATUS_LABELS = {
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",
 };
+
+const SUPPORT_URL = "https://support.khushicentre.in/";
 
 // Profile / user icon (inline SVG)
 const ProfileIcon = () => (
@@ -65,8 +66,6 @@ const TrackCowWidget = () => {
   const [helpLineNumber, setHelpLineNumber] = useState("1962");
   const [showHelpLine, setShowHelpLine] = useState(false);
   const [showFullDetails, setShowFullDetails] = useState(false);
-  const [showSupportModal, setShowSupportModal] = useState(false);
-  const [supportCaseData, setSupportCaseData] = useState(null);
   const [emergencyNumber, setEmergencyNumber] = useState("1962");
   const [emergencyLabel, setEmergencyLabel] = useState("Govt. Animal Ambulance");
 
@@ -327,8 +326,7 @@ const TrackCowWidget = () => {
           <button
             className={styles.supportBtn}
             onClick={() => {
-              setSupportCaseData(data);
-              setShowSupportModal(true);
+              window.open(SUPPORT_URL, "_blank", "noopener,noreferrer");
             }}
           >
             💝 Support this Rescue
@@ -737,25 +735,6 @@ const TrackCowWidget = () => {
         </div>
       )}
 
-      {/* Support Modal */}
-      {showSupportModal && supportCaseData && (
-        <SupportRescueModal
-          caseData={supportCaseData}
-          onClose={() => {
-            setShowSupportModal(false);
-            setSupportCaseData(null);
-          }}
-          onSuccess={() => {
-            if (searchMode === "phone" && phoneInput) {
-              getMyCasesByPhone(phoneInput.trim()).then((res) => {
-                setMyCases(res.data || []);
-              });
-            } else if (caseData) {
-              refetchCase();
-            }
-          }}
-        />
-      )}
     </>
   );
 };
