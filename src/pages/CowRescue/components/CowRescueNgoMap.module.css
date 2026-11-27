@@ -104,7 +104,7 @@
 }
 
 .mapFrame {
-  height: 520px;
+  height: clamp(300px, calc(100vh - 420px), 520px);
   overflow: hidden;
   border: 2px solid #86efac;
   border-radius: 16px;
@@ -131,8 +131,9 @@
 }
 
 .map :global(.leaflet-control-attribution) {
-  background: rgba(240, 253, 244, 0.92);
+  background: transparent;
   color: #14532d;
+  font-size: 0.65rem;
 }
 
 .map :global(.leaflet-popup-content-wrapper),
@@ -227,7 +228,7 @@
   }
 
   .mapFrame {
-    height: 420px;
+    height: clamp(300px, calc(100vh - 420px), 420px);
   }
 }
 
@@ -249,6 +250,6 @@
   }
 
   .mapFrame {
-    height: 360px;
+    height: clamp(280px, calc(100vh - 420px), 360px);
   }
 }

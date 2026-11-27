@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   getAdminCases,
   adminUpdateCaseStatus,
@@ -7,7 +7,9 @@ import {
   getAdminNGOs,
   getNearbyNGOs,
   getAdminStats,
+  getAdminFullCase,
 } from "../../services/api";
+import CowRescueCasesMap from "./CowRescueCasesMap";
 
 const STATUS_OPTIONS = [
   "REPORTED",
@@ -33,6 +35,10 @@ const CowRescueAdmin = ({ token }) => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showGovModal, setShowGovModal] = useState(false);
+  const [showCaseMap, setShowCaseMap] = useState(false);
+  const [historyCase, setHistoryCase] = useState(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState("");
 
   const [newStatus, setNewStatus] = useState("");
   const [statusNote, setStatusNote] = useState("");
@@ -46,33 +52,60 @@ const CowRescueAdmin = ({ token }) => {
   const [actionLoading, setActionLoading] = useState(false);
   const [toast, setToast] = useState(null);
 
-  useEffect(() => {
-    if (token) fetchAll();
-  }, [token, statusFilter]);
-
   const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
   };
 
-  const fetchAll = async () => {
+  const loadAdminData = useCallback(async () => {
+    const [casesRes, ngosRes, statsRes] = await Promise.all([
+      getAdminCases(token, statusFilter),
+      getAdminNGOs(token).catch(() => ({ data: [] })),
+      getAdminStats(token).catch(() => ({ data: null })),
+    ]);
+    return {
+      cases: casesRes.data || [],
+      ngos: ngosRes.data || [],
+      stats: statsRes.data || null,
+    };
+  }, [token, statusFilter]);
+
+  const fetchAll = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const [casesRes, ngosRes, statsRes] = await Promise.all([
-        getAdminCases(token, statusFilter),
-        getAdminNGOs(token).catch(() => ({ data: [] })),
-        getAdminStats(token).catch(() => ({ data: null })),
-      ]);
-      setCases(casesRes.data || []);
-      setNgos(ngosRes.data || []);
-      setStats(statsRes.data || null);
+      const data = await loadAdminData();
+      setCases(data.cases);
+      setNgos(data.ngos);
+      setStats(data.stats);
     } catch (err) {
       setError(err.message || "Failed to load Cow Rescue data.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadAdminData]);
+
+  useEffect(() => {
+    if (!token) return undefined;
+    let active = true;
+    loadAdminData()
+      .then((data) => {
+        if (!active) return;
+        setCases(data.cases);
+        setNgos(data.ngos);
+        setStats(data.stats);
+        setError("");
+      })
+      .catch((err) => {
+        if (active) setError(err.message || "Failed to load Cow Rescue data.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [token, loadAdminData]);
 
   const openStatusModal = (c) => {
     setSelectedCase(c);
@@ -93,7 +126,7 @@ const CowRescueAdmin = ({ token }) => {
     try {
       const res = await getNearbyNGOs(c.case_id);
       setAvailableNgos(res.data || []);
-    } catch (err) {
+    } catch {
       setAvailableNgos(ngos);
     }
   };
@@ -103,6 +136,20 @@ const CowRescueAdmin = ({ token }) => {
     setGovStatus(c.government_route_status || "NOT_CHECKED");
     setGovNote("");
     setShowGovModal(true);
+  };
+
+  const openCaseHistory = async (c) => {
+    setHistoryCase(c);
+    setHistoryError("");
+    setHistoryLoading(true);
+    try {
+      const result = await getAdminFullCase(token, c.case_id);
+      setHistoryCase(result.data);
+    } catch (err) {
+      setHistoryError(err.message || "Failed to load case history.");
+    } finally {
+      setHistoryLoading(false);
+    }
   };
 
   const handleUpdateStatus = async () => {
@@ -192,7 +239,9 @@ const CowRescueAdmin = ({ token }) => {
 
       <div style={{ marginBottom: "20px" }}>
         <h2 style={{ margin: 0 }}>🐄 Cow Rescue Management</h2>
-        <p style={{ color: "#64748b", margin: "6px 0 0" }}>Manage rescue cases, assign NGOs, and track progress</p>
+        <p style={{ color: "#64748b", margin: "6px 0 0" }}>
+          Review reported cows, contact nearby gaushalas, track accept/reject responses, and follow rescue progress.
+        </p>
       </div>
 
       {stats && (
@@ -226,7 +275,11 @@ const CowRescueAdmin = ({ token }) => {
         />
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => {
+            setLoading(true);
+            setError("");
+            setStatusFilter(e.target.value);
+          }}
           style={{ padding: "10px 14px", border: "1px solid #cbd5e1", borderRadius: "8px" }}
         >
           <option value="">All Statuses</option>
@@ -240,7 +293,18 @@ const CowRescueAdmin = ({ token }) => {
         >
           🔄 Refresh
         </button>
+        <button
+          onClick={() => setShowCaseMap((visible) => !visible)}
+          style={{ padding: "10px 18px", background: "#0f766e", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer" }}
+          aria-expanded={showCaseMap}
+        >
+          {showCaseMap ? "Hide Case Map" : "Open Case Map"}
+        </button>
       </div>
+
+      {showCaseMap && (
+        <CowRescueCasesMap cases={filteredCases} onOpenHistory={openCaseHistory} />
+      )}
 
       {error && (
         <div style={{ padding: "12px", background: "#fee", color: "#991b1b", borderRadius: "8px", marginBottom: "16px" }}>
@@ -298,6 +362,9 @@ const CowRescueAdmin = ({ token }) => {
                   </td>
                   <td style={{ padding: "12px" }}>
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      <button onClick={() => openCaseHistory(c)} style={{ padding: "5px 10px", fontSize: "0.75rem", background: "#0f766e", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                        History
+                      </button>
                       <button onClick={() => openStatusModal(c)} style={{ padding: "5px 10px", fontSize: "0.75rem", background: "#2563eb", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
                         Status
                       </button>
@@ -399,6 +466,108 @@ const CowRescueAdmin = ({ token }) => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {historyCase && (
+        <div
+          onClick={() => {
+            if (!historyLoading) setHistoryCase(null);
+          }}
+          style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000, padding: "16px" }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="case-history-title"
+            onClick={(event) => event.stopPropagation()}
+            style={{ background: "#fff", padding: "24px", borderRadius: "14px", width: "min(900px, 100%)", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(15,23,42,0.25)" }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px" }}>
+              <div>
+                <h3 id="case-history-title" style={{ margin: 0 }}>
+                  Case workflow — {historyCase.case_id}
+                </h3>
+                <p style={{ margin: "6px 0 0", color: "#64748b" }}>
+                  Current status: <strong>{historyCase.status || "REPORTED"}</strong>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHistoryCase(null)}
+                disabled={historyLoading}
+                aria-label="Close case history"
+                style={{ border: "1px solid #cbd5e1", borderRadius: "8px", background: "#fff", padding: "6px 10px", cursor: "pointer" }}
+              >
+                Close
+              </button>
+            </div>
+
+            {historyLoading ? (
+              <p style={{ padding: "24px 0", color: "#64748b" }}>Loading full case history...</p>
+            ) : historyError ? (
+              <div role="alert" style={{ marginTop: "18px", padding: "12px", borderRadius: "8px", background: "#fef2f2", color: "#991b1b" }}>
+                {historyError}
+              </div>
+            ) : (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: "10px", margin: "18px 0", padding: "14px", borderRadius: "10px", background: "#f8fafc" }}>
+                  <div><strong>Reporter</strong><br />{historyCase.reporter_name || "—"}</div>
+                  <div><strong>Location</strong><br />{[historyCase.city, historyCase.district, historyCase.state].filter(Boolean).join(", ") || "—"}</div>
+                  <div><strong>Severity</strong><br />{historyCase.severity || "MEDIUM"}</div>
+                  <div><strong>Assigned gaushala</strong><br />{historyCase.ngos?.name || "Not assigned"}</div>
+                  <div><strong>Gaushala response</strong><br />{historyCase.ngo_response || "No response recorded"}</div>
+                  <div><strong>Government route</strong><br />{historyCase.government_route_status || "NOT_CHECKED"}</div>
+                </div>
+
+                <h4 style={{ margin: "18px 0 8px" }}>Gaushala alerts and decisions</h4>
+                {historyCase.case_alerts?.length ? (
+                  <div style={{ display: "grid", gap: "8px" }}>
+                    {historyCase.case_alerts.map((alert) => {
+                      const gaushala = alert.ngos_case_alerts_ngo_idTongos;
+                      const decision = alert.response || alert.status || "PENDING";
+                      const timestamp = alert.responded_at || alert.created_at;
+                      return (
+                        <article key={alert.id} style={{ padding: "12px", border: "1px solid #e2e8f0", borderRadius: "9px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+                            <strong>{gaushala?.name || "Gaushala not recorded"}</strong>
+                            <span style={{ fontWeight: 700, color: decision === "ACCEPTED" ? "#15803d" : decision === "REJECTED" ? "#b91c1c" : "#475569" }}>
+                              {decision}
+                            </span>
+                          </div>
+                          <div style={{ marginTop: "4px", color: "#64748b", fontSize: "0.85rem" }}>
+                            {[gaushala?.city, gaushala?.state].filter(Boolean).join(", ") || "Location not recorded"}
+                            {timestamp && ` · ${new Date(timestamp).toLocaleString("en-IN")}`}
+                          </div>
+                          {alert.note && <p style={{ margin: "6px 0 0" }}>Note: {alert.note}</p>}
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p style={{ color: "#64748b" }}>No gaushala alerts have been recorded for this case.</p>
+                )}
+
+                <h4 style={{ margin: "20px 0 8px" }}>Full case timeline</h4>
+                {historyCase.case_timeline?.length ? (
+                  <ol style={{ margin: 0, paddingLeft: "22px", display: "grid", gap: "10px" }}>
+                    {historyCase.case_timeline.map((event) => (
+                      <li key={event.id} style={{ paddingLeft: "4px" }}>
+                        <strong>{(event.event || "UPDATE").replaceAll("_", " ")}</strong>
+                        <div style={{ color: "#475569" }}>{event.description || "No details recorded."}</div>
+                        <div style={{ color: "#94a3b8", fontSize: "0.82rem" }}>
+                          {event.performed_by || "System"}
+                          {event.created_at && ` · ${new Date(event.created_at).toLocaleString("en-IN")}`}
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p style={{ color: "#64748b" }}>No timeline events have been recorded.</p>
+                )}
+              </>
+            )}
+          </section>
         </div>
       )}
     </div>

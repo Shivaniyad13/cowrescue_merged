@@ -34,7 +34,14 @@ const formatStatus = (status) => status.charAt(0) + status.slice(1).toLowerCase(
 const FitIndiaBounds = () => {
   const map = useMap();
   useEffect(() => {
+    map.attributionControl.setPrefix(false);
     map.fitBounds(INDIA_BOUNDS, { padding: [8, 8] });
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize({ pan: false });
+    });
+    resizeObserver.observe(map.getContainer());
+
+    return () => resizeObserver.disconnect();
   }, [map]);
   return null;
 };
